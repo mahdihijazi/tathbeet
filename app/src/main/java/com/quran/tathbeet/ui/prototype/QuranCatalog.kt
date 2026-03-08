@@ -77,6 +77,22 @@ fun summarizeSelectionTitles(
     }
 }
 
+fun fullSelectionTitles(
+    context: Context,
+    items: List<QuranSelectionItem>,
+    emptyResId: Int,
+): String {
+    if (items.isEmpty()) {
+        return context.getString(emptyResId)
+    }
+
+    return items
+        .sortedWith(selectionComparator)
+        .joinToString(separator = context.getString(R.string.selection_summary_separator)) { item ->
+            item.title
+        }
+}
+
 private fun parseSurahItems(
     context: Context,
     rubs: List<RubItem>,

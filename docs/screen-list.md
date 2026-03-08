@@ -24,7 +24,9 @@
 ## 4. Memorized Pool Selector
 
 - standalone screen dedicated to pool selection
-- contains separate tabs for `surah`, `juz`, `hizb`, and `rub al-hizb`
+- contains separate swipeable tabs for `surah`, `juz`, `hizb`, and `rub al-hizb`
+- keeps the title, current selection card, and tabs fixed at the top
+- only the list below the tabs scrolls vertically
 - lets the user select from any tab, add to the pool, and continue to the daily-ward step
 
 ## 5. Schedule Intro

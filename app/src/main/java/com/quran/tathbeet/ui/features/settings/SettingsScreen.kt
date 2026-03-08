@@ -79,7 +79,9 @@ fun SettingsScreen(
         }
 
         item {
-            Card {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Column(
                     modifier = Modifier.padding(18.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -98,7 +100,9 @@ fun SettingsScreen(
         }
 
         item {
-            Card {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Column(
                     modifier = Modifier.padding(18.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -136,7 +140,9 @@ private fun SettingCard(
     enabled: Boolean,
     onToggle: () -> Unit,
 ) {
-    Card {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

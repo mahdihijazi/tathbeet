@@ -104,7 +104,9 @@ fun ProgressScreen(
         }
 
         items(insights) { insight ->
-            Card {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Text(
                     text = insight,
                     modifier = Modifier.padding(18.dp),
@@ -117,7 +119,9 @@ fun ProgressScreen(
 
 @Composable
 private fun WeeklyBars(values: List<Float>) {
-    Card {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

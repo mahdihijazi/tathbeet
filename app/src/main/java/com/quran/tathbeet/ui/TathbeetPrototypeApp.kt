@@ -160,7 +160,7 @@ fun TathbeetPrototypeApp() {
 
                 AppDestination.PoolSelector -> PoolSelectorScreen(
                     selectedCategory = uiState.activeSelectionCategory,
-                    visibleOptions = quranCatalog.itemsFor(uiState.activeSelectionCategory),
+                    optionsForCategory = quranCatalog::itemsFor,
                     selectedPool = activePoolSelections,
                     onCategorySelected = { category ->
                         mutate { it.copy(activeSelectionCategory = category) }

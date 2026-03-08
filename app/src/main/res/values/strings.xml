@@ -126,12 +126,12 @@
     <string name="schedule_pace_title">الوتيرة اليومية</string>
     <string name="schedule_pace_subtitle">كم تريد أن تراجع كل يوم؟</string>
     <string name="schedule_preview_title">معاينة الخطة</string>
-    <string name="schedule_preview_pool_size">عدد عناصر المراجعة: %1$d</string>
+    <string name="schedule_preview_pool_size">عدد وحدات المراجعة: %1$d</string>
     <string name="schedule_preview_cycle_length">مدة الدورة التقريبية: %1$d أيام</string>
     <string name="schedule_save">حفظ الخطة وفتح ورد اليوم</string>
 
     <string name="pool_selector_title">اختيار المحفوظ</string>
-    <string name="pool_selector_subtitle">أضف من السور أو الأجزاء أو الأحزاب أو أرباع الحزب</string>
+    <string name="pool_selector_subtitle">اختر ما تريد إضافته إلى وردك اليومي</string>
     <string name="pool_selector_section_subtitle">اختر ما تريد إضافته إلى حوض المراجعة</string>
     <string name="pool_selector_current_selection">المحدد حالياً</string>
     <string name="pool_selector_empty">لم يتم تحديد شيء بعد</string>

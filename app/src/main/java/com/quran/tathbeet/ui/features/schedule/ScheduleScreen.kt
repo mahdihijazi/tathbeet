@@ -52,7 +52,9 @@ fun ScheduleScreen(
         }
 
         item {
-            Card {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Column(
                     modifier = Modifier.padding(18.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -110,7 +112,9 @@ private fun RotationPreviewCard(
     segmentCount: Int,
     cycleLength: Int,
 ) {
-    Card {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         Column(
             modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),

@@ -139,7 +139,9 @@ private fun ReviewFooterCard(
     onResetDay: () -> Unit,
     onOpenSchedule: () -> Unit,
 ) {
-    Card {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         Column(
             modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),

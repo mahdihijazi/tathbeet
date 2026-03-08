@@ -33,6 +33,8 @@ flowchart TD
 - Account creation should not block the first-run flow; it can be offered later from the toolbar.
 - The setup wizard should have three screens: intro once, محفوظ selection, then daily ward.
 - Memorized-pool selection should happen in its own dedicated screen, not inside the daily-ward screen.
+- The محفوظ selection screen should keep its header area fixed and scroll only the item list below.
+- Category switching in the محفوظ selection screen should support both tapping tabs and horizontal swiping.
 - The daily-ward screen should stay lightweight and answer only: how large is the pool, and how long is one full rotation.
 - The daily-ward screen should stay visually focused and avoid extra blocks that do not help the user finish setup.
 - Guests can use the app fully for local profile management and offline revision.

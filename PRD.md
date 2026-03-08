@@ -324,11 +324,13 @@ The data model should support shared ownership and conflict-safe synchronization
 - the wizard should show a one-time intro screen on first app open
 - user can choose memorized content using surah, juz, hizb, or rub al-hizb
 - memorized-content selection should use a dedicated selection screen rather than a compact inline control
+- the memorized-content screen should keep the top summary and navigation area fixed while only the item list scrolls
+- category switching in the memorized-content screen should use swipeable tabs rather than button-like chips
 - after the first intro has been seen, reopening schedule setup should start from the memorized-content selection step
 - user can choose a daily revision target in juz-per-day
 - user can review a lightweight summary before saving, focused on pool size and estimated rotation length
 - saving the wizard should take the user directly to today’s review screen
-- the daily-dose screen should stay visually focused and avoid noisy helper blocks that do not help the user complete setup
+- the daily-ward screen should stay visually focused and avoid noisy helper blocks that do not help the user complete setup
 
 ### 13.3 Daily Review
 

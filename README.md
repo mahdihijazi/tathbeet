@@ -136,6 +136,7 @@ The current prototype is:
 - uses Arabic-only user-facing copy
 - renders in RTL for Arabic layout review even on non-Arabic devices
 - moves memorized-pool selection into a standalone screen
+- uses swipeable tabs in the memorized-pool selector with a fixed top summary area
 - loads the selector data from the Quran assets under `app/src/main/assets/quran`
 - shows real lists for all four tabs: surahs, juzs, hizbs, and rub al-hizb
 - generates fake review tasks from those real selections so the prototype feels closer to the final product
