@@ -33,6 +33,8 @@ Follow Kotlin and Android Studio defaults: 4-space indentation, organized import
 
 Prefer small composables, clear state names, and RTL-aware UI decisions because the product is Arabic-first. Keep prototype screens and future feature UI grouped by domain instead of growing `MainActivity.kt`.
 
+Code files must never go beyond 400 lines. This is a hard limit. If a file crosses that limit, refactor it immediately into smaller, modular pieces instead of adding more code to the oversized file.
+
 ## Localization
 Do not hardcode user-facing strings in Kotlin code, even for prototypes. Put all user-facing app strings in Android XML resource files such as `strings.xml` and reference them from code.
 
