@@ -14,17 +14,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
 fun ScreenLayout(
@@ -33,8 +30,11 @@ fun ScreenLayout(
     content: LazyListScope.() -> Unit,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(
+            horizontal = TathbeetTokens.spacing.x2Half,
+            vertical = TathbeetTokens.spacing.x2Half,
+        ),
+        verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x2),
     ) {
         if (subtitle.isNotBlank()) {
             item {
@@ -56,18 +56,15 @@ fun HeroCard(
     body: String,
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
-    Card(
-        shape = RoundedCornerShape(30.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
+    AppCard(
+        tone = AppCardTone.Highlight,
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(TathbeetTokens.spacing.x3),
+            verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
             content = {
                 Text(
-                    text = eyebrow.uppercase(),
+                    text = eyebrow,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -91,7 +88,7 @@ fun SectionHeader(
     title: String,
     subtitle: String? = null,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half)) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
@@ -113,53 +110,43 @@ fun MetricCard(
     value: String,
     supporting: String,
 ) {
-    Card(shape = RoundedCornerShape(24.dp)) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = supporting,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+    CardSection {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = supporting,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
 @Composable
 fun BulletListCard(lines: List<String>) {
-    Card(shape = RoundedCornerShape(24.dp)) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            lines.forEach { line ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.Top,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .size(6.dp)
-                            .background(MaterialTheme.colorScheme.primary, CircleShape),
-                    )
-                    Text(
-                        text = line,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
+    CardSection {
+        lines.forEach { line ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
+                verticalAlignment = Alignment.Top,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = TathbeetTokens.spacing.x1)
+                        .size(TathbeetTokens.spacing.x1 - TathbeetTokens.spacing.half)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape),
+                )
+                Text(
+                    text = line,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
             }
         }
     }
@@ -168,8 +155,8 @@ fun BulletListCard(lines: List<String>) {
 @Composable
 fun LabelCloud(items: List<String>) {
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+        verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
     ) {
         items.forEach { item ->
             AssistChip(

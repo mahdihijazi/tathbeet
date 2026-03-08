@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -17,8 +14,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
+import com.quran.tathbeet.ui.components.AppCard
+import com.quran.tathbeet.ui.components.AppKeyValueRow
+import com.quran.tathbeet.ui.components.AppPrimaryButton
+import com.quran.tathbeet.ui.components.AppSecondaryButton
+import com.quran.tathbeet.ui.components.AppSelectionChip
 import com.quran.tathbeet.ui.components.HeroCard
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
@@ -28,6 +29,7 @@ import com.quran.tathbeet.ui.model.Guardian
 import com.quran.tathbeet.ui.model.activeProfile
 import com.quran.tathbeet.ui.model.asString
 import com.quran.tathbeet.ui.model.completionRate
+import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
 fun ProfilesScreen(
@@ -51,15 +53,20 @@ fun ProfilesScreen(
                 body = stringResource(R.string.profile_active_body),
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
                 ) {
-                    Button(onClick = onOpenSchedule) {
-                        Text(stringResource(R.string.profile_button_open_schedule))
-                    }
+                    AppPrimaryButton(
+                        text = stringResource(R.string.profile_button_open_schedule),
+                        onClick = onOpenSchedule,
+                        modifier = Modifier.weight(1f),
+                    )
                     if (!activeProfile.isSelfProfile) {
-                        Button(onClick = onOpenSharedProfile) {
-                            Text(stringResource(R.string.profile_button_manage_sharing))
-                        }
+                        AppSecondaryButton(
+                            text = stringResource(R.string.profile_button_manage_sharing),
+                            onClick = onOpenSharedProfile,
+                            modifier = Modifier.weight(1f),
+                        )
                     }
                 }
             }
@@ -82,9 +89,10 @@ fun ProfilesScreen(
         }
 
         item {
-            Button(onClick = onAddChildProfile) {
-                Text(stringResource(R.string.profile_add_child))
-            }
+            AppPrimaryButton(
+                text = stringResource(R.string.profile_add_child),
+                onClick = onAddChildProfile,
+            )
         }
     }
 }
@@ -109,17 +117,17 @@ private fun ProfileCard(
         stringResource(R.string.profile_local_only)
     }
 
-    Card(onClick = onSelected) {
+    AppCard(onClick = onSelected) {
         Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(TathbeetTokens.spacing.x2Half),
+            verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half)) {
                     Text(
                         text = profile.name.asString(),
                         style = MaterialTheme.typography.titleLarge,
@@ -135,41 +143,24 @@ private fun ProfileCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                FilterChip(
+                AppSelectionChip(
                     selected = isActive,
                     onClick = onSelected,
-                    label = {
-                        Text(
-                            if (isActive) {
-                                stringResource(R.string.profile_chip_active)
-                            } else {
-                                stringResource(R.string.profile_chip_activate)
-                            },
-                        )
+                    text = if (isActive) {
+                        stringResource(R.string.profile_chip_active)
+                    } else {
+                        stringResource(R.string.profile_chip_activate)
                     },
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.profile_goal),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(stringResource(profile.pace.labelRes))
-                }
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = stringResource(R.string.profile_completion_rate),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(stringResource(R.string.percentage_value, profile.completionRate))
-                }
-            }
+            AppKeyValueRow(
+                label = stringResource(R.string.profile_goal),
+                value = stringResource(profile.pace.labelRes),
+            )
+            AppKeyValueRow(
+                label = stringResource(R.string.profile_completion_rate),
+                value = stringResource(R.string.percentage_value, profile.completionRate),
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

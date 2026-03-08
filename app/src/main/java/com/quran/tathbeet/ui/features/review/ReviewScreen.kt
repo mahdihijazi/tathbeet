@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -19,12 +18,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
+import com.quran.tathbeet.ui.components.AppCard
+import com.quran.tathbeet.ui.components.AppCardTone
+import com.quran.tathbeet.ui.components.AppPill
+import com.quran.tathbeet.ui.components.CardSection
 import com.quran.tathbeet.ui.model.AppProfile
 import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.asString
 import com.quran.tathbeet.ui.model.dailyProgress
+import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
 fun ReviewScreen(
@@ -38,8 +41,11 @@ fun ReviewScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(
+                horizontal = TathbeetTokens.spacing.x2Half,
+                vertical = TathbeetTokens.spacing.x2Half,
+            ),
+        verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x2),
     ) {
         ReviewSummaryCard(
             remainingCount = remainingCount,
@@ -49,8 +55,8 @@ fun ReviewScreen(
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = TathbeetTokens.spacing.x1),
+            verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
         ) {
             items(profile.reviewTasks, key = { it.id }) { task ->
                 ReviewTaskCard(
@@ -76,30 +82,19 @@ private fun ReviewSummaryCard(
     rolloverCount: Int,
     progress: Float,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.review_summary_remaining, remainingCount),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-            if (rolloverCount > 0) {
-                Text(
-                    text = stringResource(R.string.review_summary_rollover, rolloverCount),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier.fillMaxWidth(),
-            )
+    CardSection(tone = AppCardTone.Highlight) {
+        Text(
+            text = stringResource(R.string.review_summary_remaining, remainingCount),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+        )
+        if (rolloverCount > 0) {
+            AppPill(text = stringResource(R.string.review_summary_rollover, rolloverCount))
         }
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -111,15 +106,15 @@ private fun ReviewTaskCard(
     isRollover: Boolean,
     onToggle: () -> Unit,
 ) {
-    Card(
+    AppCard(
         onClick = onToggle,
-        modifier = Modifier.fillMaxWidth(),
+        tone = if (isRollover) AppCardTone.Accent else AppCardTone.Default,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+                .padding(TathbeetTokens.spacing.x2Half),
+            verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -128,7 +123,7 @@ private fun ReviewTaskCard(
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half),
                 ) {
                     Text(
                         text = title.asString(),
@@ -147,11 +142,7 @@ private fun ReviewTaskCard(
                 )
             }
             if (isRollover) {
-                Text(
-                    text = stringResource(R.string.review_rollover_chip),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
+                AppPill(text = stringResource(R.string.review_rollover_chip))
             }
         }
     }
@@ -162,26 +153,19 @@ private fun ReviewStatusCard(
     completionRate: Int,
     isComplete: Boolean,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.review_status_rate, completionRate),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Text(
-                text = if (isComplete) {
-                    stringResource(R.string.review_status_done)
-                } else {
-                    stringResource(R.string.review_status_open)
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+    CardSection(tone = AppCardTone.Muted) {
+        Text(
+            text = stringResource(R.string.review_status_rate, completionRate),
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        Text(
+            text = if (isComplete) {
+                stringResource(R.string.review_status_done)
+            } else {
+                stringResource(R.string.review_status_open)
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

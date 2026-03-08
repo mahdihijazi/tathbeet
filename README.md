@@ -94,7 +94,7 @@ Missed work rolls over to the next day rather than being dropped.
 1. Create a local profile.
 2. Select memorized portions of the Quran.
 3. Choose a revision pace.
-4. Receive a daily task list.
+4. Receive a daily task list made of smaller execution units, not raw pool labels.
 5. Mark items or sub-items as done.
 6. Track completion rate over time.
 
