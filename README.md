@@ -120,13 +120,13 @@ This repository will hold:
 - product documentation
 - planning artifacts for MVP delivery
 
-## Prototype Artifacts
+## Current App Artifacts
 
 - Mermaid MVP user flow: [docs/mvp-user-flow.md](/Users/mahdi/personal-repos/tathbeet/docs/mvp-user-flow.md)
 - Screen inventory: [docs/screen-list.md](/Users/mahdi/personal-repos/tathbeet/docs/screen-list.md)
-- Android prototype entry point: [MainActivity.kt](/Users/mahdi/personal-repos/tathbeet/app/src/main/java/com/quran/tathbeet/MainActivity.kt)
+- Android app entry point: [MainActivity.kt](/Users/mahdi/personal-repos/tathbeet/app/src/main/java/com/quran/tathbeet/MainActivity.kt)
 
-The current prototype is:
+The current app build is:
 
 - high-fidelity
 - interactive
@@ -147,7 +147,7 @@ The current prototype is:
 
 Prototype review is part of product definition. If prototype feedback changes scope, flow, or UX expectations, update `README.md` and `PRD.md` before moving into implementation.
 
-To build the prototype locally:
+To build the app locally:
 
 ```bash
 ANDROID_HOME=$HOME/Library/Android/sdk ANDROID_SDK_ROOT=$HOME/Library/Android/sdk ./gradlew assembleDebug

@@ -32,13 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
-import com.quran.tathbeet.ui.prototype.AccountMode
-import com.quran.tathbeet.ui.prototype.AppDestination
-import com.quran.tathbeet.ui.prototype.PrototypeUiState
+import com.quran.tathbeet.ui.model.AccountMode
+import com.quran.tathbeet.ui.model.AppDestination
+import com.quran.tathbeet.ui.model.AppUiState
 
 @Composable
-fun PrototypeShell(
-    uiState: PrototypeUiState,
+fun AppShell(
+    uiState: AppUiState,
     onNavigate: (AppDestination) -> Unit,
     onBack: () -> Unit,
     onAccountAction: () -> Unit,
@@ -49,7 +49,7 @@ fun PrototypeShell(
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.82f),
             topBar = {
-                PrototypeTopBar(
+                AppTopBar(
                     uiState = uiState,
                     onBack = onBack,
                     onAccountAction = onAccountAction,
@@ -57,7 +57,7 @@ fun PrototypeShell(
             },
             bottomBar = {
                 if (uiState.destination in mainDestinations) {
-                    PrototypeBottomBar(
+                    AppBottomBar(
                         currentDestination = uiState.destination,
                         onNavigate = onNavigate,
                     )
@@ -85,8 +85,8 @@ private val mainDestinations = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PrototypeTopBar(
-    uiState: PrototypeUiState,
+private fun AppTopBar(
+    uiState: AppUiState,
     onBack: () -> Unit,
     onAccountAction: () -> Unit,
 ) {
@@ -126,7 +126,7 @@ private fun PrototypeTopBar(
 }
 
 @Composable
-private fun PrototypeBottomBar(
+private fun AppBottomBar(
     currentDestination: AppDestination,
     onNavigate: (AppDestination) -> Unit,
 ) {

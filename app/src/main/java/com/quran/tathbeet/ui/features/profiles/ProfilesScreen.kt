@@ -20,18 +20,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.HeroCard
-import com.quran.tathbeet.ui.components.PrototypeScreenLayout
+import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
-import com.quran.tathbeet.ui.prototype.Guardian
-import com.quran.tathbeet.ui.prototype.PrototypeProfile
-import com.quran.tathbeet.ui.prototype.PrototypeUiState
-import com.quran.tathbeet.ui.prototype.activeProfile
-import com.quran.tathbeet.ui.prototype.asString
-import com.quran.tathbeet.ui.prototype.completionRate
+import com.quran.tathbeet.ui.model.AppProfile
+import com.quran.tathbeet.ui.model.AppUiState
+import com.quran.tathbeet.ui.model.Guardian
+import com.quran.tathbeet.ui.model.activeProfile
+import com.quran.tathbeet.ui.model.asString
+import com.quran.tathbeet.ui.model.completionRate
 
 @Composable
 fun ProfilesScreen(
-    uiState: PrototypeUiState,
+    uiState: AppUiState,
     onProfileSelected: (String) -> Unit,
     onProfileNotificationsToggled: (String) -> Unit,
     onAddChildProfile: () -> Unit,
@@ -40,7 +40,7 @@ fun ProfilesScreen(
 ) {
     val activeProfile = uiState.activeProfile
 
-    PrototypeScreenLayout(
+    ScreenLayout(
         title = stringResource(R.string.profile_screen_title),
         subtitle = stringResource(R.string.profile_screen_subtitle),
     ) {
@@ -91,7 +91,7 @@ fun ProfilesScreen(
 
 @Composable
 private fun ProfileCard(
-    profile: PrototypeProfile,
+    profile: AppProfile,
     isActive: Boolean,
     onSelected: () -> Unit,
     onToggleNotifications: () -> Unit,

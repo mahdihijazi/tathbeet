@@ -1,4 +1,4 @@
-package com.quran.tathbeet.ui.prototype
+package com.quran.tathbeet.ui.model
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable

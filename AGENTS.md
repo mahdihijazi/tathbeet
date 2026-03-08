@@ -7,7 +7,7 @@ Current UI structure:
 
 - `ui/features/` contains feature-specific screens and composables such as welcome, profiles, schedule, review, progress, shared-profile, and settings
 - `ui/components/` contains reusable app-level UI building blocks and shell components
-- `ui/prototype/` contains fake state models and interaction state used during the prototype phase
+- `ui/model/` contains app state models, fake interaction state, and Quran selection data used by the current app skeleton
 - `ui/theme/` contains colors, typography, and theme setup
 
 Android resources are in `app/src/main/res`, and user-facing strings should live in XML resources rather than Kotlin files.
@@ -29,7 +29,7 @@ Use the Gradle wrapper from the repository root:
 If your SDK is not auto-detected, export `ANDROID_HOME` and `ANDROID_SDK_ROOT` before running Gradle.
 
 ## Coding Style & Naming Conventions
-Follow Kotlin and Android Studio defaults: 4-space indentation, organized imports, and trailing commas where the codebase already uses them. Use `PascalCase` for classes and composables (`TathbeetPrototypeApp`), `camelCase` for functions and properties, and keep package names under `com.quran.tathbeet`.
+Follow Kotlin and Android Studio defaults: 4-space indentation, organized imports, and trailing commas where the codebase already uses them. Use `PascalCase` for classes and composables (`TathbeetApp`), `camelCase` for functions and properties, and keep package names under `com.quran.tathbeet`.
 
 Prefer small composables, clear state names, and RTL-aware UI decisions because the product is Arabic-first. Keep prototype screens and future feature UI grouped by domain instead of growing `MainActivity.kt`.
 

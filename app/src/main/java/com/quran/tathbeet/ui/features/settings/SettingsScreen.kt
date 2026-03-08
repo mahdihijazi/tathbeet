@@ -19,18 +19,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.HeroCard
-import com.quran.tathbeet.ui.components.PrototypeScreenLayout
+import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
-import com.quran.tathbeet.ui.prototype.AccountMode
-import com.quran.tathbeet.ui.prototype.PrototypeProfile
-import com.quran.tathbeet.ui.prototype.PrototypeUiState
-import com.quran.tathbeet.ui.prototype.asString
-import com.quran.tathbeet.ui.prototype.displayLabelRes
+import com.quran.tathbeet.ui.model.AccountMode
+import com.quran.tathbeet.ui.model.AppProfile
+import com.quran.tathbeet.ui.model.AppUiState
+import com.quran.tathbeet.ui.model.asString
+import com.quran.tathbeet.ui.model.displayLabelRes
 
 @Composable
 fun SettingsScreen(
-    uiState: PrototypeUiState,
-    activeProfile: PrototypeProfile,
+    uiState: AppUiState,
+    activeProfile: AppProfile,
     onGlobalNotificationsChanged: () -> Unit,
     onMotivationalMessagesChanged: () -> Unit,
     onProfileNotificationsChanged: () -> Unit,
@@ -55,7 +55,7 @@ fun SettingsScreen(
         ),
     )
 
-    PrototypeScreenLayout(
+    ScreenLayout(
         title = stringResource(R.string.settings_title),
         subtitle = stringResource(R.string.settings_subtitle),
     ) {

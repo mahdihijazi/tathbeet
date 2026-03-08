@@ -18,24 +18,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.HeroCard
-import com.quran.tathbeet.ui.components.PrototypeScreenLayout
+import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
-import com.quran.tathbeet.ui.prototype.AccountMode
-import com.quran.tathbeet.ui.prototype.Guardian
-import com.quran.tathbeet.ui.prototype.PrototypeProfile
-import com.quran.tathbeet.ui.prototype.SyncState
-import com.quran.tathbeet.ui.prototype.asString
-import com.quran.tathbeet.ui.prototype.displayLabelRes
+import com.quran.tathbeet.ui.model.AccountMode
+import com.quran.tathbeet.ui.model.AppProfile
+import com.quran.tathbeet.ui.model.Guardian
+import com.quran.tathbeet.ui.model.SyncState
+import com.quran.tathbeet.ui.model.asString
+import com.quran.tathbeet.ui.model.displayLabelRes
 
 @Composable
 fun SharedProfileScreen(
-    profile: PrototypeProfile,
+    profile: AppProfile,
     accountMode: AccountMode,
     syncState: SyncState,
     onGuardianToggled: (Guardian) -> Unit,
     onSimulateSync: () -> Unit,
 ) {
-    PrototypeScreenLayout(
+    ScreenLayout(
         title = stringResource(R.string.shared_title),
         subtitle = stringResource(R.string.shared_subtitle),
     ) {

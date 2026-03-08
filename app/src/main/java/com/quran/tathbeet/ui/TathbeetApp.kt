@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.quran.tathbeet.R
-import com.quran.tathbeet.ui.components.PrototypeShell
+import com.quran.tathbeet.ui.components.AppShell
 import com.quran.tathbeet.ui.features.progress.ProgressScreen
 import com.quran.tathbeet.ui.features.profiles.ProfilesScreen
 import com.quran.tathbeet.ui.features.review.ReviewScreen
@@ -23,36 +23,37 @@ import com.quran.tathbeet.ui.features.schedule.ScheduleScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleIntroScreen
 import com.quran.tathbeet.ui.features.settings.SettingsScreen
 import com.quran.tathbeet.ui.features.shared.SharedProfileScreen
-import com.quran.tathbeet.ui.prototype.AccountMode
-import com.quran.tathbeet.ui.prototype.AppDestination
-import com.quran.tathbeet.ui.prototype.Guardian
-import com.quran.tathbeet.ui.prototype.PrototypeProfile
-import com.quran.tathbeet.ui.prototype.PrototypeUiState
-import com.quran.tathbeet.ui.prototype.TextSpec
-import com.quran.tathbeet.ui.prototype.activeProfile
-import com.quran.tathbeet.ui.prototype.asString
-import com.quran.tathbeet.ui.prototype.completionRate
-import com.quran.tathbeet.ui.prototype.cycleLength
-import com.quran.tathbeet.ui.prototype.dailyProgress
-import com.quran.tathbeet.ui.prototype.displayLabelRes
-import com.quran.tathbeet.ui.prototype.generateTasksForProfile
-import com.quran.tathbeet.ui.prototype.loadQuranCatalog
-import com.quran.tathbeet.ui.prototype.poolSegmentCount
-import com.quran.tathbeet.ui.prototype.reminderOptions
-import com.quran.tathbeet.ui.prototype.scheduleWizardStartDestination
-import com.quran.tathbeet.ui.prototype.seedPrototypeState
-import com.quran.tathbeet.ui.prototype.updateActiveProfile
+import com.quran.tathbeet.ui.model.AccountMode
+import com.quran.tathbeet.ui.model.AppDestination
+import com.quran.tathbeet.ui.model.AppProfile
+import com.quran.tathbeet.ui.model.AppUiState
+import com.quran.tathbeet.ui.model.Guardian
+import com.quran.tathbeet.ui.model.SyncState
+import com.quran.tathbeet.ui.model.TextSpec
+import com.quran.tathbeet.ui.model.activeProfile
+import com.quran.tathbeet.ui.model.asString
+import com.quran.tathbeet.ui.model.completionRate
+import com.quran.tathbeet.ui.model.cycleLength
+import com.quran.tathbeet.ui.model.dailyProgress
+import com.quran.tathbeet.ui.model.displayLabelRes
+import com.quran.tathbeet.ui.model.generateTasksForProfile
+import com.quran.tathbeet.ui.model.loadQuranCatalog
+import com.quran.tathbeet.ui.model.poolSegmentCount
+import com.quran.tathbeet.ui.model.reminderOptions
+import com.quran.tathbeet.ui.model.scheduleWizardStartDestination
+import com.quran.tathbeet.ui.model.seedAppState
+import com.quran.tathbeet.ui.model.updateActiveProfile
 import kotlinx.coroutines.launch
 
 @Composable
-fun TathbeetPrototypeApp() {
+fun TathbeetApp() {
     val context = LocalContext.current
     val quranCatalog = remember(context) { loadQuranCatalog(context) }
-    var uiState by remember(quranCatalog) { mutableStateOf(seedPrototypeState(quranCatalog)) }
+    var uiState by remember(quranCatalog) { mutableStateOf(seedAppState(quranCatalog)) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    fun mutate(message: TextSpec? = null, transform: (PrototypeUiState) -> PrototypeUiState) {
+    fun mutate(message: TextSpec? = null, transform: (AppUiState) -> AppUiState) {
         uiState = transform(uiState)
         if (message != null) {
             scope.launch {
@@ -74,7 +75,7 @@ fun TathbeetPrototypeApp() {
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        PrototypeShell(
+        AppShell(
             uiState = uiState,
             onNavigate = { destination ->
                 mutate { it.copy(destination = destination) }
@@ -106,9 +107,9 @@ fun TathbeetPrototypeApp() {
                     it.copy(
                         accountMode = if (it.accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
                         syncState = if (it.accountMode == AccountMode.Guest) {
-                            com.quran.tathbeet.ui.prototype.SyncState.Synced
+                            SyncState.Synced
                         } else {
-                            com.quran.tathbeet.ui.prototype.SyncState.OfflineReady
+                            SyncState.OfflineReady
                         },
                     )
                 }
@@ -136,7 +137,7 @@ fun TathbeetPrototypeApp() {
                     },
                     onAddChildProfile = {
                         mutate(TextSpec(R.string.snackbar_child_profile_created)) { state ->
-                            state.addChildProfile()
+                            state.addProfile()
                         }
                     },
                     onOpenSchedule = {
@@ -203,9 +204,9 @@ fun TathbeetPrototypeApp() {
                                 destination = AppDestination.Review,
                                 hasCompletedScheduleOnboarding = true,
                                 syncState = if (it.accountMode == AccountMode.Google) {
-                                    com.quran.tathbeet.ui.prototype.SyncState.SyncPending
+                                    SyncState.SyncPending
                                 } else {
-                                    com.quran.tathbeet.ui.prototype.SyncState.OfflineReady
+                                    SyncState.OfflineReady
                                 },
                             )
                         }
@@ -293,9 +294,9 @@ fun TathbeetPrototypeApp() {
                             mutate(TextSpec(R.string.snackbar_sync_simulated)) {
                                 it.copy(
                                     syncState = when (it.syncState) {
-                                        com.quran.tathbeet.ui.prototype.SyncState.OfflineReady -> com.quran.tathbeet.ui.prototype.SyncState.SyncPending
-                                        com.quran.tathbeet.ui.prototype.SyncState.SyncPending -> com.quran.tathbeet.ui.prototype.SyncState.Synced
-                                        com.quran.tathbeet.ui.prototype.SyncState.Synced -> com.quran.tathbeet.ui.prototype.SyncState.SyncPending
+                                        SyncState.OfflineReady -> SyncState.SyncPending
+                                        SyncState.SyncPending -> SyncState.Synced
+                                        SyncState.Synced -> SyncState.SyncPending
                                     },
                                 ).updateActiveProfile { profile ->
                                     profile.copy(
@@ -337,9 +338,9 @@ fun TathbeetPrototypeApp() {
                             it.copy(
                                 accountMode = if (it.accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
                                 syncState = if (it.accountMode == AccountMode.Guest) {
-                                    com.quran.tathbeet.ui.prototype.SyncState.Synced
+                                    SyncState.Synced
                                 } else {
-                                    com.quran.tathbeet.ui.prototype.SyncState.OfflineReady
+                                    SyncState.OfflineReady
                                 },
                             )
                         }
@@ -350,7 +351,7 @@ fun TathbeetPrototypeApp() {
     }
 }
 
-private fun PrototypeUiState.addChildProfile(): PrototypeUiState {
+private fun AppUiState.addProfile(): AppUiState {
     val nextName = listOf(
         TextSpec(R.string.profile_name_hafsah),
         TextSpec(R.string.profile_name_ibrahim),

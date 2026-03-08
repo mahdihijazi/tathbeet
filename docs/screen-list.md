@@ -68,9 +68,9 @@
 - language and account state
 - account creation can be reached later from the toolbar instead of blocking first launch
 
-## Prototype Mapping
+## Current App Mapping
 
-The high-fidelity interactive Compose prototype in the app currently includes:
+The high-fidelity interactive Compose app currently includes:
 
 - Schedule
 - Memorized Pool Selector
@@ -80,7 +80,7 @@ The high-fidelity interactive Compose prototype in the app currently includes:
 - Progress
 - Settings
 
-Current prototype behavior:
+Current app behavior:
 
 - all interactions are fake and local to the UI
 - first launch opens the one-time schedule intro screen

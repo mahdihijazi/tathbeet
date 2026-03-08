@@ -28,9 +28,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
-import com.quran.tathbeet.ui.prototype.QuranSelectionItem
-import com.quran.tathbeet.ui.prototype.SelectionCategory
-import com.quran.tathbeet.ui.prototype.summarizeSelectionTitles
+import com.quran.tathbeet.ui.model.QuranSelectionItem
+import com.quran.tathbeet.ui.model.SelectionCategory
+import com.quran.tathbeet.ui.model.summarizeSelectionTitles
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

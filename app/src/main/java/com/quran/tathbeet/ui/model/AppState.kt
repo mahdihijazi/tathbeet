@@ -1,4 +1,4 @@
-package com.quran.tathbeet.ui.prototype
+package com.quran.tathbeet.ui.model
 
 import androidx.annotation.StringRes
 import com.quran.tathbeet.R
@@ -62,7 +62,7 @@ data class ReviewTask(
     val isRollover: Boolean,
 )
 
-data class PrototypeProfile(
+data class AppProfile(
     val id: String,
     val name: TextSpec,
     val isSelfProfile: Boolean,
@@ -76,11 +76,11 @@ data class PrototypeProfile(
     val activityFeed: List<TextSpec>,
 )
 
-data class PrototypeUiState(
+data class AppUiState(
     val destination: AppDestination,
     val scheduleReturnDestination: AppDestination,
     val accountMode: AccountMode,
-    val profiles: List<PrototypeProfile>,
+    val profiles: List<AppProfile>,
     val activeProfileId: String,
     val activeSelectionCategory: SelectionCategory,
     val hasSeenScheduleIntro: Boolean,
@@ -93,39 +93,39 @@ data class PrototypeUiState(
     val extraProfileCount: Int,
 )
 
-val PrototypeUiState.activeProfile: PrototypeProfile
+val AppUiState.activeProfile: AppProfile
     get() = profiles.first { it.id == activeProfileId }
 
-val PrototypeProfile.dailyProgress: Float
+val AppProfile.dailyProgress: Float
     get() = if (reviewTasks.isEmpty()) 0f else reviewTasks.count { it.isDone }.toFloat() / reviewTasks.size
 
-val PrototypeProfile.completionRate: Int
+val AppProfile.completionRate: Int
     get() = (weekCompletion.average() * 100).roundToInt()
 
-fun PrototypeUiState.poolSegmentCount(
+fun AppUiState.poolSegmentCount(
     catalog: QuranCatalog,
-    profile: PrototypeProfile = activeProfile,
+    profile: AppProfile = activeProfile,
 ): Int =
     catalog.resolveSelections(profile.selectedPoolKeys).sumOf { it.segments }
 
-fun PrototypeUiState.cycleLength(
+fun AppUiState.cycleLength(
     catalog: QuranCatalog,
-    profile: PrototypeProfile = activeProfile,
+    profile: AppProfile = activeProfile,
 ): Int =
     ceil(poolSegmentCount(catalog, profile).toFloat() / profile.pace.dailySegments).toInt().coerceAtLeast(1)
 
-fun PrototypeUiState.updateActiveProfile(transform: (PrototypeProfile) -> PrototypeProfile): PrototypeUiState =
+fun AppUiState.updateActiveProfile(transform: (AppProfile) -> AppProfile): AppUiState =
     copy(
         profiles = profiles.map { profile ->
             if (profile.id == activeProfileId) transform(profile) else profile
         },
     )
 
-fun PrototypeUiState.scheduleWizardStartDestination(): AppDestination =
+fun AppUiState.scheduleWizardStartDestination(): AppDestination =
     if (hasSeenScheduleIntro) AppDestination.PoolSelector else AppDestination.ScheduleIntro
 
 fun generateTasksForProfile(
-    profile: PrototypeProfile,
+    profile: AppProfile,
     catalog: QuranCatalog,
 ): List<ReviewTask> {
     val base = catalog.resolveSelections(profile.selectedPoolKeys)
@@ -165,8 +165,8 @@ fun generateTasksForProfile(
     }
 }
 
-fun seedPrototypeState(catalog: QuranCatalog): PrototypeUiState {
-    val father = PrototypeProfile(
+fun seedAppState(catalog: QuranCatalog): AppUiState {
+    val father = AppProfile(
         id = "mahdi",
         name = TextSpec(R.string.profile_name_father),
         isSelfProfile = true,
@@ -186,7 +186,7 @@ fun seedPrototypeState(catalog: QuranCatalog): PrototypeUiState {
             TextSpec(R.string.feed_father_yesterday),
         ),
     )
-    val maryam = PrototypeProfile(
+    val maryam = AppProfile(
         id = "maryam",
         name = TextSpec(R.string.profile_name_maryam),
         isSelfProfile = false,
@@ -207,7 +207,7 @@ fun seedPrototypeState(catalog: QuranCatalog): PrototypeUiState {
             TextSpec(R.string.feed_shared_synced),
         ),
     )
-    val yusuf = PrototypeProfile(
+    val yusuf = AppProfile(
         id = "yusuf",
         name = TextSpec(R.string.profile_name_yusuf),
         isSelfProfile = false,
@@ -231,7 +231,7 @@ fun seedPrototypeState(catalog: QuranCatalog): PrototypeUiState {
         profile.copy(reviewTasks = generateTasksForProfile(profile, catalog))
     }
 
-    return PrototypeUiState(
+    return AppUiState(
         destination = AppDestination.ScheduleIntro,
         scheduleReturnDestination = AppDestination.Review,
         accountMode = AccountMode.Guest,

@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PrototypeScreenLayout(
+fun ScreenLayout(
     title: String,
     subtitle: String,
     content: LazyListScope.() -> Unit,

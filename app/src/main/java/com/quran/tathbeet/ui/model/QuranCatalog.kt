@@ -1,4 +1,4 @@
-package com.quran.tathbeet.ui.prototype
+package com.quran.tathbeet.ui.model
 
 import android.content.Context
 import com.quran.tathbeet.R

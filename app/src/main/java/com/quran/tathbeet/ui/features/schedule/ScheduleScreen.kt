@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
-import com.quran.tathbeet.ui.components.PrototypeScreenLayout
+import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
-import com.quran.tathbeet.ui.prototype.PaceOption
-import com.quran.tathbeet.ui.prototype.QuranSelectionItem
-import com.quran.tathbeet.ui.prototype.summarizeSelectionTitles
+import com.quran.tathbeet.ui.model.PaceOption
+import com.quran.tathbeet.ui.model.QuranSelectionItem
+import com.quran.tathbeet.ui.model.summarizeSelectionTitles
 
 @Composable
 fun ScheduleScreen(
@@ -39,7 +39,7 @@ fun ScheduleScreen(
         emptyResId = R.string.schedule_pool_empty,
     )
 
-    PrototypeScreenLayout(
+    ScreenLayout(
         title = stringResource(R.string.schedule_dose_title),
         subtitle = stringResource(R.string.schedule_dose_subtitle),
     ) {

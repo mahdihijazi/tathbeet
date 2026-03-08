@@ -1,6 +1,6 @@
 # Quran Reference Data
 
-Prototype-friendly Quran selection data lives in `app/src/main/assets/quran/`.
+Quran selection reference data lives in `app/src/main/assets/quran/`.
 
 ## Files
 

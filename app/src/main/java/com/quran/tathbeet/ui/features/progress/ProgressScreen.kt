@@ -22,14 +22,14 @@ import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.HeroCard
 import com.quran.tathbeet.ui.components.MetricCard
-import com.quran.tathbeet.ui.components.PrototypeScreenLayout
+import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
-import com.quran.tathbeet.ui.prototype.PrototypeProfile
-import com.quran.tathbeet.ui.prototype.asString
+import com.quran.tathbeet.ui.model.AppProfile
+import com.quran.tathbeet.ui.model.asString
 
 @Composable
 fun ProgressScreen(
-    profile: PrototypeProfile,
+    profile: AppProfile,
     completionRate: Int,
     onOpenReview: () -> Unit,
 ) {
@@ -39,7 +39,7 @@ fun ProgressScreen(
         stringResource(R.string.progress_insight_3),
     )
 
-    PrototypeScreenLayout(
+    ScreenLayout(
         title = stringResource(R.string.progress_title),
         subtitle = stringResource(R.string.progress_subtitle),
     ) {
