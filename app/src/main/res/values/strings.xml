@@ -1,0 +1,210 @@
+<resources>
+    <string name="app_name">تثبيت</string>
+
+    <string name="destination_profiles">الملفات</string>
+    <string name="destination_schedule_intro">الخطة</string>
+    <string name="destination_pool_selector">اختيار المحفوظ</string>
+    <string name="destination_pool_selector_short">المحفوظ</string>
+    <string name="destination_schedule_dose">الورد اليومي</string>
+    <string name="destination_review">الورد</string>
+    <string name="destination_progress">التقدم</string>
+    <string name="destination_shared">المشاركة</string>
+    <string name="destination_settings">الإعدادات</string>
+
+    <string name="content_back">رجوع</string>
+    <string name="content_create_account">إنشاء حساب</string>
+    <string name="content_account_active">الحساب مفعّل</string>
+    <string name="action_next">التالي</string>
+
+    <string name="snackbar_account_enabled">تم تفعيل وضع الحساب.</string>
+    <string name="snackbar_guest_mode">تمت العودة لوضع الضيف.</string>
+    <string name="snackbar_schedule_updated">تم تحديث الخطة.</string>
+    <string name="snackbar_review_done">تم إنهاء ورد اليوم.</string>
+    <string name="snackbar_review_reset">تمت إعادة ضبط الورد.</string>
+    <string name="snackbar_create_account_for_sharing">أنشئ حساباً من أعلى الشاشة لتجربة المشاركة.</string>
+    <string name="snackbar_sync_simulated">تمت محاكاة المزامنة.</string>
+    <string name="snackbar_child_profile_created">تم إنشاء ملف طفل.</string>
+
+    <string name="pace_half_juz">نصف جزء يومياً</string>
+    <string name="pace_one_juz">جزء يومياً</string>
+    <string name="pace_two_juz">جزآن يومياً</string>
+    <string name="pace_three_juz">ثلاثة أجزاء يومياً</string>
+
+    <string name="selection_category_surahs">السور</string>
+    <string name="selection_category_juz">الأجزاء</string>
+    <string name="selection_category_hizb">الأحزاب</string>
+    <string name="selection_category_rub">أرباع الحزب</string>
+    <string name="selection_summary_separator">، </string>
+    <string name="selection_summary_more"> + %1$d أخرى</string>
+    <string name="quran_surah_title">سورة %1$s</string>
+    <string name="quran_surah_detail">%1$d آية · %2$d مقطع مراجعة</string>
+    <string name="quran_juz_title">الجزء %1$d</string>
+    <string name="quran_juz_detail">%1$s</string>
+    <string name="quran_hizb_title">الحزب %1$d</string>
+    <string name="quran_hizb_detail">في الجزء %1$d · %2$s</string>
+    <string name="quran_rub_title">ربع الحزب %1$d</string>
+    <string name="quran_rub_detail">في الجزء %1$d · الحزب %2$d · %3$s</string>
+    <string name="quran_range_single_surah">من %1$s %2$d إلى %3$d</string>
+    <string name="quran_range_multi_surah">من %1$s %2$d إلى %3$s %4$d</string>
+
+    <string name="option_surah_baqarah">سورة البقرة</string>
+    <string name="option_surah_yasin">سورة يس</string>
+    <string name="option_surah_mulk">سورة الملك</string>
+    <string name="option_juz_1">الجزء الأول</string>
+    <string name="option_juz_29">الجزء التاسع والعشرون</string>
+    <string name="option_juz_30">الجزء الثلاثون</string>
+    <string name="option_hizb_41">الحزب 41</string>
+    <string name="option_hizb_42">الحزب 42</string>
+    <string name="option_hizb_60">الحزب 60</string>
+    <string name="option_rub_12">ربع الحزب 12</string>
+    <string name="option_rub_13">ربع الحزب 13</string>
+    <string name="option_rub_236">ربع الحزب 236</string>
+
+    <string name="option_desc_surah_only">مقاطع السورة فقط</string>
+    <string name="option_desc_quick_review">مراجعة سريعة</string>
+    <string name="option_desc_short_ward">ورد قصير</string>
+    <string name="option_desc_eight_segments">ثمانية مقاطع</string>
+    <string name="option_desc_four_segments">أربعة مقاطع</string>
+    <string name="option_desc_one_segment">مقطع واحد</string>
+
+    <string name="review_starter_title">ابدأ باختيار المحفوظ</string>
+    <string name="review_starter_detail">بعد ذلك احفظ الخطة لفتح ورد اليوم</string>
+
+    <string name="profile_name_father">الأب</string>
+    <string name="profile_name_maryam">مريم</string>
+    <string name="profile_name_yusuf">يوسف</string>
+    <string name="profile_name_hafsah">حفصة</string>
+    <string name="profile_name_ibrahim">إبراهيم</string>
+    <string name="profile_name_zaynab">زينب</string>
+    <string name="profile_name_abdullah">عبدالله</string>
+    <string name="profile_name_child_generic">طفل %1$d</string>
+
+    <string name="feed_father_today">اليوم · فتح الورد بدون إنترنت</string>
+    <string name="feed_father_yesterday">أمس · تم إنجاز 3 من 4 مقاطع</string>
+    <string name="feed_shared_father_done">18:10 · الأب أنهى مقطعاً واحداً</string>
+    <string name="feed_shared_mother_time">18:32 · الأم عدلت وقت التذكير</string>
+    <string name="feed_shared_synced">أمس · تمت مزامنة الملف على جهازين</string>
+    <string name="feed_yusuf_today">اليوم · الإشعارات متوقفة</string>
+    <string name="feed_yusuf_yesterday">أمس · تم ترحيل المتبقي إلى ورد اليوم</string>
+    <string name="feed_new_child_created">الآن · تم إنشاء ملف %1$s محلياً</string>
+    <string name="feed_new_child_next_step">الخطوة التالية · اختيار المحفوظ والوتيرة</string>
+    <string name="feed_sync_now">الآن · بدأت دورة مزامنة لملف %1$s</string>
+
+    <string name="sync_offline_ready">جاهز بدون إنترنت</string>
+    <string name="sync_pending">بانتظار المزامنة</string>
+    <string name="sync_synced">تمت المزامنة</string>
+
+    <string name="profile_screen_title">الملفات</string>
+    <string name="profile_screen_subtitle">بدّل بينك وبين الأطفال بسرعة</string>
+    <string name="profile_active_eyebrow">الملف الحالي</string>
+    <string name="profile_active_body">لكل ملف خطته وورده وإشعاراته الخاصة.</string>
+    <string name="profile_button_open_schedule">فتح الخطة</string>
+    <string name="profile_button_manage_sharing">إدارة المشاركة</string>
+    <string name="profile_section_title">الملفات</string>
+    <string name="profile_section_subtitle">كل ضغطة تحدث الحالة فوراً</string>
+    <string name="profile_add_child">إضافة ملف طفل</string>
+    <string name="profile_type_self">ملف شخصي</string>
+    <string name="profile_type_child">ملف طفل</string>
+    <string name="profile_chip_active">الحالي</string>
+    <string name="profile_chip_activate">تفعيل</string>
+    <string name="profile_goal">الهدف</string>
+    <string name="profile_completion_rate">نسبة الإنجاز</string>
+    <string name="percentage_value">%1$d%%</string>
+    <string name="profile_today_tasks_done">تم %1$d من %2$d لمهام اليوم</string>
+    <string name="profile_shared_with">مشترك مع %1$s</string>
+    <string name="profile_local_only">ملف محلي حالياً</string>
+    <string name="guardian_mother">الأم</string>
+    <string name="guardian_father">الأب</string>
+
+    <string name="schedule_intro_body">سنجهز لك خطة مراجعة المحفوظ خطوة بخطوة.</string>
+    <string name="schedule_intro_supporting">ابدأ باختيار المحفوظ، ثم حدد الورد اليومي، وبعدها نفتح لك الورد مباشرة.</string>
+    <string name="schedule_dose_title">الورد اليومي</string>
+    <string name="schedule_dose_subtitle">حدد مقدار الورد اليومي لـ %1$s</string>
+    <string name="schedule_selected_pool_title">المحفوظ المحدد</string>
+    <string name="schedule_selected_pool_subtitle">تم اختياره في الخطوة السابقة</string>
+    <string name="schedule_pool_empty">لم يتم إضافة شيء بعد</string>
+    <string name="schedule_pace_title">الوتيرة اليومية</string>
+    <string name="schedule_pace_subtitle">كم تريد أن تراجع كل يوم؟</string>
+    <string name="schedule_preview_title">معاينة الخطة</string>
+    <string name="schedule_preview_pool_size">عدد عناصر المراجعة: %1$d</string>
+    <string name="schedule_preview_cycle_length">مدة الدورة التقريبية: %1$d أيام</string>
+    <string name="schedule_save">حفظ الخطة وفتح ورد اليوم</string>
+
+    <string name="pool_selector_title">اختيار المحفوظ</string>
+    <string name="pool_selector_subtitle">أضف من السور أو الأجزاء أو الأحزاب أو أرباع الحزب</string>
+    <string name="pool_selector_section_subtitle">اختر ما تريد إضافته إلى حوض المراجعة</string>
+    <string name="pool_selector_current_selection">المحدد حالياً</string>
+    <string name="pool_selector_empty">لم يتم تحديد شيء بعد</string>
+    <string name="pool_selector_done">تم</string>
+
+    <string name="review_title">ورد اليوم</string>
+    <string name="review_subtitle">أكمل المقاطع المطلوبة لليوم</string>
+    <string name="review_eyebrow">قائمة اليوم</string>
+    <string name="review_remaining_count">المتبقي %1$d</string>
+    <string name="review_remaining_body">المتبقي من الأمس يظهر أولاً ثم مهام اليوم.</string>
+    <string name="review_tasks_title">مهام اليوم</string>
+    <string name="review_tasks_subtitle">المتبقي من الأمس يظهر أولاً</string>
+    <string name="review_task_segment_detail">المقطع %1$d من %2$d</string>
+    <string name="review_rollover_chip">ترحيل</string>
+    <string name="review_status_title">حالة اليوم</string>
+    <string name="review_status_rate">نسبة الإنجاز الحالية: %1$d%%</string>
+    <string name="review_status_done">تم إنهاء الورد.</string>
+    <string name="review_status_open">يبقى الورد مفتوحاً حتى يكتمل كل شيء.</string>
+    <string name="review_complete_remaining">إكمال المتبقي</string>
+    <string name="review_reset">إعادة الضبط</string>
+    <string name="review_adjust_schedule">تعديل الخطة</string>
+
+    <string name="progress_title">التقدم</string>
+    <string name="progress_subtitle">مؤشرات بسيطة تساعد على الاستمرار</string>
+    <string name="progress_eyebrow">التقدم</string>
+    <string name="progress_rate_title">نسبة الإنجاز %1$d%%</string>
+    <string name="progress_rate_body">ملخص سريع لانتظام %1$s.</string>
+    <string name="progress_back_to_review">العودة إلى الورد</string>
+    <string name="progress_week_title">هذا الأسبوع</string>
+    <string name="progress_week_value">%1$d / %2$d</string>
+    <string name="progress_week_supporting">إنجاز ورد اليوم</string>
+    <string name="progress_shared_title">المشاركة</string>
+    <string name="progress_shared_enabled">مفعلة</string>
+    <string name="progress_shared_disabled">متوقفة</string>
+    <string name="progress_shared_supporting">حالة التعاون الأسري</string>
+    <string name="progress_weekly_rhythm_title">إيقاع الأسبوع</string>
+    <string name="progress_weekly_rhythm_subtitle">آخر عمود يتغير مع إنجاز اليوم</string>
+    <string name="progress_quick_read_title">قراءة سريعة</string>
+    <string name="progress_quick_read_subtitle">ما الذي يجب أن يفهمه المستخدم فوراً؟</string>
+    <string name="progress_insight_1">ترتفع نسبة الإنجاز كلما أتم المستخدم مهام اليوم.</string>
+    <string name="progress_insight_2">حالة المشاركة مهمة لأن إدارة الطفل قد تكون بين أكثر من ولي أمر.</string>
+    <string name="progress_insight_3">إذا بدت الشاشة مزدحمة فالأولوية للتبسيط قبل التنفيذ.</string>
+
+    <string name="shared_title">مشاركة الملف</string>
+    <string name="shared_subtitle">إدارة ملف الطفل من أكثر من ولي أمر</string>
+    <string name="shared_eyebrow">المشاركة</string>
+    <string name="shared_body">فعّل الوالدين ثم جرّب حالات المزامنة.</string>
+    <string name="shared_editors_title">من يمكنه التعديل؟</string>
+    <string name="shared_editors_subtitle">من يمكنه تعديل الخطة ووضع الإنجاز</string>
+    <string name="shared_state_title">حالة المشاركة</string>
+    <string name="shared_account_mode">وضع الحساب: %1$s</string>
+    <string name="shared_sync_state">حالة المزامنة: %1$s</string>
+    <string name="shared_state_on">تم تفعيل أكثر من ولي أمر، لذا يعمل الملف كمشترك.</string>
+    <string name="shared_state_off">ابقِ ولي أمر واحداً لاختبار الحالة غير المشتركة.</string>
+    <string name="shared_simulate_sync">محاكاة المزامنة</string>
+    <string name="shared_activity_title">آخر النشاطات</string>
+    <string name="shared_activity_subtitle">أمثلة لحالة التزامن والتعديلات</string>
+    <string name="account_mode_guest">ضيف</string>
+    <string name="account_mode_account">حساب</string>
+
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_subtitle">تحكم سريع في الإشعارات والحساب</string>
+    <string name="settings_eyebrow">النموذج</string>
+    <string name="settings_body_title">واجهة فقط</string>
+    <string name="settings_body">كل المفاتيح تفاعلية لكنها غير مرتبطة بخدمة حقيقية.</string>
+    <string name="settings_notifications_title">الإشعارات</string>
+    <string name="settings_notifications_subtitle">هذه المفاتيح تغير الحالة المرئية مباشرة</string>
+    <string name="settings_global_notifications">الإشعارات العامة</string>
+    <string name="settings_motivational_messages">الرسائل التحفيزية</string>
+    <string name="settings_profile_notifications">إشعارات %1$s</string>
+    <string name="settings_reminder_title">وقت التذكير</string>
+    <string name="settings_reminder_current">الوقت الحالي: %1$s</string>
+    <string name="settings_reminder_change">تغيير الوقت</string>
+    <string name="settings_account_title">الحساب</string>
+    <string name="settings_toggle_account_mode">تبديل وضع الحساب</string>
+</resources>

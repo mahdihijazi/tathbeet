@@ -1,0 +1,95 @@
+# Tathbeet MVP Screen List
+
+## 1. Schedule Builder
+
+- is now a wizard instead of a single screen
+- shows a one-time intro on first app open
+- starts from محفوظ selection on later visits
+- ends with a daily-ward screen in `juz/day`
+- keeps only a lightweight preview before saving
+- should remain visually focused and avoid noisy supporting blocks that do not help schedule setup
+
+## 2. Profiles Home
+
+- shows all local profiles on the device
+- lets the user switch between self and child profiles
+- highlights active schedule status, today’s load, and notification state
+
+## 3. Create / Edit Profile
+
+- create a new self or child profile
+- define profile name and sharing state
+- later connect a guest profile to a signed-in account
+
+## 4. Memorized Pool Selector
+
+- standalone screen dedicated to pool selection
+- contains separate tabs for `surah`, `juz`, `hizb`, and `rub al-hizb`
+- lets the user select from any tab, add to the pool, and continue to the daily-ward step
+
+## 5. Schedule Intro
+
+- one-time onboarding step for the setup wizard
+- explains what the schedule wizard does
+- centered body copy with a next button
+
+## 6. Daily Ward
+
+- second functional step after محفوظ selection
+- lets the user choose the daily pace
+- shows a lightweight preview before saving
+- saving takes the user directly to today’s review
+
+## 7. Daily Review
+
+- shows today’s assigned review segments
+- shows rollover items first when previous work was missed
+- lets the user mark individual segments complete
+- marks the day complete when all assigned segments are done
+
+## 8. Progress
+
+- shows completion rate
+- keeps analytics intentionally lightweight in MVP
+
+## 9. Shared Child Profile
+
+- shows who can manage the child profile
+- supports father and mother updating the same schedule/task state
+- communicates sync status and recent shared changes
+
+## 10. Settings
+
+- global and per-profile notification controls
+- reminder timing
+- motivational message toggle
+- language and account state
+- account creation can be reached later from the toolbar instead of blocking first launch
+
+## Prototype Mapping
+
+The high-fidelity interactive Compose prototype in the app currently includes:
+
+- Schedule
+- Memorized Pool Selector
+- Profiles
+- Daily Review
+- Shared Profile
+- Progress
+- Settings
+
+Current prototype behavior:
+
+- all interactions are fake and local to the UI
+- first launch opens the one-time schedule intro screen
+- later schedule entry opens the محفوظ selection step directly
+- the prototype uses Arabic-only user-facing copy
+- the prototype is reviewed in RTL layout
+- user-facing strings come from Android XML resources
+- profile switching is wired
+- the schedule wizard is wired across intro, محفوظ selection, and daily ward
+- daily review completion is wired
+- settings toggles are wired
+- shared-profile controls are wired
+
+The dedicated `Create / Edit Profile` flow is still represented as an in-place prototype action from the Profiles screen and should become its own implementation screen when real navigation and persistence are added.

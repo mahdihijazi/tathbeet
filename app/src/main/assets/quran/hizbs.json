@@ -1,0 +1,1262 @@
+[
+  {
+    "id": 1,
+    "start": {
+      "surahId": 1,
+      "surahNameArabic": "الفاتحة",
+      "surahNameTransliteration": "Al-Faatiha",
+      "surahNameEnglish": "The Opening",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 74
+    },
+    "juzId": 1,
+    "hizbInJuz": 1,
+    "firstQuarterId": 1,
+    "lastQuarterId": 4
+  },
+  {
+    "id": 2,
+    "start": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 75
+    },
+    "end": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 141
+    },
+    "juzId": 1,
+    "hizbInJuz": 2,
+    "firstQuarterId": 5,
+    "lastQuarterId": 8
+  },
+  {
+    "id": 3,
+    "start": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 142
+    },
+    "end": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 202
+    },
+    "juzId": 2,
+    "hizbInJuz": 1,
+    "firstQuarterId": 9,
+    "lastQuarterId": 12
+  },
+  {
+    "id": 4,
+    "start": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 203
+    },
+    "end": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 252
+    },
+    "juzId": 2,
+    "hizbInJuz": 2,
+    "firstQuarterId": 13,
+    "lastQuarterId": 16
+  },
+  {
+    "id": 5,
+    "start": {
+      "surahId": 2,
+      "surahNameArabic": "البقرة",
+      "surahNameTransliteration": "Al-Baqara",
+      "surahNameEnglish": "The Cow",
+      "ayah": 253
+    },
+    "end": {
+      "surahId": 3,
+      "surahNameArabic": "آل عمران",
+      "surahNameTransliteration": "Aal-i-Imraan",
+      "surahNameEnglish": "The Family of Imraan",
+      "ayah": 14
+    },
+    "juzId": 3,
+    "hizbInJuz": 1,
+    "firstQuarterId": 17,
+    "lastQuarterId": 20
+  },
+  {
+    "id": 6,
+    "start": {
+      "surahId": 3,
+      "surahNameArabic": "آل عمران",
+      "surahNameTransliteration": "Aal-i-Imraan",
+      "surahNameEnglish": "The Family of Imraan",
+      "ayah": 15
+    },
+    "end": {
+      "surahId": 3,
+      "surahNameArabic": "آل عمران",
+      "surahNameTransliteration": "Aal-i-Imraan",
+      "surahNameEnglish": "The Family of Imraan",
+      "ayah": 92
+    },
+    "juzId": 3,
+    "hizbInJuz": 2,
+    "firstQuarterId": 21,
+    "lastQuarterId": 24
+  },
+  {
+    "id": 7,
+    "start": {
+      "surahId": 3,
+      "surahNameArabic": "آل عمران",
+      "surahNameTransliteration": "Aal-i-Imraan",
+      "surahNameEnglish": "The Family of Imraan",
+      "ayah": 93
+    },
+    "end": {
+      "surahId": 3,
+      "surahNameArabic": "آل عمران",
+      "surahNameTransliteration": "Aal-i-Imraan",
+      "surahNameEnglish": "The Family of Imraan",
+      "ayah": 170
+    },
+    "juzId": 4,
+    "hizbInJuz": 1,
+    "firstQuarterId": 25,
+    "lastQuarterId": 28
+  },
+  {
+    "id": 8,
+    "start": {
+      "surahId": 3,
+      "surahNameArabic": "آل عمران",
+      "surahNameTransliteration": "Aal-i-Imraan",
+      "surahNameEnglish": "The Family of Imraan",
+      "ayah": 171
+    },
+    "end": {
+      "surahId": 4,
+      "surahNameArabic": "النساء",
+      "surahNameTransliteration": "An-Nisaa",
+      "surahNameEnglish": "The Women",
+      "ayah": 23
+    },
+    "juzId": 4,
+    "hizbInJuz": 2,
+    "firstQuarterId": 29,
+    "lastQuarterId": 32
+  },
+  {
+    "id": 9,
+    "start": {
+      "surahId": 4,
+      "surahNameArabic": "النساء",
+      "surahNameTransliteration": "An-Nisaa",
+      "surahNameEnglish": "The Women",
+      "ayah": 24
+    },
+    "end": {
+      "surahId": 4,
+      "surahNameArabic": "النساء",
+      "surahNameTransliteration": "An-Nisaa",
+      "surahNameEnglish": "The Women",
+      "ayah": 87
+    },
+    "juzId": 5,
+    "hizbInJuz": 1,
+    "firstQuarterId": 33,
+    "lastQuarterId": 36
+  },
+  {
+    "id": 10,
+    "start": {
+      "surahId": 4,
+      "surahNameArabic": "النساء",
+      "surahNameTransliteration": "An-Nisaa",
+      "surahNameEnglish": "The Women",
+      "ayah": 88
+    },
+    "end": {
+      "surahId": 4,
+      "surahNameArabic": "النساء",
+      "surahNameTransliteration": "An-Nisaa",
+      "surahNameEnglish": "The Women",
+      "ayah": 147
+    },
+    "juzId": 5,
+    "hizbInJuz": 2,
+    "firstQuarterId": 37,
+    "lastQuarterId": 40
+  },
+  {
+    "id": 11,
+    "start": {
+      "surahId": 4,
+      "surahNameArabic": "النساء",
+      "surahNameTransliteration": "An-Nisaa",
+      "surahNameEnglish": "The Women",
+      "ayah": 148
+    },
+    "end": {
+      "surahId": 5,
+      "surahNameArabic": "المائدة",
+      "surahNameTransliteration": "Al-Maaida",
+      "surahNameEnglish": "The Table",
+      "ayah": 26
+    },
+    "juzId": 6,
+    "hizbInJuz": 1,
+    "firstQuarterId": 41,
+    "lastQuarterId": 44
+  },
+  {
+    "id": 12,
+    "start": {
+      "surahId": 5,
+      "surahNameArabic": "المائدة",
+      "surahNameTransliteration": "Al-Maaida",
+      "surahNameEnglish": "The Table",
+      "ayah": 27
+    },
+    "end": {
+      "surahId": 5,
+      "surahNameArabic": "المائدة",
+      "surahNameTransliteration": "Al-Maaida",
+      "surahNameEnglish": "The Table",
+      "ayah": 81
+    },
+    "juzId": 6,
+    "hizbInJuz": 2,
+    "firstQuarterId": 45,
+    "lastQuarterId": 48
+  },
+  {
+    "id": 13,
+    "start": {
+      "surahId": 5,
+      "surahNameArabic": "المائدة",
+      "surahNameTransliteration": "Al-Maaida",
+      "surahNameEnglish": "The Table",
+      "ayah": 82
+    },
+    "end": {
+      "surahId": 6,
+      "surahNameArabic": "الأنعام",
+      "surahNameTransliteration": "Al-An'aam",
+      "surahNameEnglish": "The Cattle",
+      "ayah": 35
+    },
+    "juzId": 7,
+    "hizbInJuz": 1,
+    "firstQuarterId": 49,
+    "lastQuarterId": 52
+  },
+  {
+    "id": 14,
+    "start": {
+      "surahId": 6,
+      "surahNameArabic": "الأنعام",
+      "surahNameTransliteration": "Al-An'aam",
+      "surahNameEnglish": "The Cattle",
+      "ayah": 36
+    },
+    "end": {
+      "surahId": 6,
+      "surahNameArabic": "الأنعام",
+      "surahNameTransliteration": "Al-An'aam",
+      "surahNameEnglish": "The Cattle",
+      "ayah": 110
+    },
+    "juzId": 7,
+    "hizbInJuz": 2,
+    "firstQuarterId": 53,
+    "lastQuarterId": 56
+  },
+  {
+    "id": 15,
+    "start": {
+      "surahId": 6,
+      "surahNameArabic": "الأنعام",
+      "surahNameTransliteration": "Al-An'aam",
+      "surahNameEnglish": "The Cattle",
+      "ayah": 111
+    },
+    "end": {
+      "surahId": 6,
+      "surahNameArabic": "الأنعام",
+      "surahNameTransliteration": "Al-An'aam",
+      "surahNameEnglish": "The Cattle",
+      "ayah": 165
+    },
+    "juzId": 8,
+    "hizbInJuz": 1,
+    "firstQuarterId": 57,
+    "lastQuarterId": 60
+  },
+  {
+    "id": 16,
+    "start": {
+      "surahId": 7,
+      "surahNameArabic": "الأعراف",
+      "surahNameTransliteration": "Al-A'raaf",
+      "surahNameEnglish": "The Heights",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 7,
+      "surahNameArabic": "الأعراف",
+      "surahNameTransliteration": "Al-A'raaf",
+      "surahNameEnglish": "The Heights",
+      "ayah": 87
+    },
+    "juzId": 8,
+    "hizbInJuz": 2,
+    "firstQuarterId": 61,
+    "lastQuarterId": 64
+  },
+  {
+    "id": 17,
+    "start": {
+      "surahId": 7,
+      "surahNameArabic": "الأعراف",
+      "surahNameTransliteration": "Al-A'raaf",
+      "surahNameEnglish": "The Heights",
+      "ayah": 88
+    },
+    "end": {
+      "surahId": 7,
+      "surahNameArabic": "الأعراف",
+      "surahNameTransliteration": "Al-A'raaf",
+      "surahNameEnglish": "The Heights",
+      "ayah": 170
+    },
+    "juzId": 9,
+    "hizbInJuz": 1,
+    "firstQuarterId": 65,
+    "lastQuarterId": 68
+  },
+  {
+    "id": 18,
+    "start": {
+      "surahId": 7,
+      "surahNameArabic": "الأعراف",
+      "surahNameTransliteration": "Al-A'raaf",
+      "surahNameEnglish": "The Heights",
+      "ayah": 171
+    },
+    "end": {
+      "surahId": 8,
+      "surahNameArabic": "الأنفال",
+      "surahNameTransliteration": "Al-Anfaal",
+      "surahNameEnglish": "The Spoils of War",
+      "ayah": 40
+    },
+    "juzId": 9,
+    "hizbInJuz": 2,
+    "firstQuarterId": 69,
+    "lastQuarterId": 72
+  },
+  {
+    "id": 19,
+    "start": {
+      "surahId": 8,
+      "surahNameArabic": "الأنفال",
+      "surahNameTransliteration": "Al-Anfaal",
+      "surahNameEnglish": "The Spoils of War",
+      "ayah": 41
+    },
+    "end": {
+      "surahId": 9,
+      "surahNameArabic": "التوبة",
+      "surahNameTransliteration": "At-Tawba",
+      "surahNameEnglish": "The Repentance",
+      "ayah": 33
+    },
+    "juzId": 10,
+    "hizbInJuz": 1,
+    "firstQuarterId": 73,
+    "lastQuarterId": 76
+  },
+  {
+    "id": 20,
+    "start": {
+      "surahId": 9,
+      "surahNameArabic": "التوبة",
+      "surahNameTransliteration": "At-Tawba",
+      "surahNameEnglish": "The Repentance",
+      "ayah": 34
+    },
+    "end": {
+      "surahId": 9,
+      "surahNameArabic": "التوبة",
+      "surahNameTransliteration": "At-Tawba",
+      "surahNameEnglish": "The Repentance",
+      "ayah": 92
+    },
+    "juzId": 10,
+    "hizbInJuz": 2,
+    "firstQuarterId": 77,
+    "lastQuarterId": 80
+  },
+  {
+    "id": 21,
+    "start": {
+      "surahId": 9,
+      "surahNameArabic": "التوبة",
+      "surahNameTransliteration": "At-Tawba",
+      "surahNameEnglish": "The Repentance",
+      "ayah": 93
+    },
+    "end": {
+      "surahId": 10,
+      "surahNameArabic": "يونس",
+      "surahNameTransliteration": "Yunus",
+      "surahNameEnglish": "Jonas",
+      "ayah": 25
+    },
+    "juzId": 11,
+    "hizbInJuz": 1,
+    "firstQuarterId": 81,
+    "lastQuarterId": 84
+  },
+  {
+    "id": 22,
+    "start": {
+      "surahId": 10,
+      "surahNameArabic": "يونس",
+      "surahNameTransliteration": "Yunus",
+      "surahNameEnglish": "Jonas",
+      "ayah": 26
+    },
+    "end": {
+      "surahId": 11,
+      "surahNameArabic": "هود",
+      "surahNameTransliteration": "Hud",
+      "surahNameEnglish": "Hud",
+      "ayah": 5
+    },
+    "juzId": 11,
+    "hizbInJuz": 2,
+    "firstQuarterId": 85,
+    "lastQuarterId": 88
+  },
+  {
+    "id": 23,
+    "start": {
+      "surahId": 11,
+      "surahNameArabic": "هود",
+      "surahNameTransliteration": "Hud",
+      "surahNameEnglish": "Hud",
+      "ayah": 6
+    },
+    "end": {
+      "surahId": 11,
+      "surahNameArabic": "هود",
+      "surahNameTransliteration": "Hud",
+      "surahNameEnglish": "Hud",
+      "ayah": 83
+    },
+    "juzId": 12,
+    "hizbInJuz": 1,
+    "firstQuarterId": 89,
+    "lastQuarterId": 92
+  },
+  {
+    "id": 24,
+    "start": {
+      "surahId": 11,
+      "surahNameArabic": "هود",
+      "surahNameTransliteration": "Hud",
+      "surahNameEnglish": "Hud",
+      "ayah": 84
+    },
+    "end": {
+      "surahId": 12,
+      "surahNameArabic": "يوسف",
+      "surahNameTransliteration": "Yusuf",
+      "surahNameEnglish": "Joseph",
+      "ayah": 52
+    },
+    "juzId": 12,
+    "hizbInJuz": 2,
+    "firstQuarterId": 93,
+    "lastQuarterId": 96
+  },
+  {
+    "id": 25,
+    "start": {
+      "surahId": 12,
+      "surahNameArabic": "يوسف",
+      "surahNameTransliteration": "Yusuf",
+      "surahNameEnglish": "Joseph",
+      "ayah": 53
+    },
+    "end": {
+      "surahId": 13,
+      "surahNameArabic": "الرعد",
+      "surahNameTransliteration": "Ar-Ra'd",
+      "surahNameEnglish": "The Thunder",
+      "ayah": 18
+    },
+    "juzId": 13,
+    "hizbInJuz": 1,
+    "firstQuarterId": 97,
+    "lastQuarterId": 100
+  },
+  {
+    "id": 26,
+    "start": {
+      "surahId": 13,
+      "surahNameArabic": "الرعد",
+      "surahNameTransliteration": "Ar-Ra'd",
+      "surahNameEnglish": "The Thunder",
+      "ayah": 19
+    },
+    "end": {
+      "surahId": 14,
+      "surahNameArabic": "ابراهيم",
+      "surahNameTransliteration": "Ibrahim",
+      "surahNameEnglish": "Abraham",
+      "ayah": 52
+    },
+    "juzId": 13,
+    "hizbInJuz": 2,
+    "firstQuarterId": 101,
+    "lastQuarterId": 104
+  },
+  {
+    "id": 27,
+    "start": {
+      "surahId": 15,
+      "surahNameArabic": "الحجر",
+      "surahNameTransliteration": "Al-Hijr",
+      "surahNameEnglish": "The Rock",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 16,
+      "surahNameArabic": "النحل",
+      "surahNameTransliteration": "An-Nahl",
+      "surahNameEnglish": "The Bee",
+      "ayah": 50
+    },
+    "juzId": 14,
+    "hizbInJuz": 1,
+    "firstQuarterId": 105,
+    "lastQuarterId": 108
+  },
+  {
+    "id": 28,
+    "start": {
+      "surahId": 16,
+      "surahNameArabic": "النحل",
+      "surahNameTransliteration": "An-Nahl",
+      "surahNameEnglish": "The Bee",
+      "ayah": 51
+    },
+    "end": {
+      "surahId": 16,
+      "surahNameArabic": "النحل",
+      "surahNameTransliteration": "An-Nahl",
+      "surahNameEnglish": "The Bee",
+      "ayah": 128
+    },
+    "juzId": 14,
+    "hizbInJuz": 2,
+    "firstQuarterId": 109,
+    "lastQuarterId": 112
+  },
+  {
+    "id": 29,
+    "start": {
+      "surahId": 17,
+      "surahNameArabic": "الإسراء",
+      "surahNameTransliteration": "Al-Israa",
+      "surahNameEnglish": "The Night Journey",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 17,
+      "surahNameArabic": "الإسراء",
+      "surahNameTransliteration": "Al-Israa",
+      "surahNameEnglish": "The Night Journey",
+      "ayah": 98
+    },
+    "juzId": 15,
+    "hizbInJuz": 1,
+    "firstQuarterId": 113,
+    "lastQuarterId": 116
+  },
+  {
+    "id": 30,
+    "start": {
+      "surahId": 17,
+      "surahNameArabic": "الإسراء",
+      "surahNameTransliteration": "Al-Israa",
+      "surahNameEnglish": "The Night Journey",
+      "ayah": 99
+    },
+    "end": {
+      "surahId": 18,
+      "surahNameArabic": "الكهف",
+      "surahNameTransliteration": "Al-Kahf",
+      "surahNameEnglish": "The Cave",
+      "ayah": 74
+    },
+    "juzId": 15,
+    "hizbInJuz": 2,
+    "firstQuarterId": 117,
+    "lastQuarterId": 120
+  },
+  {
+    "id": 31,
+    "start": {
+      "surahId": 18,
+      "surahNameArabic": "الكهف",
+      "surahNameTransliteration": "Al-Kahf",
+      "surahNameEnglish": "The Cave",
+      "ayah": 75
+    },
+    "end": {
+      "surahId": 19,
+      "surahNameArabic": "مريم",
+      "surahNameTransliteration": "Maryam",
+      "surahNameEnglish": "Mary",
+      "ayah": 98
+    },
+    "juzId": 16,
+    "hizbInJuz": 1,
+    "firstQuarterId": 121,
+    "lastQuarterId": 124
+  },
+  {
+    "id": 32,
+    "start": {
+      "surahId": 20,
+      "surahNameArabic": "طه",
+      "surahNameTransliteration": "Taa-Haa",
+      "surahNameEnglish": "Taa-Haa",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 20,
+      "surahNameArabic": "طه",
+      "surahNameTransliteration": "Taa-Haa",
+      "surahNameEnglish": "Taa-Haa",
+      "ayah": 135
+    },
+    "juzId": 16,
+    "hizbInJuz": 2,
+    "firstQuarterId": 125,
+    "lastQuarterId": 128
+  },
+  {
+    "id": 33,
+    "start": {
+      "surahId": 21,
+      "surahNameArabic": "الأنبياء",
+      "surahNameTransliteration": "Al-Anbiyaa",
+      "surahNameEnglish": "The Prophets",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 21,
+      "surahNameArabic": "الأنبياء",
+      "surahNameTransliteration": "Al-Anbiyaa",
+      "surahNameEnglish": "The Prophets",
+      "ayah": 112
+    },
+    "juzId": 17,
+    "hizbInJuz": 1,
+    "firstQuarterId": 129,
+    "lastQuarterId": 132
+  },
+  {
+    "id": 34,
+    "start": {
+      "surahId": 22,
+      "surahNameArabic": "الحج",
+      "surahNameTransliteration": "Al-Hajj",
+      "surahNameEnglish": "The Pilgrimage",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 22,
+      "surahNameArabic": "الحج",
+      "surahNameTransliteration": "Al-Hajj",
+      "surahNameEnglish": "The Pilgrimage",
+      "ayah": 78
+    },
+    "juzId": 17,
+    "hizbInJuz": 2,
+    "firstQuarterId": 133,
+    "lastQuarterId": 136
+  },
+  {
+    "id": 35,
+    "start": {
+      "surahId": 23,
+      "surahNameArabic": "المؤمنون",
+      "surahNameTransliteration": "Al-Muminoon",
+      "surahNameEnglish": "The Believers",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 24,
+      "surahNameArabic": "النور",
+      "surahNameTransliteration": "An-Noor",
+      "surahNameEnglish": "The Light",
+      "ayah": 20
+    },
+    "juzId": 18,
+    "hizbInJuz": 1,
+    "firstQuarterId": 137,
+    "lastQuarterId": 140
+  },
+  {
+    "id": 36,
+    "start": {
+      "surahId": 24,
+      "surahNameArabic": "النور",
+      "surahNameTransliteration": "An-Noor",
+      "surahNameEnglish": "The Light",
+      "ayah": 21
+    },
+    "end": {
+      "surahId": 25,
+      "surahNameArabic": "الفرقان",
+      "surahNameTransliteration": "Al-Furqaan",
+      "surahNameEnglish": "The Criterion",
+      "ayah": 20
+    },
+    "juzId": 18,
+    "hizbInJuz": 2,
+    "firstQuarterId": 141,
+    "lastQuarterId": 144
+  },
+  {
+    "id": 37,
+    "start": {
+      "surahId": 25,
+      "surahNameArabic": "الفرقان",
+      "surahNameTransliteration": "Al-Furqaan",
+      "surahNameEnglish": "The Criterion",
+      "ayah": 21
+    },
+    "end": {
+      "surahId": 26,
+      "surahNameArabic": "الشعراء",
+      "surahNameTransliteration": "Ash-Shu'araa",
+      "surahNameEnglish": "The Poets",
+      "ayah": 110
+    },
+    "juzId": 19,
+    "hizbInJuz": 1,
+    "firstQuarterId": 145,
+    "lastQuarterId": 148
+  },
+  {
+    "id": 38,
+    "start": {
+      "surahId": 26,
+      "surahNameArabic": "الشعراء",
+      "surahNameTransliteration": "Ash-Shu'araa",
+      "surahNameEnglish": "The Poets",
+      "ayah": 111
+    },
+    "end": {
+      "surahId": 27,
+      "surahNameArabic": "النمل",
+      "surahNameTransliteration": "An-Naml",
+      "surahNameEnglish": "The Ant",
+      "ayah": 55
+    },
+    "juzId": 19,
+    "hizbInJuz": 2,
+    "firstQuarterId": 149,
+    "lastQuarterId": 152
+  },
+  {
+    "id": 39,
+    "start": {
+      "surahId": 27,
+      "surahNameArabic": "النمل",
+      "surahNameTransliteration": "An-Naml",
+      "surahNameEnglish": "The Ant",
+      "ayah": 56
+    },
+    "end": {
+      "surahId": 28,
+      "surahNameArabic": "القصص",
+      "surahNameTransliteration": "Al-Qasas",
+      "surahNameEnglish": "The Stories",
+      "ayah": 50
+    },
+    "juzId": 20,
+    "hizbInJuz": 1,
+    "firstQuarterId": 153,
+    "lastQuarterId": 156
+  },
+  {
+    "id": 40,
+    "start": {
+      "surahId": 28,
+      "surahNameArabic": "القصص",
+      "surahNameTransliteration": "Al-Qasas",
+      "surahNameEnglish": "The Stories",
+      "ayah": 51
+    },
+    "end": {
+      "surahId": 29,
+      "surahNameArabic": "العنكبوت",
+      "surahNameTransliteration": "Al-Ankaboot",
+      "surahNameEnglish": "The Spider",
+      "ayah": 45
+    },
+    "juzId": 20,
+    "hizbInJuz": 2,
+    "firstQuarterId": 157,
+    "lastQuarterId": 160
+  },
+  {
+    "id": 41,
+    "start": {
+      "surahId": 29,
+      "surahNameArabic": "العنكبوت",
+      "surahNameTransliteration": "Al-Ankaboot",
+      "surahNameEnglish": "The Spider",
+      "ayah": 46
+    },
+    "end": {
+      "surahId": 31,
+      "surahNameArabic": "لقمان",
+      "surahNameTransliteration": "Luqman",
+      "surahNameEnglish": "Luqman",
+      "ayah": 21
+    },
+    "juzId": 21,
+    "hizbInJuz": 1,
+    "firstQuarterId": 161,
+    "lastQuarterId": 164
+  },
+  {
+    "id": 42,
+    "start": {
+      "surahId": 31,
+      "surahNameArabic": "لقمان",
+      "surahNameTransliteration": "Luqman",
+      "surahNameEnglish": "Luqman",
+      "ayah": 22
+    },
+    "end": {
+      "surahId": 33,
+      "surahNameArabic": "الأحزاب",
+      "surahNameTransliteration": "Al-Ahzaab",
+      "surahNameEnglish": "The Clans",
+      "ayah": 30
+    },
+    "juzId": 21,
+    "hizbInJuz": 2,
+    "firstQuarterId": 165,
+    "lastQuarterId": 168
+  },
+  {
+    "id": 43,
+    "start": {
+      "surahId": 33,
+      "surahNameArabic": "الأحزاب",
+      "surahNameTransliteration": "Al-Ahzaab",
+      "surahNameEnglish": "The Clans",
+      "ayah": 31
+    },
+    "end": {
+      "surahId": 34,
+      "surahNameArabic": "سبإ",
+      "surahNameTransliteration": "Saba",
+      "surahNameEnglish": "Sheba",
+      "ayah": 23
+    },
+    "juzId": 22,
+    "hizbInJuz": 1,
+    "firstQuarterId": 169,
+    "lastQuarterId": 172
+  },
+  {
+    "id": 44,
+    "start": {
+      "surahId": 34,
+      "surahNameArabic": "سبإ",
+      "surahNameTransliteration": "Saba",
+      "surahNameEnglish": "Sheba",
+      "ayah": 24
+    },
+    "end": {
+      "surahId": 36,
+      "surahNameArabic": "يس",
+      "surahNameTransliteration": "Yaseen",
+      "surahNameEnglish": "Yaseen",
+      "ayah": 27
+    },
+    "juzId": 22,
+    "hizbInJuz": 2,
+    "firstQuarterId": 173,
+    "lastQuarterId": 176
+  },
+  {
+    "id": 45,
+    "start": {
+      "surahId": 36,
+      "surahNameArabic": "يس",
+      "surahNameTransliteration": "Yaseen",
+      "surahNameEnglish": "Yaseen",
+      "ayah": 28
+    },
+    "end": {
+      "surahId": 37,
+      "surahNameArabic": "الصافات",
+      "surahNameTransliteration": "As-Saaffaat",
+      "surahNameEnglish": "Those drawn up in Ranks",
+      "ayah": 144
+    },
+    "juzId": 23,
+    "hizbInJuz": 1,
+    "firstQuarterId": 177,
+    "lastQuarterId": 180
+  },
+  {
+    "id": 46,
+    "start": {
+      "surahId": 37,
+      "surahNameArabic": "الصافات",
+      "surahNameTransliteration": "As-Saaffaat",
+      "surahNameEnglish": "Those drawn up in Ranks",
+      "ayah": 145
+    },
+    "end": {
+      "surahId": 39,
+      "surahNameArabic": "الزمر",
+      "surahNameTransliteration": "Az-Zumar",
+      "surahNameEnglish": "The Groups",
+      "ayah": 31
+    },
+    "juzId": 23,
+    "hizbInJuz": 2,
+    "firstQuarterId": 181,
+    "lastQuarterId": 184
+  },
+  {
+    "id": 47,
+    "start": {
+      "surahId": 39,
+      "surahNameArabic": "الزمر",
+      "surahNameTransliteration": "Az-Zumar",
+      "surahNameEnglish": "The Groups",
+      "ayah": 32
+    },
+    "end": {
+      "surahId": 40,
+      "surahNameArabic": "غافر",
+      "surahNameTransliteration": "Al-Ghaafir",
+      "surahNameEnglish": "The Forgiver",
+      "ayah": 40
+    },
+    "juzId": 24,
+    "hizbInJuz": 1,
+    "firstQuarterId": 185,
+    "lastQuarterId": 188
+  },
+  {
+    "id": 48,
+    "start": {
+      "surahId": 40,
+      "surahNameArabic": "غافر",
+      "surahNameTransliteration": "Al-Ghaafir",
+      "surahNameEnglish": "The Forgiver",
+      "ayah": 41
+    },
+    "end": {
+      "surahId": 41,
+      "surahNameArabic": "فصلت",
+      "surahNameTransliteration": "Fussilat",
+      "surahNameEnglish": "Explained in detail",
+      "ayah": 46
+    },
+    "juzId": 24,
+    "hizbInJuz": 2,
+    "firstQuarterId": 189,
+    "lastQuarterId": 192
+  },
+  {
+    "id": 49,
+    "start": {
+      "surahId": 41,
+      "surahNameArabic": "فصلت",
+      "surahNameTransliteration": "Fussilat",
+      "surahNameEnglish": "Explained in detail",
+      "ayah": 47
+    },
+    "end": {
+      "surahId": 43,
+      "surahNameArabic": "الزخرف",
+      "surahNameTransliteration": "Az-Zukhruf",
+      "surahNameEnglish": "Ornaments of gold",
+      "ayah": 23
+    },
+    "juzId": 25,
+    "hizbInJuz": 1,
+    "firstQuarterId": 193,
+    "lastQuarterId": 196
+  },
+  {
+    "id": 50,
+    "start": {
+      "surahId": 43,
+      "surahNameArabic": "الزخرف",
+      "surahNameTransliteration": "Az-Zukhruf",
+      "surahNameEnglish": "Ornaments of gold",
+      "ayah": 24
+    },
+    "end": {
+      "surahId": 45,
+      "surahNameArabic": "الجاثية",
+      "surahNameTransliteration": "Al-Jaathiya",
+      "surahNameEnglish": "Crouching",
+      "ayah": 37
+    },
+    "juzId": 25,
+    "hizbInJuz": 2,
+    "firstQuarterId": 197,
+    "lastQuarterId": 200
+  },
+  {
+    "id": 51,
+    "start": {
+      "surahId": 46,
+      "surahNameArabic": "الأحقاف",
+      "surahNameTransliteration": "Al-Ahqaf",
+      "surahNameEnglish": "The Dunes",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 48,
+      "surahNameArabic": "الفتح",
+      "surahNameTransliteration": "Al-Fath",
+      "surahNameEnglish": "The Victory",
+      "ayah": 17
+    },
+    "juzId": 26,
+    "hizbInJuz": 1,
+    "firstQuarterId": 201,
+    "lastQuarterId": 204
+  },
+  {
+    "id": 52,
+    "start": {
+      "surahId": 48,
+      "surahNameArabic": "الفتح",
+      "surahNameTransliteration": "Al-Fath",
+      "surahNameEnglish": "The Victory",
+      "ayah": 18
+    },
+    "end": {
+      "surahId": 51,
+      "surahNameArabic": "الذاريات",
+      "surahNameTransliteration": "Adh-Dhaariyat",
+      "surahNameEnglish": "The Winnowing Winds",
+      "ayah": 30
+    },
+    "juzId": 26,
+    "hizbInJuz": 2,
+    "firstQuarterId": 205,
+    "lastQuarterId": 208
+  },
+  {
+    "id": 53,
+    "start": {
+      "surahId": 51,
+      "surahNameArabic": "الذاريات",
+      "surahNameTransliteration": "Adh-Dhaariyat",
+      "surahNameEnglish": "The Winnowing Winds",
+      "ayah": 31
+    },
+    "end": {
+      "surahId": 54,
+      "surahNameArabic": "القمر",
+      "surahNameTransliteration": "Al-Qamar",
+      "surahNameEnglish": "The Moon",
+      "ayah": 55
+    },
+    "juzId": 27,
+    "hizbInJuz": 1,
+    "firstQuarterId": 209,
+    "lastQuarterId": 212
+  },
+  {
+    "id": 54,
+    "start": {
+      "surahId": 55,
+      "surahNameArabic": "الرحمن",
+      "surahNameTransliteration": "Ar-Rahmaan",
+      "surahNameEnglish": "The Beneficent",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 57,
+      "surahNameArabic": "الحديد",
+      "surahNameTransliteration": "Al-Hadid",
+      "surahNameEnglish": "The Iron",
+      "ayah": 29
+    },
+    "juzId": 27,
+    "hizbInJuz": 2,
+    "firstQuarterId": 213,
+    "lastQuarterId": 216
+  },
+  {
+    "id": 55,
+    "start": {
+      "surahId": 58,
+      "surahNameArabic": "المجادلة",
+      "surahNameTransliteration": "Al-Mujaadila",
+      "surahNameEnglish": "The Pleading Woman",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 61,
+      "surahNameArabic": "الصف",
+      "surahNameTransliteration": "As-Saff",
+      "surahNameEnglish": "The Ranks",
+      "ayah": 14
+    },
+    "juzId": 28,
+    "hizbInJuz": 1,
+    "firstQuarterId": 217,
+    "lastQuarterId": 220
+  },
+  {
+    "id": 56,
+    "start": {
+      "surahId": 62,
+      "surahNameArabic": "الجمعة",
+      "surahNameTransliteration": "Al-Jumu'a",
+      "surahNameEnglish": "Friday",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 66,
+      "surahNameArabic": "التحريم",
+      "surahNameTransliteration": "At-Tahrim",
+      "surahNameEnglish": "The Prohibition",
+      "ayah": 12
+    },
+    "juzId": 28,
+    "hizbInJuz": 2,
+    "firstQuarterId": 221,
+    "lastQuarterId": 224
+  },
+  {
+    "id": 57,
+    "start": {
+      "surahId": 67,
+      "surahNameArabic": "الملك",
+      "surahNameTransliteration": "Al-Mulk",
+      "surahNameEnglish": "The Sovereignty",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 71,
+      "surahNameArabic": "نوح",
+      "surahNameTransliteration": "Nooh",
+      "surahNameEnglish": "Noah",
+      "ayah": 28
+    },
+    "juzId": 29,
+    "hizbInJuz": 1,
+    "firstQuarterId": 225,
+    "lastQuarterId": 228
+  },
+  {
+    "id": 58,
+    "start": {
+      "surahId": 72,
+      "surahNameArabic": "الجن",
+      "surahNameTransliteration": "Al-Jinn",
+      "surahNameEnglish": "The Jinn",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 77,
+      "surahNameArabic": "المرسلات",
+      "surahNameTransliteration": "Al-Mursalaat",
+      "surahNameEnglish": "The Emissaries",
+      "ayah": 50
+    },
+    "juzId": 29,
+    "hizbInJuz": 2,
+    "firstQuarterId": 229,
+    "lastQuarterId": 232
+  },
+  {
+    "id": 59,
+    "start": {
+      "surahId": 78,
+      "surahNameArabic": "النبإ",
+      "surahNameTransliteration": "An-Naba",
+      "surahNameEnglish": "The Announcement",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 86,
+      "surahNameArabic": "الطارق",
+      "surahNameTransliteration": "At-Taariq",
+      "surahNameEnglish": "The Morning Star",
+      "ayah": 17
+    },
+    "juzId": 30,
+    "hizbInJuz": 1,
+    "firstQuarterId": 233,
+    "lastQuarterId": 236
+  },
+  {
+    "id": 60,
+    "start": {
+      "surahId": 87,
+      "surahNameArabic": "الأعلى",
+      "surahNameTransliteration": "Al-A'laa",
+      "surahNameEnglish": "The Most High",
+      "ayah": 1
+    },
+    "end": {
+      "surahId": 114,
+      "surahNameArabic": "الناس",
+      "surahNameTransliteration": "An-Naas",
+      "surahNameEnglish": "Mankind",
+      "ayah": 6
+    },
+    "juzId": 30,
+    "hizbInJuz": 2,
+    "firstQuarterId": 237,
+    "lastQuarterId": 240
+  }
+]
