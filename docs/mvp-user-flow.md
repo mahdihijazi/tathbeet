@@ -11,16 +11,19 @@ flowchart TD
     C --> D["Browse tabs:<br/>surah / juz / hizb / rub al-hizb"]
     D --> E["Select memorized items"]
     E --> F["Continue to الورد اليومي"]
-    F --> G["Choose pace:<br/>0.5 / 1 / 2 / 3 juz per day"]
-    G --> H["Review lightweight preview"]
-    H --> I["Save schedule"]
-    I --> J["Open today's review directly"]
+    F --> G["Choose target cycle:<br/>1 week / 2 weeks / 1 month / 45 days / 2 months"]
+    G --> H["Show resolved daily equivalent"]
+    H --> I["Optional manual pace bottom sheet"]
+    I --> J["Review lightweight preview"]
+    J --> K["Save schedule"]
+    K --> L["Open today's review directly"]
 ```
 
 Notes:
 - The intro screen appears only once.
 - Account creation should not block this flow.
 - The pool should display what the user selected, while overlap handling stays internal to the scheduler.
+- The pace step should default to cycle-based setup rather than manual daily-unit selection.
 
 ## 2. Reopening Schedule Setup Later
 
@@ -30,7 +33,7 @@ flowchart TD
     B --> C["Open محفوظ selection directly"]
     C --> D["Update memorized pool"]
     D --> E["Continue to الورد اليومي"]
-    E --> F["Adjust daily pace"]
+    E --> F["Adjust target cycle or open manual pace sheet"]
     F --> G["Save updated schedule"]
     G --> H["Return to today's review"]
 ```
@@ -112,3 +115,4 @@ Notes:
 - The pool keeps exact user selections.
 - Full containment should be resolved internally by keeping the larger effective coverage.
 - Partial overlap should be resolved internally by counting shared coverage once.
+- The pace step should default to target cycle presets and keep manual pace in a secondary bottom sheet.

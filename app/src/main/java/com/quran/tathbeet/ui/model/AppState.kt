@@ -28,10 +28,31 @@ enum class PaceOption(
     @param:StringRes val labelRes: Int,
     val dailySegments: Int,
 ) {
-    HalfJuz(R.string.pace_half_juz, 4),
+    OneRub(R.string.pace_one_rub, 1),
+    OneHizb(R.string.pace_one_hizb, 4),
     OneJuz(R.string.pace_one_juz, 8),
+    OneAndHalfJuz(R.string.pace_one_and_half_juz, 12),
     TwoJuz(R.string.pace_two_juz, 16),
+    TwoAndHalfJuz(R.string.pace_two_and_half_juz, 20),
     ThreeJuz(R.string.pace_three_juz, 24),
+    FourJuz(R.string.pace_four_juz, 32),
+    FiveJuz(R.string.pace_five_juz, 40),
+}
+
+enum class PaceMethod {
+    CycleTarget,
+    Manual,
+}
+
+enum class CycleTarget(
+    @param:StringRes val labelRes: Int,
+    val days: Int,
+) {
+    OneWeek(R.string.cycle_target_one_week, 7),
+    TwoWeeks(R.string.cycle_target_two_weeks, 14),
+    OneMonth(R.string.cycle_target_one_month, 30),
+    FortyFiveDays(R.string.cycle_target_forty_five_days, 45),
+    TwoMonths(R.string.cycle_target_two_months, 60),
 }
 
 enum class SelectionCategory(
@@ -69,6 +90,8 @@ data class AppProfile(
     val isShared: Boolean,
     val guardians: Set<Guardian>,
     val notificationsEnabled: Boolean,
+    val paceMethod: PaceMethod,
+    val cycleTarget: CycleTarget,
     val pace: PaceOption,
     val selectedPoolKeys: Set<String>,
     val reviewTasks: List<ReviewTask>,
@@ -113,6 +136,15 @@ fun AppUiState.cycleLength(
     profile: AppProfile = activeProfile,
 ): Int =
     ceil(poolSegmentCount(catalog, profile).toFloat() / profile.pace.dailySegments).toInt().coerceAtLeast(1)
+
+fun recommendedPace(
+    segmentCount: Int,
+    cycleTarget: CycleTarget,
+): PaceOption {
+    val requiredSegmentsPerDay = ceil(segmentCount.toFloat() / cycleTarget.days).toInt().coerceAtLeast(1)
+    return PaceOption.entries.firstOrNull { it.dailySegments >= requiredSegmentsPerDay }
+        ?: PaceOption.entries.last()
+}
 
 fun AppUiState.updateActiveProfile(transform: (AppProfile) -> AppProfile): AppUiState =
     copy(
@@ -173,6 +205,8 @@ fun seedAppState(catalog: QuranCatalog): AppUiState {
         isShared = false,
         guardians = emptySet(),
         notificationsEnabled = true,
+        paceMethod = PaceMethod.CycleTarget,
+        cycleTarget = CycleTarget.OneMonth,
         pace = PaceOption.OneJuz,
         selectedPoolKeys = setOf(
             catalog.requireSelection(SelectionCategory.Surahs, 2).key,
@@ -193,7 +227,9 @@ fun seedAppState(catalog: QuranCatalog): AppUiState {
         isShared = true,
         guardians = setOf(Guardian.Mother, Guardian.Father),
         notificationsEnabled = true,
-        pace = PaceOption.HalfJuz,
+        paceMethod = PaceMethod.CycleTarget,
+        cycleTarget = CycleTarget.TwoWeeks,
+        pace = PaceOption.OneHizb,
         selectedPoolKeys = setOf(
             catalog.requireSelection(SelectionCategory.Juz, 30).key,
             catalog.requireSelection(SelectionCategory.Hizb, 41).key,
@@ -214,6 +250,8 @@ fun seedAppState(catalog: QuranCatalog): AppUiState {
         isShared = false,
         guardians = setOf(Guardian.Mother),
         notificationsEnabled = false,
+        paceMethod = PaceMethod.CycleTarget,
+        cycleTarget = CycleTarget.OneMonth,
         pace = PaceOption.OneJuz,
         selectedPoolKeys = setOf(
             catalog.requireSelection(SelectionCategory.Surahs, 2).key,
@@ -228,7 +266,21 @@ fun seedAppState(catalog: QuranCatalog): AppUiState {
     )
 
     val seededProfiles = listOf(father, maryam, yusuf).map { profile ->
-        profile.copy(reviewTasks = generateTasksForProfile(profile, catalog))
+        val recommendedPace = recommendedPace(
+            segmentCount = catalog.resolveSelections(profile.selectedPoolKeys).sumOf { it.segments },
+            cycleTarget = profile.cycleTarget,
+        )
+        profile.copy(
+            pace = if (profile.paceMethod == PaceMethod.CycleTarget) recommendedPace else profile.pace,
+            reviewTasks = generateTasksForProfile(
+                profile = if (profile.paceMethod == PaceMethod.CycleTarget) {
+                    profile.copy(pace = recommendedPace)
+                } else {
+                    profile
+                },
+                catalog = catalog,
+            ),
+        )
     }
 
     return AppUiState(

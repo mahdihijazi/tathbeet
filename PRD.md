@@ -237,19 +237,48 @@ This approach preserves:
 
 ### 9.1 Rotation Objective
 
-The app should support a user-friendly revision target such as:
+The app should support two ways to define revision pace:
 
-- `0.5 juz/day`
+- primary method: finish the full revision pool within a target cycle duration
+- secondary method: choose a fixed manual daily pace
+
+The default method in MVP should be target cycle duration because it is simpler and more outcome-oriented.
+
+Supported cycle presets:
+
+- `1 week`
+- `2 weeks`
+- `1 month`
+- `45 days`
+- `2 months`
+
+For cycle-based setup:
+
+- `1 month` should mean `30 days`
+- weeks and months should convert internally to days
+- the engine should calculate the needed daily load from real `rub-equivalent` coverage
+- if the exact pace is awkward, the app should round up to the next practical pace milestone
+
+Supported manual pace milestones:
+
+- `1 rub/day`
+- `1 hizb/day`
 - `1 juz/day`
+- `1.5 juz/day`
 - `2 juz/day`
+- `2.5 juz/day`
 - `3 juz/day`
+- `4 juz/day`
+- `5 juz/day`
 
 ### 9.2 Recommended Scheduling Logic
 
 For MVP, the scheduler should:
 
 - convert the selected memorization pool into normalized review segments
-- calculate how many segments approximately match the user’s daily target
+- calculate the required daily load from either the selected cycle target or the selected manual pace
+- use real `rub-equivalent` coverage for that calculation
+- expose the resolved daily equivalent to the user even when they chose a cycle target
 - create a daily task list from the next items in the rotation
 - continue from where the last completed task left off
 - roll incomplete tasks into the next day before assigning new work
@@ -350,8 +379,9 @@ The data model should support shared ownership and conflict-safe synchronization
 - the memorized-content screen should keep the top summary and navigation area fixed while only the item list scrolls
 - category switching in the memorized-content screen should use swipeable tabs rather than button-like chips
 - after the first intro has been seen, reopening schedule setup should start from the memorized-content selection step
-- user can choose a daily revision target in juz-per-day
-- user can review a lightweight summary before saving, focused on pool size and estimated rotation length
+- daily-ward setup should default to choosing when the user wants to finish one full revision cycle
+- daily-ward setup should also allow a manual pace override through a secondary bottom-sheet flow
+- user can review a lightweight summary before saving, focused on pool size, target cycle, resolved daily equivalent, and estimated rotation length
 - saving the wizard should take the user directly to today’s review screen
 - the daily-ward screen should stay visually focused and avoid noisy helper blocks that do not help the user complete setup
 

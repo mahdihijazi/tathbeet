@@ -27,7 +27,9 @@ import com.quran.tathbeet.ui.model.AccountMode
 import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.model.AppProfile
 import com.quran.tathbeet.ui.model.AppUiState
+import com.quran.tathbeet.ui.model.CycleTarget
 import com.quran.tathbeet.ui.model.Guardian
+import com.quran.tathbeet.ui.model.PaceMethod
 import com.quran.tathbeet.ui.model.SyncState
 import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.activeProfile
@@ -39,6 +41,7 @@ import com.quran.tathbeet.ui.model.displayLabelRes
 import com.quran.tathbeet.ui.model.generateTasksForProfile
 import com.quran.tathbeet.ui.model.loadQuranCatalog
 import com.quran.tathbeet.ui.model.poolSegmentCount
+import com.quran.tathbeet.ui.model.recommendedPace
 import com.quran.tathbeet.ui.model.reminderOptions
 import com.quran.tathbeet.ui.model.scheduleWizardStartDestination
 import com.quran.tathbeet.ui.model.seedAppState
@@ -185,12 +188,42 @@ fun TathbeetApp() {
 
                 AppDestination.ScheduleDose -> ScheduleScreen(
                     selectedPool = activePoolSelections,
+                    paceMethod = activeProfile.paceMethod,
+                    selectedCycleTarget = activeProfile.cycleTarget,
                     selectedPace = activeProfile.pace,
                     segmentCount = uiState.poolSegmentCount(quranCatalog),
                     cycleLength = uiState.cycleLength(quranCatalog),
+                    onCycleTargetSelected = { cycleTarget ->
+                        mutate {
+                            val nextSegmentCount = it.poolSegmentCount(quranCatalog)
+                            it.updateActiveProfile { profile ->
+                                profile.copy(
+                                    paceMethod = PaceMethod.CycleTarget,
+                                    cycleTarget = cycleTarget,
+                                    pace = recommendedPace(nextSegmentCount, cycleTarget),
+                                )
+                            }
+                        }
+                    },
                     onPaceSelected = { pace ->
                         mutate {
-                            it.updateActiveProfile { profile -> profile.copy(pace = pace) }
+                            it.updateActiveProfile { profile ->
+                                profile.copy(
+                                    paceMethod = PaceMethod.Manual,
+                                    pace = pace,
+                                )
+                            }
+                        }
+                    },
+                    onResetToCycleMode = {
+                        mutate {
+                            val nextSegmentCount = it.poolSegmentCount(quranCatalog)
+                            it.updateActiveProfile { profile ->
+                                profile.copy(
+                                    paceMethod = PaceMethod.CycleTarget,
+                                    pace = recommendedPace(nextSegmentCount, profile.cycleTarget),
+                                )
+                            }
                         }
                     },
                     onSaveSchedule = {

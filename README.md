@@ -73,10 +73,17 @@ Internally, the scheduler should separately compute effective coverage from thos
 
 This allows the app to support practical pacing such as:
 
-- `0.5 juz/day`
-- `1 juz/day`
-- `2 juz/day`
-- `3 juz/day`
+- cycle target presets like `1 week`, `2 weeks`, `1 month`, `45 days`, and `2 months`
+- manual pace presets from `1 rub/day` up to `5 juz/day`
+
+The default pace setup should be cycle-based:
+
+- user chooses when they want to finish one full revision cycle
+- app converts that target into a daily equivalent using real `rub al-hizb` coverage
+- app rounds up to the next practical pace milestone
+- app still shows the resolved daily equivalent clearly
+
+Manual pace remains available as a secondary override.
 
 Missed work rolls over to the next day rather than being dropped.
 

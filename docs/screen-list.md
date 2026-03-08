@@ -5,7 +5,7 @@
 - is now a wizard instead of a single screen
 - shows a one-time intro on first app open
 - starts from محفوظ selection on later visits
-- ends with a daily-ward screen in `juz/day`
+- ends with a daily-ward screen that defaults to cycle-target setup
 - keeps only a lightweight preview before saving
 - should remain visually focused and avoid noisy supporting blocks that do not help schedule setup
 
@@ -38,7 +38,10 @@
 ## 6. Daily Ward
 
 - second functional step after محفوظ selection
-- lets the user choose the daily pace
+- defaults to choosing when the user wants to finish one full revision cycle
+- supports presets like `1 week`, `2 weeks`, `1 month`, `45 days`, and `2 months`
+- shows the resolved daily equivalent after conversion
+- offers manual pace as a secondary bottom-sheet flow
 - shows a lightweight preview before saving
 - saving takes the user directly to today’s review
 
