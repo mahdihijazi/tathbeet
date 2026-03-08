@@ -22,6 +22,7 @@ import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.AppCardTone
 import com.quran.tathbeet.ui.components.AppPrimaryButton
 import com.quran.tathbeet.ui.components.CardSection
+import com.quran.tathbeet.ui.components.WizardStepIndicator
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
@@ -41,12 +42,12 @@ fun ScheduleIntroScreen(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Surface(
-                    modifier = Modifier.size(TathbeetTokens.spacing.x4 * 4),
+                    modifier = Modifier.size(TathbeetTokens.spacing.x4 * 5),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.92f),
                 ) {}
                 Surface(
-                    modifier = Modifier.size(TathbeetTokens.spacing.x4 * 3),
+                    modifier = Modifier.size(TathbeetTokens.spacing.x4 * 4),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.background.copy(alpha = 0.92f),
                     tonalElevation = TathbeetTokens.spacing.x1,
@@ -55,7 +56,7 @@ fun ScheduleIntroScreen(
                         Image(
                             painter = painterResource(R.drawable.tathbeet_logo),
                             contentDescription = null,
-                            modifier = Modifier.size(TathbeetTokens.spacing.x4 * 2),
+                            modifier = Modifier.size(TathbeetTokens.spacing.x4 * 3),
                         )
                     }
                 }
@@ -69,6 +70,10 @@ fun ScheduleIntroScreen(
                     verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x2),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    WizardStepIndicator(
+                        currentStep = 1,
+                        totalSteps = 3,
+                    )
                     Text(
                         text = stringResource(R.string.schedule_intro_body),
                         style = MaterialTheme.typography.headlineSmall,
@@ -76,7 +81,9 @@ fun ScheduleIntroScreen(
                     )
                     Text(
                         text = stringResource(R.string.schedule_intro_supporting),
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Normal,
+                        ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )

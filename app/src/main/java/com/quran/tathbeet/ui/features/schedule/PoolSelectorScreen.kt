@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
+import com.quran.tathbeet.ui.components.WizardStepIndicator
 import com.quran.tathbeet.ui.model.QuranSelectionItem
 import com.quran.tathbeet.ui.model.SelectionCategory
 import com.quran.tathbeet.ui.model.summarizeSelectionTitles
@@ -76,6 +77,10 @@ fun PoolSelectorScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            WizardStepIndicator(
+                currentStep = 2,
+                totalSteps = 3,
+            )
             Text(
                 text = stringResource(R.string.pool_selector_subtitle),
                 style = MaterialTheme.typography.bodyLarge,

@@ -166,3 +166,32 @@ fun LabelCloud(items: List<String>) {
         }
     }
 }
+
+@Composable
+fun WizardStepIndicator(
+    currentStep: Int,
+    totalSteps: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(totalSteps) { index ->
+            val isActive = index + 1 == currentStep
+            Box(
+                modifier = Modifier
+                    .size(if (isActive) TathbeetTokens.spacing.x2 else TathbeetTokens.spacing.x1)
+                    .background(
+                        color = if (isActive) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                        },
+                        shape = CircleShape,
+                    ),
+            )
+        }
+    }
+}

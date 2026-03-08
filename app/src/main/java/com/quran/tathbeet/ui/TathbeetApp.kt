@@ -1,6 +1,7 @@
 package com.quran.tathbeet.ui
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -77,28 +78,42 @@ fun TathbeetApp() {
         }
     }
 
+    fun handleBack() {
+        mutate {
+            when (it.destination) {
+                AppDestination.ScheduleIntro -> it
+                AppDestination.PoolSelector -> {
+                    if (it.hasCompletedScheduleOnboarding) {
+                        it.copy(destination = it.scheduleReturnDestination)
+                    } else {
+                        it.copy(destination = AppDestination.ScheduleIntro)
+                    }
+                }
+                AppDestination.ScheduleDose -> it.copy(destination = AppDestination.PoolSelector)
+                else -> it.copy(destination = AppDestination.Review)
+            }
+        }
+    }
+
+    BackHandler(
+        enabled = uiState.destination !in setOf(
+            AppDestination.Profiles,
+            AppDestination.Review,
+            AppDestination.Progress,
+            AppDestination.Settings,
+            AppDestination.ScheduleIntro,
+        ),
+    ) {
+        handleBack()
+    }
+
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         AppShell(
             uiState = uiState,
             onNavigate = { destination ->
                 mutate { it.copy(destination = destination) }
             },
-            onBack = {
-                mutate {
-                    when (it.destination) {
-                        AppDestination.ScheduleIntro -> it
-                        AppDestination.PoolSelector -> {
-                            if (it.hasCompletedScheduleOnboarding) {
-                                it.copy(destination = it.scheduleReturnDestination)
-                            } else {
-                                it.copy(destination = AppDestination.ScheduleIntro)
-                            }
-                        }
-                        AppDestination.ScheduleDose -> it.copy(destination = AppDestination.PoolSelector)
-                        else -> it.copy(destination = AppDestination.Review)
-                    }
-                }
-            },
+            onBack = ::handleBack,
             onReviewPlanAction = {
                 openScheduleWizard(AppDestination.Review)
             },
