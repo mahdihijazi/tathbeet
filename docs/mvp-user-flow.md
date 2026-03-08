@@ -1,44 +1,114 @@
-# Tathbeet MVP User Flow
+# Tathbeet MVP User Flows
 
-This flow focuses on the Android MVP that you asked for: offline-first review, optional Google sign-in, multiple profiles, shared child profiles, and an Arabic-first RTL prototype.
+This document splits the MVP into separate user journeys so each flow stays focused and reviewable.
+
+## 1. Onboarding And First Schedule Setup
 
 ```mermaid
 flowchart TD
-    A["Open Tathbeet"] --> B{"First app open?"}
-    B -- "Yes" --> C["Show one-time wizard intro"]
-    B -- "No" --> D["Open محفوظ selection directly"]
-    C --> D
-    D --> E["Switch between tabs:<br/>surah / juz / hizb / rub al-hizb"]
-    E --> F["Add selected items to the pool"]
-    F --> G["Move to daily ward screen"]
-    G --> H["Choose daily pace<br/>0.5 / 1 / 2 / 3 juz per day"]
-    H --> I["Show lightweight preview<br/>pool size + cycle length"]
-    I --> J["Save active schedule"]
-    J --> K["Open today's review directly"]
-    K --> L{"Finish all assigned segments?"}
-    L -- "No" --> M["Keep unfinished segments in rollover queue"]
-    L -- "Yes" --> N["Mark day done"]
-    M --> O["Show motivation and next reminder state"]
-    N --> O
-    O --> P["Open profiles or settings as needed"]
-    P --> Q["Optional toolbar action: create account later"]
-    P --> R["Optional shared child profile flow"]
-    R --> S["Sync child profile across devices"]
+    A["Open Tathbeet for the first time"] --> B["Show one-time intro screen"]
+    B --> C["Open محفوظ selection"]
+    C --> D["Browse tabs:<br/>surah / juz / hizb / rub al-hizb"]
+    D --> E["Select memorized items"]
+    E --> F["Continue to الورد اليومي"]
+    F --> G["Choose pace:<br/>0.5 / 1 / 2 / 3 juz per day"]
+    G --> H["Review lightweight preview"]
+    H --> I["Save schedule"]
+    I --> J["Open today's review directly"]
 ```
 
-## Flow Notes
+Notes:
+- The intro screen appears only once.
+- Account creation should not block this flow.
+- The pool should display what the user selected, while overlap handling stays internal to the scheduler.
 
-- The first app open shows a one-time wizard intro screen, then moves into the schedule setup flow.
-- After that first intro has been seen, reopening the setup flow should start directly on the محفوظ selection screen.
-- Account creation should not block the first-run flow; it can be offered later from the toolbar.
-- The setup wizard should have three screens: intro once, محفوظ selection, then daily ward.
-- Memorized-pool selection should happen in its own dedicated screen, not inside the daily-ward screen.
-- The محفوظ selection screen should keep its header area fixed and scroll only the item list below.
-- Category switching in the محفوظ selection screen should support both tapping tabs and horizontal swiping.
-- The daily-ward screen should stay lightweight and answer only: how large is the pool, and how long is one full rotation.
-- The daily-ward screen should stay visually focused and avoid extra blocks that do not help the user finish setup.
-- Guests can use the app fully for local profile management and offline revision.
-- Signed-in users unlock sync and shared child profile management.
-- Daily review is intentionally simple: see due items, mark segments done, and let missed work roll over.
-- The prototype should use Arabic-only visible copy and should render in RTL even when tested on a non-Arabic device.
-- Prototype strings should live in Android XML resources so copy review and later localization stay manageable.
+## 2. Reopening Schedule Setup Later
+
+```mermaid
+flowchart TD
+    A["Open schedule setup again"] --> B["Skip intro"]
+    B --> C["Open محفوظ selection directly"]
+    C --> D["Update memorized pool"]
+    D --> E["Continue to الورد اليومي"]
+    E --> F["Adjust daily pace"]
+    F --> G["Save updated schedule"]
+    G --> H["Return to today's review"]
+```
+
+Notes:
+- After the first run, setup should always start from محفوظ selection.
+- The daily-ward screen should stay simple and focused.
+
+## 3. Daily Ward And Review
+
+```mermaid
+flowchart TD
+    A["Open today's review"] --> B["See assigned review units"]
+    B --> C{"Finish all assigned units?"}
+    C -- "No" --> D["Keep unfinished units for rollover"]
+    C -- "Yes" --> E["Mark day complete"]
+    D --> F["Show next reminder state"]
+    E --> F["Show next reminder state"]
+```
+
+Notes:
+- Review is intentionally simple in MVP.
+- The engine should count partial overlap once when building effective coverage.
+- Missed work rolls over instead of being dropped.
+
+## 4. Add And Manage Profiles
+
+```mermaid
+flowchart TD
+    A["Open profiles"] --> B["View all local profiles"]
+    B --> C["Add learner profile"]
+    B --> D["Switch active profile"]
+    C --> E["Configure profile locally"]
+    E --> F["Create schedule for that profile"]
+    D --> G["Open review, progress, or settings"]
+```
+
+Notes:
+- Profiles should support self and additional learners.
+- This flow should work offline.
+
+## 5. Shared Learner Profile
+
+```mermaid
+flowchart TD
+    A["Open shared profile"] --> B{"Signed in?"}
+    B -- "No" --> C["Keep profile local only"]
+    B -- "Yes" --> D["Enable shared learner profile"]
+    D --> E["Allow more than one manager"]
+    E --> F["Sync schedule and task state across devices"]
+```
+
+Notes:
+- Shared access is optional.
+- Shared profile wording should stay role-neutral and support family or class use cases.
+
+## 6. Create Account Later
+
+```mermaid
+flowchart TD
+    A["Use app as guest"] --> B["Open toolbar account action later"]
+    B --> C["Sign in with Google"]
+    C --> D["Preserve local data"]
+    D --> E["Sync profiles and schedules"]
+    E --> F["Unlock shared profile support"]
+```
+
+Notes:
+- Guest usage is valid in MVP.
+- Sign-in should enhance the product, not block first use.
+
+## Flow Rules
+
+- The prototype should use Arabic-only visible copy.
+- The prototype should render in RTL even on non-Arabic devices.
+- User-facing strings should live in Android XML resources.
+- The محفوظ selection screen should keep its top area fixed and scroll only the list below.
+- Category switching in محفوظ selection should support both tab taps and horizontal swiping.
+- The pool keeps exact user selections.
+- Full containment should be resolved internally by keeping the larger effective coverage.
+- Partial overlap should be resolved internally by counting shared coverage once.
