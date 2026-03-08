@@ -160,4 +160,20 @@ To build the app locally:
 ANDROID_HOME=$HOME/Library/Android/sdk ANDROID_SDK_ROOT=$HOME/Library/Android/sdk ./gradlew assembleDebug
 ```
 
+## Screenshot Testing
+
+The app uses Android's Compose Preview Screenshot Testing for host-side golden screenshots.
+
+- screenshot test sources live under [app/src/screenshotTest](/Users/mahdi/personal-repos/tathbeet/app/src/screenshotTest)
+- generated reference images live under [app/src/screenshotTestDebug/reference](/Users/mahdi/personal-repos/tathbeet/app/src/screenshotTestDebug/reference)
+
+Common commands:
+
+```bash
+./gradlew updateDebugScreenshotTest
+./gradlew validateDebugScreenshotTest
+```
+
+The current baseline follows a component-first strategy.
+
 See [PRD.md](/Users/mahdi/personal-repos/tathbeet/PRD.md) for the detailed product requirements.

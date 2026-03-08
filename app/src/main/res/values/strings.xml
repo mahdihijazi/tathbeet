@@ -129,7 +129,7 @@
     <string name="guardian_father">الأب</string>
 
     <string name="schedule_intro_body">لنثبّت مراجعتك اليومية</string>
-    <string name="schedule_intro_supporting">في خطوتين فقط: اختر ما تحفظه، ثم حدّد مقدار وردك اليومي.</string>
+    <string name="schedule_intro_supporting">في ثلاث خطوات: اختر ما تحفظه، ثم حدّد مقدار وردك اليومي، وبعدها ابدأ وردك.</string>
     <string name="schedule_dose_title">الورد اليومي</string>
     <string name="schedule_dose_subtitle">حدد مقدار الورد اليومي</string>
     <string name="schedule_selected_pool_title">المحفوظ المحدد</string>

@@ -53,6 +53,11 @@ Prefer black-box UI testing from the user's perspective over unit tests. Skip un
 
 Use `AndroidJUnitRunner` for instrumentation coverage. Name UI test files clearly by feature or flow, and prioritize end-to-end user scenarios such as onboarding, profile switching, schedule setup, daily review completion, shared-profile interactions, and notification/settings behavior.
 
+Use Compose Preview Screenshot Testing for visual regression coverage of important screens and UI states. The standard screenshot workflow is:
+
+- `./gradlew updateDebugScreenshotTest` to generate or refresh reference images
+- `./gradlew validateDebugScreenshotTest` to compare current renders against the saved references
+
 ## Commit & Pull Request Guidelines
 Each commit must have a clear title that explains what the commit does.
 
