@@ -25,7 +25,6 @@ import com.quran.tathbeet.ui.prototype.summarizeSelectionTitles
 
 @Composable
 fun ScheduleScreen(
-    profileName: String,
     selectedPool: List<QuranSelectionItem>,
     selectedPace: PaceOption,
     segmentCount: Int,
@@ -42,7 +41,7 @@ fun ScheduleScreen(
 
     PrototypeScreenLayout(
         title = stringResource(R.string.schedule_dose_title),
-        subtitle = stringResource(R.string.schedule_dose_subtitle, profileName),
+        subtitle = stringResource(R.string.schedule_dose_subtitle),
     ) {
         item {
             SectionHeader(

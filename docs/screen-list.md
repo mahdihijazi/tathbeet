@@ -12,12 +12,12 @@
 ## 2. Profiles Home
 
 - shows all local profiles on the device
-- lets the user switch between self and child profiles
+- lets the user switch between self and learner profiles
 - highlights active schedule status, today’s load, and notification state
 
 ## 3. Create / Edit Profile
 
-- create a new self or child profile
+- create a new self or learner profile
 - define profile name and sharing state
 - later connect a guest profile to a signed-in account
 
@@ -54,10 +54,10 @@
 - shows completion rate
 - keeps analytics intentionally lightweight in MVP
 
-## 9. Shared Child Profile
+## 9. Shared Learner Profile
 
-- shows who can manage the child profile
-- supports father and mother updating the same schedule/task state
+- shows who can manage the learner profile
+- supports multiple managers updating the same schedule/task state
 - communicates sync status and recent shared changes
 
 ## 10. Settings

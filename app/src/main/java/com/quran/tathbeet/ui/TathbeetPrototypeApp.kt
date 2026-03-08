@@ -183,7 +183,6 @@ fun TathbeetPrototypeApp() {
                 )
 
                 AppDestination.ScheduleDose -> ScheduleScreen(
-                    profileName = activeProfile.name.asString(),
                     selectedPool = activePoolSelections,
                     selectedPace = activeProfile.pace,
                     segmentCount = uiState.poolSegmentCount(quranCatalog),

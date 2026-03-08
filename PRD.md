@@ -14,13 +14,13 @@ Tathbeet is an Android app for Quran memorization revision. It helps users maint
 The product is for:
 
 - individuals reviewing their own memorization
-- parents managing revision schedules for children
+- people managing revision schedules for other learners, such as family members, teachers, or class managers
 
 The app should be usable offline for core schedule and review workflows, while optional online features support authentication, sync, and shared access.
 
 ## 2. Problem Statement
 
-People who memorize Quran often struggle with consistency in revision. After memorizing new content, older memorization can weaken without a simple, sustainable review system. Existing approaches are often manual, inconsistent, or hard to manage for multiple family members.
+People who memorize Quran often struggle with consistency in revision. After memorizing new content, older memorization can weaken without a simple, sustainable review system. Existing approaches are often manual, inconsistent, or hard to manage across multiple learners.
 
 Tathbeet should make revision:
 
@@ -51,7 +51,7 @@ Tathbeet should make revision:
 - support optional Google sign-in
 - support notifications with per-profile controls
 - support sync across devices for signed-in users
-- support shared child profiles for parent collaboration
+- support shared learner profiles for collaborative management
 
 ## 4. Non-Goals
 
@@ -73,13 +73,13 @@ The MVP will not include:
 
 A person who has memorized some portion of the Quran and wants a simple system to maintain it.
 
-### User Type B: Parent Managing Children
+### User Type B: Multi-Learner Manager
 
-A parent using one device to manage revision schedules for children, including tracking completion and controlling reminders.
+A person using one device to manage revision schedules for other learners, such as family members or a Quran class, including tracking completion and controlling reminders.
 
-### User Type C: Co-Managing Parents
+### User Type C: Co-Managers
 
-Two parents who want shared visibility and edit access for a child profile through optional cloud-backed sync.
+Two people who want shared visibility and edit access for the same learner profile through optional cloud-backed sync.
 
 ## 6. Platforms and Technical Direction
 
@@ -161,6 +161,8 @@ The schedule is defined by:
 - a target pace expressed in juz-per-day
 - notification preferences
 
+The stored pool should preserve the user’s original selections as chosen in the UI.
+
 If the user misses work on a given day, unfinished work rolls over to the next day.
 
 ### 7.5 Prototype Validation Rules
@@ -186,29 +188,50 @@ Users can build a revision pool by selecting:
 - hizb
 - rub al-hizb
 
-### 8.2 Boundary Rule
+### 8.2 Pool Preservation Rule
 
-The system should avoid expanding a surah selection into content outside that surah.
+The memorized-content pool should preserve the user’s original selections exactly as entered.
 
-If a selected surah does not align perfectly with `rub al-hizb` boundaries:
+Examples:
 
-- the app should preserve the surah boundary
-- the app should create a smaller system-generated review segment for the overlapping part
+- if the user selects a surah, the pool contains that surah
+- if the user selects a surah and also selects a `rub al-hizb` that extends beyond that surah, the pool contains both items
 
-This is an internal system behavior, not a user-facing freeform ayah-range feature.
+The pool UI should reflect what the user explicitly selected, without rewriting those picks into smaller internal units.
 
-### 8.3 Internal Scheduling Unit
+### 8.3 Overlap Resolution Rule
 
-For implementation, the scheduler should normalize the selected pool into `review segments`.
+The scheduling engine should resolve overlap automatically without asking the user.
 
-Most review segments will map to standard `rub al-hizb` units. Boundary cases may produce smaller surah-bounded segments.
+Rules:
+
+- if one selected item is fully contained inside another selected item, effective scheduling should keep only the larger outer coverage
+- if two selected items overlap only partially, effective scheduling should merge the shared coverage and count that overlapping part once
+- this behavior must be independent of selection order
+
+Examples:
+
+- `surah` + `rub al-hizb` fully inside that surah: effective coverage keeps the surah only
+- `juz` + `surah` fully inside that juz: effective coverage keeps the juz only
+- `surah` + `rub al-hizb` that starts inside the surah and extends into the next surah: effective coverage keeps both selections but counts the shared part once
+
+### 8.4 Internal Scheduling Unit
+
+For implementation, the scheduler should normalize effective coverage into `rub-equivalent` review size using real Quran reference data.
+
+This means:
+
+- the pool stores exact user selections
+- the engine computes effective non-duplicated coverage from those selections
+- daily pace calculations use approximate Quran size derived from real `rub al-hizb` coverage
 
 This approach preserves:
 
 - predictable daily pacing
 - support for mixed selection types
-- correct surah boundaries
-- partial completion inside a larger selected unit such as a surah
+- automatic handling of full containment
+- automatic handling of partial overlap without duplicate workload
+- separation between user-visible selections and internal scheduling logic
 
 ## 9. Rotation and Daily Planning
 
@@ -292,13 +315,13 @@ The MVP will not include:
 
 ## 12. Sharing and Collaboration
 
-### 12.1 Parent-Managed Profiles
+### 12.1 Managed Profiles
 
-A parent should be able to create and edit child profiles locally on one device.
+A user should be able to create and edit additional learner profiles locally on one device.
 
-### 12.2 Shared Child Profile
+### 12.2 Shared Learner Profile
 
-The MVP should support a shared child profile so both father and mother can update the same child profile and mark tasks as done from different devices.
+The MVP should support a shared learner profile so more than one manager can update the same learner profile and mark tasks as done from different devices.
 
 This requires:
 
@@ -399,7 +422,7 @@ The MVP is successful if a user can:
 These items should be resolved during design and implementation planning:
 
 - exact algorithm for converting juz-per-day targets into mixed review segments
-- exact permissions model for shared child profiles
+- exact permissions model for shared learner profiles
 - whether motivational content is bundled locally, fetched remotely, or both
 - how much schedule editing is allowed once a profile has active progress
 
@@ -418,8 +441,8 @@ These items should be resolved during design and implementation planning:
 - Google sign-in
 - sync local data to Firebase
 - restore data across devices
-- parent collaboration permissions
-- synchronized updates by multiple guardians
+- collaboration permissions for shared profiles
+- synchronized updates by multiple managers
 
 ### Milestone 3: Product Polish
 

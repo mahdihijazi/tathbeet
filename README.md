@@ -9,14 +9,14 @@ The core idea is:
 - the app builds a rotating daily review plan
 - the app sends reminders and motivational notifications
 - the app works offline for core review and schedule tracking
-- the app supports multiple local profiles, such as a parent and children
+- the app supports multiple local profiles, such as one user managing multiple learners in a family or class
 
 ## Product Direction
 
 Tathbeet is designed for two main use cases:
 
 - an individual who wants to protect and maintain their memorization
-- a parent managing revision schedules for children on the same device
+- a person managing revision schedules for multiple learners on the same device, including family or class use cases
 
 The app is Android-only in the MVP and is planned as a native app using:
 
@@ -47,7 +47,7 @@ The MVP supports:
 - completion-rate tracking
 - profile-level notification settings
 - cloud sync for signed-in users
-- shared child profiles so both parents can update schedule and completion state
+- shared learner profiles so more than one manager can update schedule and completion state
 
 The MVP does not include:
 
@@ -63,10 +63,13 @@ The MVP does not include:
 
 Users can add memorized content to a rotation pool using `surah`, `juz`, `hizb`, and `rub al-hizb`.
 
-Internally, the scheduler should normalize selections into review segments that are small enough for flexible rotation while still respecting surah boundaries:
+The pool should preserve the user’s original selections exactly as chosen.
 
-- standard unit: `rub al-hizb`
-- boundary exception: if a rub crosses outside a selected surah, the app keeps the smaller surah-specific segment instead of forcing the whole rub
+Internally, the scheduler should separately compute effective coverage from those selections:
+
+- full containment is resolved automatically by keeping the larger outer selection
+- partial overlap is resolved automatically by counting shared coverage once
+- daily pace uses approximate Quran size based on real `rub al-hizb` coverage
 
 This allows the app to support practical pacing such as:
 
@@ -88,17 +91,17 @@ Missed work rolls over to the next day rather than being dropped.
 5. Mark items or sub-items as done.
 6. Track completion rate over time.
 
-### Parent Managing Children
+### Multi-Learner Management
 
-1. Create profiles for children on the same device.
-2. Configure each child profile separately.
+1. Create profiles for multiple learners on the same device.
+2. Configure each learner profile separately.
 3. Enable or disable notifications per profile.
-4. Mark revision as completed for each child.
+4. Mark revision as completed for each learner.
 5. Optionally sign in and sync data.
 
-### Shared Child Profile
+### Shared Learner Profile
 
-Signed-in users should be able to share a child profile with both father and mother so both can update schedule state and completed tasks across devices.
+Signed-in users should be able to share a learner profile with more than one manager so each person can update schedule state and completed tasks across devices.
 
 ## Notifications
 

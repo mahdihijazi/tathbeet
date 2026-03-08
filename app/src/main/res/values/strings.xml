@@ -119,7 +119,7 @@
     <string name="schedule_intro_body">سنجهز لك خطة مراجعة المحفوظ خطوة بخطوة.</string>
     <string name="schedule_intro_supporting">ابدأ باختيار المحفوظ، ثم حدد الورد اليومي، وبعدها نفتح لك الورد مباشرة.</string>
     <string name="schedule_dose_title">الورد اليومي</string>
-    <string name="schedule_dose_subtitle">حدد مقدار الورد اليومي لـ %1$s</string>
+    <string name="schedule_dose_subtitle">حدد مقدار الورد اليومي</string>
     <string name="schedule_selected_pool_title">المحفوظ المحدد</string>
     <string name="schedule_selected_pool_subtitle">تم اختياره في الخطوة السابقة</string>
     <string name="schedule_pool_empty">لم يتم إضافة شيء بعد</string>

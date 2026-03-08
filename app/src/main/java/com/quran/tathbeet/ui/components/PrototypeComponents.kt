@@ -36,13 +36,8 @@ fun PrototypeScreenLayout(
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                )
+        if (subtitle.isNotBlank()) {
+            item {
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyLarge,
