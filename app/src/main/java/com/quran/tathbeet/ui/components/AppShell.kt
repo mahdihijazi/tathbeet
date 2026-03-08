@@ -48,11 +48,13 @@ fun AppShell(
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.12f),
             topBar = {
-                AppTopBar(
-                    uiState = uiState,
-                    onBack = onBack,
-                    onReviewPlanAction = onReviewPlanAction,
-                )
+                if (uiState.destination != AppDestination.ScheduleIntro) {
+                    AppTopBar(
+                        uiState = uiState,
+                        onBack = onBack,
+                        onReviewPlanAction = onReviewPlanAction,
+                    )
+                }
             },
             bottomBar = {
                 if (uiState.destination in mainDestinations) {
@@ -95,9 +97,11 @@ private fun AppTopBar(
             titleContentColor = MaterialTheme.colorScheme.onBackground,
         ),
         title = {
-            Text(
-                text = stringResource(uiState.destination.titleRes),
-            )
+            if (uiState.destination != AppDestination.ScheduleIntro) {
+                Text(
+                    text = stringResource(uiState.destination.titleRes),
+                )
+            }
         },
         navigationIcon = {
             if (uiState.destination !in mainDestinations && uiState.destination != AppDestination.ScheduleIntro) {

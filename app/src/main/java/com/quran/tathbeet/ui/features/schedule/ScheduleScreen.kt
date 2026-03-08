@@ -27,7 +27,7 @@ import com.quran.tathbeet.ui.components.AppSelectionChip
 import com.quran.tathbeet.ui.components.CardSection
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
-import com.quran.tathbeet.ui.components.WizardStepIndicator
+import com.quran.tathbeet.ui.components.WizardHeader
 import com.quran.tathbeet.ui.model.CycleTarget
 import com.quran.tathbeet.ui.model.PaceMethod
 import com.quran.tathbeet.ui.model.PaceOption
@@ -44,6 +44,7 @@ fun ScheduleScreen(
     selectedPace: PaceOption,
     segmentCount: Int,
     cycleLength: Int,
+    showWizardHeader: Boolean,
     onCycleTargetSelected: (CycleTarget) -> Unit,
     onPaceSelected: (PaceOption) -> Unit,
     onResetToCycleMode: () -> Unit,
@@ -61,11 +62,13 @@ fun ScheduleScreen(
         title = stringResource(R.string.schedule_dose_title),
         subtitle = stringResource(R.string.schedule_dose_subtitle),
     ) {
-        item {
-            WizardStepIndicator(
-                currentStep = 3,
-                totalSteps = 3,
-            )
+        if (showWizardHeader) {
+            item {
+                WizardHeader(
+                    currentStep = 3,
+                    totalSteps = 3,
+                )
+            }
         }
 
         item {

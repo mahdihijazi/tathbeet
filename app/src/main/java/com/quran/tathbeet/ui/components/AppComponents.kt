@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
+import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
@@ -193,5 +195,28 @@ fun WizardStepIndicator(
                     ),
             )
         }
+    }
+}
+
+@Composable
+fun WizardHeader(
+    currentStep: Int,
+    totalSteps: Int,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.wizard_step_counter, currentStep, totalSteps),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        WizardStepIndicator(
+            currentStep = currentStep,
+            totalSteps = totalSteps,
+        )
     }
 }

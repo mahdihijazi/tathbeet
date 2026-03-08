@@ -166,6 +166,7 @@ fun TathbeetApp() {
                     selectedCategory = uiState.activeSelectionCategory,
                     optionsForCategory = quranCatalog::itemsFor,
                     selectedPool = activePoolSelections,
+                    showWizardHeader = !uiState.hasCompletedScheduleOnboarding,
                     onCategorySelected = { category ->
                         mutate { it.copy(activeSelectionCategory = category) }
                     },
@@ -193,6 +194,7 @@ fun TathbeetApp() {
                     selectedPace = activeProfile.pace,
                     segmentCount = uiState.poolSegmentCount(quranCatalog),
                     cycleLength = uiState.cycleLength(quranCatalog),
+                    showWizardHeader = !uiState.hasCompletedScheduleOnboarding,
                     onCycleTargetSelected = { cycleTarget ->
                         mutate {
                             val nextSegmentCount = it.poolSegmentCount(quranCatalog)

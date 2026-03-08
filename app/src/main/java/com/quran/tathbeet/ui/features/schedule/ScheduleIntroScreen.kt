@@ -22,7 +22,7 @@ import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.AppCardTone
 import com.quran.tathbeet.ui.components.AppPrimaryButton
 import com.quran.tathbeet.ui.components.CardSection
-import com.quran.tathbeet.ui.components.WizardStepIndicator
+import com.quran.tathbeet.ui.components.WizardHeader
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
@@ -33,10 +33,30 @@ fun ScheduleIntroScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(TathbeetTokens.spacing.x3),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.TopCenter,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = TathbeetTokens.spacing.x4),
+                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x3),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                WizardHeader(
+                    currentStep = 1,
+                    totalSteps = 3,
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = TathbeetTokens.spacing.x4),
             verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x3),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -70,10 +90,6 @@ fun ScheduleIntroScreen(
                     verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x2),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    WizardStepIndicator(
-                        currentStep = 1,
-                        totalSteps = 3,
-                    )
                     Text(
                         text = stringResource(R.string.schedule_intro_body),
                         style = MaterialTheme.typography.headlineSmall,
@@ -93,6 +109,7 @@ fun ScheduleIntroScreen(
                     )
                 }
             }
+        }
         }
     }
 }
