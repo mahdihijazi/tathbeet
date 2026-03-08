@@ -12,10 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +24,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
@@ -33,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
-import com.quran.tathbeet.ui.model.AccountMode
 import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.model.AppUiState
 
@@ -43,19 +41,17 @@ fun AppShell(
     onNavigate: (AppDestination) -> Unit,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
-    onAccountAction: () -> Unit,
     snackbarHost: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
     TathbeetBackdrop {
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.82f),
+            containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.12f),
             topBar = {
                 AppTopBar(
                     uiState = uiState,
                     onBack = onBack,
                     onReviewPlanAction = onReviewPlanAction,
-                    onAccountAction = onAccountAction,
                 )
             },
             bottomBar = {
@@ -92,9 +88,12 @@ private fun AppTopBar(
     uiState: AppUiState,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
-    onAccountAction: () -> Unit,
 ) {
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.18f),
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+        ),
         title = {
             Text(
                 text = stringResource(uiState.destination.titleRes),
@@ -118,20 +117,6 @@ private fun AppTopBar(
                         contentDescription = stringResource(R.string.content_edit_plan),
                     )
                 }
-            }
-            IconButton(onClick = onAccountAction) {
-                Icon(
-                    imageVector = if (uiState.accountMode == AccountMode.Guest) {
-                        Icons.Outlined.PersonAddAlt1
-                    } else {
-                        Icons.Outlined.CloudDone
-                    },
-                    contentDescription = if (uiState.accountMode == AccountMode.Guest) {
-                        stringResource(R.string.content_create_account)
-                    } else {
-                        stringResource(R.string.content_account_active)
-                    },
-                )
             }
         },
     )
@@ -174,11 +159,12 @@ fun TathbeetBackdrop(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush = Brush.verticalGradient(
+                brush = Brush.linearGradient(
                     listOf(
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75f),
+                        MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.45f),
                         MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
-                        MaterialTheme.colorScheme.background,
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
                     ),
                 ),
             ),
@@ -186,20 +172,30 @@ fun TathbeetBackdrop(
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .offset(x = 60.dp, y = (-12).dp)
-                .size(180.dp)
+                .offset(x = 72.dp, y = (-24).dp)
+                .size(220.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.12f),
+                    color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.16f),
                     shape = CircleShape,
                 ),
         )
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .offset(x = (-80).dp, y = 120.dp)
-                .size(220.dp)
+                .offset(x = (-88).dp, y = 100.dp)
+                .size(260.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.08f),
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.14f),
+                    shape = CircleShape,
+                ),
+        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(x = 84.dp, y = 92.dp)
+                .size(240.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                     shape = CircleShape,
                 ),
         )

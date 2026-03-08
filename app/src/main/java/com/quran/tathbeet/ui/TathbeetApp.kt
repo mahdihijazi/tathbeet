@@ -102,24 +102,6 @@ fun TathbeetApp() {
             onReviewPlanAction = {
                 openScheduleWizard(AppDestination.Review)
             },
-            onAccountAction = {
-                mutate(
-                    if (uiState.accountMode == AccountMode.Guest) {
-                        TextSpec(R.string.snackbar_account_enabled)
-                    } else {
-                        TextSpec(R.string.snackbar_guest_mode)
-                    },
-                ) {
-                    it.copy(
-                        accountMode = if (it.accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
-                        syncState = if (it.accountMode == AccountMode.Guest) {
-                            SyncState.Synced
-                        } else {
-                            SyncState.OfflineReady
-                        },
-                    )
-                }
-            },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) {
             when (uiState.destination) {
