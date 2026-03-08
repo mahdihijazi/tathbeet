@@ -279,7 +279,8 @@ For MVP, the scheduler should:
 - calculate the required daily load from either the selected cycle target or the selected manual pace
 - use real `rub-equivalent` coverage for that calculation
 - expose the resolved daily equivalent to the user even when they chose a cycle target
-- create a daily task list from the next items in the rotation
+- create a daily task list from execution units rather than raw pool item labels
+- use `rub-equivalent` execution units while keeping task labels friendly and Quran-aware
 - continue from where the last completed task left off
 - roll incomplete tasks into the next day before assigning new work
 
@@ -290,7 +291,7 @@ Daily completion should support both:
 - marking the whole day as done
 - marking individual review segments as done
 
-This is important because a selected surah may be completed in smaller pieces even though the original selection was not entered as rub-level items.
+This is important because a selected surah or juz may be completed in smaller pieces even though the original selection was not entered as rub-level items.
 
 For MVP reporting, the visible outcome is still simple:
 
@@ -388,9 +389,14 @@ The data model should support shared ownership and conflict-safe synchronization
 ### 13.3 Daily Review
 
 - app shows today’s assigned review items
+- review items should be execution units, not raw pool labels like `الجزء 30`
+- if a task spans multiple short surahs, the main task label should read like `من النبأ إلى المرسلات`
+- if a task stays inside one long surah, the labeling should use Quran range detail with ayah numbering
 - user can mark individual items done
 - app can determine when the day is complete
 - incomplete items roll over to the next day
+- the review screen should stay structurally simple: compact summary, task list, and status-only bottom card
+- editing the revision plan should be available from the review screen top app bar rather than from the review body
 
 ### 13.4 Offline Behavior
 

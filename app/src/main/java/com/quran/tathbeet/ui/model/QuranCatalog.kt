@@ -14,10 +14,14 @@ data class QuranSelectionItem(
     val title: String,
     val subtitle: String,
     val segments: Int,
+    val firstRubId: Int,
+    val lastRubId: Int,
 )
 
-data class QuranCatalog(
+class QuranCatalog internal constructor(
     private val itemsByCategory: Map<SelectionCategory, List<QuranSelectionItem>>,
+    private val rubsById: Map<Int, RubItem>,
+    private val surahAyahCounts: Map<Int, Int>,
 ) {
     private val itemsByKey: Map<String, QuranSelectionItem> = itemsByCategory
         .values
@@ -33,7 +37,84 @@ data class QuranCatalog(
     fun requireSelection(category: SelectionCategory, itemId: Int): QuranSelectionItem =
         itemsByKey[selectionKey(category, itemId)]
             ?: error("Missing Quran selection for ${category.name}:$itemId")
+
+    fun buildReviewUnits(
+        context: Context,
+        keys: Set<String>,
+    ): List<ReviewUnitTemplate> {
+        val coverageByRubId = linkedMapOf<Int, CoverageSegment>()
+
+        resolveSelections(keys).forEach { item ->
+            buildCoverageSegments(item).forEach { segment ->
+                coverageByRubId[segment.rubId] = coverageByRubId[segment.rubId]
+                    ?.mergeWith(segment)
+                    ?: segment
+            }
+        }
+
+        return coverageByRubId.values
+            .sortedBy { it.rubId }
+            .map { segment ->
+                ReviewUnitTemplate(
+                    id = "review-unit-${segment.rubId}",
+                    title = buildReviewUnitTitle(context, segment),
+                    detail = context.getString(
+                        R.string.review_unit_detail,
+                        rubsById.getValue(segment.rubId).title,
+                        buildRangeSummary(context, segment.start, segment.end),
+                    ),
+                    isPartial = !segment.isWholeRub(rubsById.getValue(segment.rubId)),
+                )
+            }
+    }
+
+    private fun buildCoverageSegments(item: QuranSelectionItem): List<CoverageSegment> =
+        (item.firstRubId..item.lastRubId).map { rubId ->
+            val rub = rubsById.getValue(rubId)
+            val clippedStart = when (item.category) {
+                SelectionCategory.Surahs -> {
+                    if (rub.start.surahId < item.itemId) {
+                        Boundary(
+                            surahId = item.itemId,
+                            surahNameArabic = rub.end.surahNameArabic.takeIf { rub.end.surahId == item.itemId }
+                                ?: rub.start.surahNameArabic,
+                            ayah = 1,
+                        )
+                    } else {
+                        rub.start
+                    }
+                }
+                else -> rub.start
+            }
+            val clippedEnd = when (item.category) {
+                SelectionCategory.Surahs -> {
+                    if (rub.end.surahId > item.itemId) {
+                        Boundary(
+                            surahId = item.itemId,
+                            surahNameArabic = rub.start.surahNameArabic.takeIf { rub.start.surahId == item.itemId }
+                                ?: rub.end.surahNameArabic,
+                            ayah = surahAyahCounts.getValue(item.itemId),
+                        )
+                    } else {
+                        rub.end
+                    }
+                }
+                else -> rub.end
+            }
+            CoverageSegment(
+                rubId = rubId,
+                start = clippedStart,
+                end = clippedEnd,
+            )
+        }
 }
+
+data class ReviewUnitTemplate(
+    val id: String,
+    val title: String,
+    val detail: String,
+    val isPartial: Boolean,
+)
 
 private val selectionComparator =
     compareBy<QuranSelectionItem>({ it.category.ordinal }, { it.order })
@@ -50,6 +131,10 @@ fun loadQuranCatalog(context: Context): QuranCatalog {
             SelectionCategory.Hizb to parseHizbItems(context),
             SelectionCategory.Rub to rubs.map { it.toSelectionItem(context) },
         ),
+        rubsById = rubs.associateBy { it.id },
+        surahAyahCounts = context.readJsonArray(QURAN_SURAHS_ASSET).mapObjects { json ->
+            json.getInt("id") to json.getInt("ayahCount")
+        }.toMap(),
     )
 }
 
@@ -120,6 +205,12 @@ private fun parseSurahItems(
                 segmentCount,
             ),
             segments = segmentCount,
+            firstRubId = rubs.first { rub ->
+                rub.start.surahId <= surahId && rub.end.surahId >= surahId
+            }.id,
+            lastRubId = rubs.last { rub ->
+                rub.start.surahId <= surahId && rub.end.surahId >= surahId
+            }.id,
         )
     }
 
@@ -142,6 +233,8 @@ private fun parseJuzItems(context: Context): List<QuranSelectionItem> =
                 buildRangeSummary(context, start, end),
             ),
             segments = lastQuarterId - firstQuarterId + 1,
+            firstRubId = firstQuarterId,
+            lastRubId = lastQuarterId,
         )
     }
 
@@ -166,17 +259,21 @@ private fun parseHizbItems(context: Context): List<QuranSelectionItem> =
                 buildRangeSummary(context, start, end),
             ),
             segments = lastQuarterId - firstQuarterId + 1,
+            firstRubId = firstQuarterId,
+            lastRubId = lastQuarterId,
         )
     }
 
 private fun parseRubItems(context: Context): List<RubItem> =
     context.readJsonArray(QURAN_RUB_ASSET).mapObjects { json ->
+        val id = json.getInt("id")
         RubItem(
-            id = json.getInt("id"),
+            id = id,
             juzId = json.getInt("juzId"),
             hizbId = json.getInt("hizbId"),
             start = json.getJSONObject("start").toBoundary(),
             end = json.getJSONObject("end").toBoundary(),
+            title = context.getString(R.string.quran_rub_title, id),
         )
     }
 
@@ -194,7 +291,23 @@ private fun RubItem.toSelectionItem(context: Context): QuranSelectionItem =
             buildRangeSummary(context, start, end),
         ),
         segments = 1,
+        firstRubId = id,
+        lastRubId = id,
     )
+
+private fun buildReviewUnitTitle(
+    context: Context,
+    segment: CoverageSegment,
+): String =
+    if (segment.start.surahId == segment.end.surahId) {
+        buildRangeSummary(context, segment.start, segment.end)
+    } else {
+        context.getString(
+            R.string.review_unit_title_multi_surah,
+            segment.start.surahNameArabic,
+            segment.end.surahNameArabic,
+        )
+    }
 
 private fun buildRangeSummary(
     context: Context,
@@ -239,19 +352,41 @@ private fun JSONObject.toBoundary(): Boundary =
         ayah = getInt("ayah"),
     )
 
-private data class Boundary(
+internal data class Boundary(
     val surahId: Int,
     val surahNameArabic: String,
     val ayah: Int,
 )
 
-private data class RubItem(
+internal data class RubItem(
     val id: Int,
     val juzId: Int,
     val hizbId: Int,
     val start: Boundary,
     val end: Boundary,
+    val title: String,
 )
+
+internal data class CoverageSegment(
+    val rubId: Int,
+    val start: Boundary,
+    val end: Boundary,
+) {
+    fun mergeWith(other: CoverageSegment): CoverageSegment =
+        copy(
+            start = if (start.isBeforeOrEqual(other.start)) start else other.start,
+            end = if (end.isAfterOrEqual(other.end)) end else other.end,
+        )
+
+    fun isWholeRub(rub: RubItem): Boolean =
+        start == rub.start && end == rub.end
+}
+
+private fun Boundary.isBeforeOrEqual(other: Boundary): Boolean =
+    surahId < other.surahId || (surahId == other.surahId && ayah <= other.ayah)
+
+private fun Boundary.isAfterOrEqual(other: Boundary): Boolean =
+    surahId > other.surahId || (surahId == other.surahId && ayah >= other.ayah)
 
 private const val QURAN_SURAHS_ASSET = "quran/surahs.json"
 private const val QURAN_JUZ_ASSET = "quran/juzs.json"

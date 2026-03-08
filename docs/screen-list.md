@@ -47,10 +47,14 @@
 
 ## 7. Daily Review
 
-- shows today’s assigned review segments
+- shows today’s assigned execution units
+- uses friendly Quran-range labels instead of raw pool labels like `الجزء 30`
+- shows ranges like `من النبأ إلى المرسلات` for multi-surah tasks
 - shows rollover items first when previous work was missed
 - lets the user mark individual segments complete
 - marks the day complete when all assigned segments are done
+- keeps the screen simple with a compact summary at the top and a status-only bottom card
+- exposes `تعديل الخطة` from the top app bar instead of the screen body
 
 ## 8. Progress
 

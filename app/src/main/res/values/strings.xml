@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">تثبيت</string>
 
-    <string name="destination_profiles">الملفات</string>
+    <string name="destination_profiles">الحسابات</string>
     <string name="destination_schedule_intro">الخطة</string>
     <string name="destination_pool_selector">اختيار المحفوظ</string>
     <string name="destination_pool_selector_short">المحفوظ</string>
@@ -14,16 +14,15 @@
     <string name="content_back">رجوع</string>
     <string name="content_create_account">إنشاء حساب</string>
     <string name="content_account_active">الحساب مفعّل</string>
+    <string name="content_edit_plan">تعديل الخطة</string>
     <string name="action_next">التالي</string>
 
     <string name="snackbar_account_enabled">تم تفعيل وضع الحساب.</string>
     <string name="snackbar_guest_mode">تمت العودة لوضع الضيف.</string>
     <string name="snackbar_schedule_updated">تم تحديث الخطة.</string>
-    <string name="snackbar_review_done">تم إنهاء ورد اليوم.</string>
-    <string name="snackbar_review_reset">تمت إعادة ضبط الورد.</string>
     <string name="snackbar_create_account_for_sharing">أنشئ حساباً من أعلى الشاشة لتجربة المشاركة.</string>
     <string name="snackbar_sync_simulated">تمت محاكاة المزامنة.</string>
-    <string name="snackbar_child_profile_created">تم إنشاء ملف طفل.</string>
+    <string name="snackbar_child_profile_created">تم إنشاء حساب جديد.</string>
 
     <string name="pace_one_rub">ربع حزب يومياً</string>
     <string name="pace_one_hizb">حزب يومياً</string>
@@ -56,6 +55,8 @@
     <string name="quran_rub_detail">في الجزء %1$d · الحزب %2$d · %3$s</string>
     <string name="quran_range_single_surah">من %1$s %2$d إلى %3$d</string>
     <string name="quran_range_multi_surah">من %1$s %2$d إلى %3$s %4$d</string>
+    <string name="review_unit_title_multi_surah">من %1$s إلى %2$s</string>
+    <string name="review_unit_detail">%1$s · %2$s</string>
 
     <string name="option_surah_baqarah">سورة البقرة</string>
     <string name="option_surah_yasin">سورة يس</string>
@@ -93,28 +94,28 @@
     <string name="feed_father_yesterday">أمس · تم إنجاز 3 من 4 مقاطع</string>
     <string name="feed_shared_father_done">18:10 · الأب أنهى مقطعاً واحداً</string>
     <string name="feed_shared_mother_time">18:32 · الأم عدلت وقت التذكير</string>
-    <string name="feed_shared_synced">أمس · تمت مزامنة الملف على جهازين</string>
+    <string name="feed_shared_synced">أمس · تمت مزامنة الحساب على جهازين</string>
     <string name="feed_yusuf_today">اليوم · الإشعارات متوقفة</string>
     <string name="feed_yusuf_yesterday">أمس · تم ترحيل المتبقي إلى ورد اليوم</string>
-    <string name="feed_new_child_created">الآن · تم إنشاء ملف %1$s محلياً</string>
+    <string name="feed_new_child_created">الآن · تم إنشاء حساب %1$s محلياً</string>
     <string name="feed_new_child_next_step">الخطوة التالية · اختيار المحفوظ والوتيرة</string>
-    <string name="feed_sync_now">الآن · بدأت دورة مزامنة لملف %1$s</string>
+    <string name="feed_sync_now">الآن · بدأت دورة مزامنة لحساب %1$s</string>
 
     <string name="sync_offline_ready">جاهز بدون إنترنت</string>
     <string name="sync_pending">بانتظار المزامنة</string>
     <string name="sync_synced">تمت المزامنة</string>
 
-    <string name="profile_screen_title">الملفات</string>
-    <string name="profile_screen_subtitle">بدّل بينك وبين الأطفال بسرعة</string>
-    <string name="profile_active_eyebrow">الملف الحالي</string>
-    <string name="profile_active_body">لكل ملف خطته وورده وإشعاراته الخاصة.</string>
+    <string name="profile_screen_title">الحسابات</string>
+    <string name="profile_screen_subtitle">بدّل بين الحسابات بسرعة</string>
+    <string name="profile_active_eyebrow">الحساب الحالي</string>
+    <string name="profile_active_body">لكل حساب خطته وورده وإشعاراته الخاصة.</string>
     <string name="profile_button_open_schedule">فتح الخطة</string>
     <string name="profile_button_manage_sharing">إدارة المشاركة</string>
-    <string name="profile_section_title">الملفات</string>
+    <string name="profile_section_title">الحسابات</string>
     <string name="profile_section_subtitle">كل ضغطة تحدث الحالة فوراً</string>
-    <string name="profile_add_child">إضافة ملف طفل</string>
-    <string name="profile_type_self">ملف شخصي</string>
-    <string name="profile_type_child">ملف طفل</string>
+    <string name="profile_add_child">إضافة حساب</string>
+    <string name="profile_type_self">حساب شخصي</string>
+    <string name="profile_type_child">حساب إضافي</string>
     <string name="profile_chip_active">الحالي</string>
     <string name="profile_chip_activate">تفعيل</string>
     <string name="profile_goal">الهدف</string>
@@ -122,7 +123,7 @@
     <string name="percentage_value">%1$d%%</string>
     <string name="profile_today_tasks_done">تم %1$d من %2$d لمهام اليوم</string>
     <string name="profile_shared_with">مشترك مع %1$s</string>
-    <string name="profile_local_only">ملف محلي حالياً</string>
+    <string name="profile_local_only">حساب محلي حالياً</string>
     <string name="guardian_mother">الأم</string>
     <string name="guardian_father">الأب</string>
 
@@ -159,20 +160,13 @@
 
     <string name="review_title">ورد اليوم</string>
     <string name="review_subtitle">أكمل المقاطع المطلوبة لليوم</string>
-    <string name="review_eyebrow">قائمة اليوم</string>
-    <string name="review_remaining_count">المتبقي %1$d</string>
-    <string name="review_remaining_body">المتبقي من الأمس يظهر أولاً ثم مهام اليوم.</string>
-    <string name="review_tasks_title">مهام اليوم</string>
-    <string name="review_tasks_subtitle">المتبقي من الأمس يظهر أولاً</string>
+    <string name="review_summary_remaining">متبقي اليوم: %1$d</string>
+    <string name="review_summary_rollover">مؤجل من الأمس: %1$d</string>
     <string name="review_task_segment_detail">المقطع %1$d من %2$d</string>
-    <string name="review_rollover_chip">ترحيل</string>
-    <string name="review_status_title">حالة اليوم</string>
+    <string name="review_rollover_chip">مؤجل</string>
     <string name="review_status_rate">نسبة الإنجاز الحالية: %1$d%%</string>
     <string name="review_status_done">تم إنهاء الورد.</string>
     <string name="review_status_open">يبقى الورد مفتوحاً حتى يكتمل كل شيء.</string>
-    <string name="review_complete_remaining">إكمال المتبقي</string>
-    <string name="review_reset">إعادة الضبط</string>
-    <string name="review_adjust_schedule">تعديل الخطة</string>
 
     <string name="progress_title">التقدم</string>
     <string name="progress_subtitle">مؤشرات بسيطة تساعد على الاستمرار</string>
@@ -195,8 +189,8 @@
     <string name="progress_insight_2">حالة المشاركة مهمة لأن إدارة الطفل قد تكون بين أكثر من ولي أمر.</string>
     <string name="progress_insight_3">إذا بدت الشاشة مزدحمة فالأولوية للتبسيط قبل التنفيذ.</string>
 
-    <string name="shared_title">مشاركة الملف</string>
-    <string name="shared_subtitle">إدارة ملف الطفل من أكثر من ولي أمر</string>
+    <string name="shared_title">مشاركة الحساب</string>
+    <string name="shared_subtitle">إدارة الحساب من أكثر من مشرف</string>
     <string name="shared_eyebrow">المشاركة</string>
     <string name="shared_body">فعّل الوالدين ثم جرّب حالات المزامنة.</string>
     <string name="shared_editors_title">من يمكنه التعديل؟</string>
@@ -204,7 +198,7 @@
     <string name="shared_state_title">حالة المشاركة</string>
     <string name="shared_account_mode">وضع الحساب: %1$s</string>
     <string name="shared_sync_state">حالة المزامنة: %1$s</string>
-    <string name="shared_state_on">تم تفعيل أكثر من ولي أمر، لذا يعمل الملف كمشترك.</string>
+    <string name="shared_state_on">تم تفعيل أكثر من مشرف، لذا يعمل الحساب كمشترك.</string>
     <string name="shared_state_off">ابقِ ولي أمر واحداً لاختبار الحالة غير المشتركة.</string>
     <string name="shared_simulate_sync">محاكاة المزامنة</string>
     <string name="shared_activity_title">آخر النشاطات</string>

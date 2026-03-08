@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 fun TathbeetApp() {
     val context = LocalContext.current
     val quranCatalog = remember(context) { loadQuranCatalog(context) }
-    var uiState by remember(quranCatalog) { mutableStateOf(seedAppState(quranCatalog)) }
+    var uiState by remember(quranCatalog) { mutableStateOf(seedAppState(context, quranCatalog)) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -98,6 +98,9 @@ fun TathbeetApp() {
                         else -> it.copy(destination = AppDestination.Review)
                     }
                 }
+            },
+            onReviewPlanAction = {
+                openScheduleWizard(AppDestination.Review)
             },
             onAccountAction = {
                 mutate(
@@ -229,7 +232,7 @@ fun TathbeetApp() {
                     onSaveSchedule = {
                         mutate(TextSpec(R.string.snackbar_schedule_updated)) {
                             it.updateActiveProfile { profile ->
-                                val refreshed = profile.copy(reviewTasks = generateTasksForProfile(profile, quranCatalog))
+                                val refreshed = profile.copy(reviewTasks = generateTasksForProfile(profile, quranCatalog, context))
                                 refreshed.copy(
                                     weekCompletion = refreshed.weekCompletion.dropLast(1) + refreshed.dailyProgress,
                                 )
@@ -263,35 +266,6 @@ fun TathbeetApp() {
                                 )
                             }
                         }
-                    },
-                    onCompleteDay = {
-                        mutate(TextSpec(R.string.snackbar_review_done)) {
-                            it.updateActiveProfile { profile ->
-                                val nextTasks = profile.reviewTasks.map { task -> task.copy(isDone = true) }
-                                profile.copy(
-                                    reviewTasks = nextTasks,
-                                    weekCompletion = profile.weekCompletion.dropLast(1) + 1f,
-                                )
-                            }
-                        }
-                    },
-                    onResetDay = {
-                        mutate(TextSpec(R.string.snackbar_review_reset)) {
-                            it.updateActiveProfile { profile ->
-                                val nextTasks = generateTasksForProfile(profile, quranCatalog).mapIndexed { index, task ->
-                                    task.copy(isDone = index == 0)
-                                }
-                                profile.copy(
-                                    reviewTasks = nextTasks,
-                                    weekCompletion = profile.weekCompletion.dropLast(1) + (
-                                        nextTasks.count { task -> task.isDone }.toFloat() / nextTasks.size
-                                    ),
-                                )
-                            }
-                        }
-                    },
-                    onOpenSchedule = {
-                        openScheduleWizard(AppDestination.Review)
                     },
                 )
 

@@ -1,5 +1,6 @@
 package com.quran.tathbeet.ui.model
 
+import android.content.Context
 import androidx.annotation.StringRes
 import com.quran.tathbeet.R
 import kotlin.math.ceil
@@ -159,26 +160,19 @@ fun AppUiState.scheduleWizardStartDestination(): AppDestination =
 fun generateTasksForProfile(
     profile: AppProfile,
     catalog: QuranCatalog,
+    context: Context,
 ): List<ReviewTask> {
-    val base = catalog.resolveSelections(profile.selectedPoolKeys)
-        .flatMap { option ->
-            (1..option.segments).map { segmentIndex ->
-                ReviewTask(
-                    id = "task-${option.key}-$segmentIndex",
-                    title = TextSpec(rawText = option.title),
-                    detail = TextSpec(
-                        R.string.review_task_segment_detail,
-                        formatArgs = listOf(segmentIndex, option.segments),
-                    ),
-                    isDone = false,
-                    isRollover = false,
-                )
-            }
-        }
+    val base = catalog.buildReviewUnits(
+        context = context,
+        keys = profile.selectedPoolKeys,
+    )
         .mapIndexed { index, task ->
-            task.copy(
-                isDone = index == 0,
-                isRollover = index == 0,
+            ReviewTask(
+                id = task.id,
+                title = TextSpec(rawText = task.title),
+                detail = TextSpec(rawText = task.detail),
+                isDone = index == 1 || index == 2,
+                isRollover = index == 0 || index == 1,
             )
         }
 
@@ -197,7 +191,10 @@ fun generateTasksForProfile(
     }
 }
 
-fun seedAppState(catalog: QuranCatalog): AppUiState {
+fun seedAppState(
+    context: Context,
+    catalog: QuranCatalog,
+): AppUiState {
     val father = AppProfile(
         id = "mahdi",
         name = TextSpec(R.string.profile_name_father),
@@ -227,13 +224,11 @@ fun seedAppState(catalog: QuranCatalog): AppUiState {
         isShared = true,
         guardians = setOf(Guardian.Mother, Guardian.Father),
         notificationsEnabled = true,
-        paceMethod = PaceMethod.CycleTarget,
+        paceMethod = PaceMethod.Manual,
         cycleTarget = CycleTarget.TwoWeeks,
-        pace = PaceOption.OneHizb,
+        pace = PaceOption.OneJuz,
         selectedPoolKeys = setOf(
             catalog.requireSelection(SelectionCategory.Juz, 30).key,
-            catalog.requireSelection(SelectionCategory.Hizb, 41).key,
-            catalog.requireSelection(SelectionCategory.Rub, 12).key,
         ),
         reviewTasks = emptyList(),
         weekCompletion = listOf(1f, 0.5f, 1f, 1f, 0.8f, 0.65f, 0.4f),
@@ -279,6 +274,7 @@ fun seedAppState(catalog: QuranCatalog): AppUiState {
                     profile
                 },
                 catalog = catalog,
+                context = context,
             ),
         )
     }

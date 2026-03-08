@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.CloudDone
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.PersonAddAlt1
 import androidx.compose.material.icons.outlined.Settings
@@ -41,6 +42,7 @@ fun AppShell(
     uiState: AppUiState,
     onNavigate: (AppDestination) -> Unit,
     onBack: () -> Unit,
+    onReviewPlanAction: () -> Unit,
     onAccountAction: () -> Unit,
     snackbarHost: @Composable () -> Unit,
     content: @Composable () -> Unit,
@@ -52,6 +54,7 @@ fun AppShell(
                 AppTopBar(
                     uiState = uiState,
                     onBack = onBack,
+                    onReviewPlanAction = onReviewPlanAction,
                     onAccountAction = onAccountAction,
                 )
             },
@@ -88,6 +91,7 @@ private val mainDestinations = listOf(
 private fun AppTopBar(
     uiState: AppUiState,
     onBack: () -> Unit,
+    onReviewPlanAction: () -> Unit,
     onAccountAction: () -> Unit,
 ) {
     TopAppBar(
@@ -107,6 +111,14 @@ private fun AppTopBar(
             }
         },
         actions = {
+            if (uiState.destination == AppDestination.Review) {
+                IconButton(onClick = onReviewPlanAction) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = stringResource(R.string.content_edit_plan),
+                    )
+                }
+            }
             IconButton(onClick = onAccountAction) {
                 Icon(
                     imageVector = if (uiState.accountMode == AccountMode.Guest) {
