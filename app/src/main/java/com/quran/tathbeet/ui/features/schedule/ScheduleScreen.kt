@@ -73,8 +73,8 @@ fun ScheduleScreen(
             item {
                 Text(
                     text = stringResource(R.string.schedule_dose_subtitle),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }

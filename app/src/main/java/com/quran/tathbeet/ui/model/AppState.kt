@@ -224,8 +224,8 @@ fun seedAppState(
         isShared = true,
         guardians = setOf(Guardian.Mother, Guardian.Father),
         notificationsEnabled = true,
-        paceMethod = PaceMethod.Manual,
-        cycleTarget = CycleTarget.TwoWeeks,
+        paceMethod = PaceMethod.CycleTarget,
+        cycleTarget = CycleTarget.OneMonth,
         pace = PaceOption.OneJuz,
         selectedPoolKeys = setOf(
             catalog.requireSelection(SelectionCategory.Juz, 30).key,
