@@ -60,13 +60,21 @@ fun ScheduleScreen(
 
     ScreenLayout(
         title = stringResource(R.string.schedule_dose_title),
-        subtitle = stringResource(R.string.schedule_dose_subtitle),
+        subtitle = if (showWizardHeader) "" else stringResource(R.string.schedule_dose_subtitle),
     ) {
         if (showWizardHeader) {
             item {
                 WizardHeader(
                     currentStep = 3,
                     totalSteps = 3,
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.schedule_dose_subtitle),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
