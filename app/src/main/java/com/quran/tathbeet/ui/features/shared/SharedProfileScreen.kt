@@ -4,20 +4,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
+import com.quran.tathbeet.ui.components.BodyTextCard
 import com.quran.tathbeet.ui.components.HeroCard
+import com.quran.tathbeet.ui.components.InfoActionCard
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
 import com.quran.tathbeet.ui.model.AccountMode
@@ -78,39 +76,29 @@ fun SharedProfileScreen(
         }
 
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
+            InfoActionCard(
+                title = stringResource(R.string.shared_state_title),
             ) {
-                Column(
-                    modifier = Modifier.padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.shared_state_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        stringResource(
-                            R.string.shared_account_mode,
-                            if (accountMode == AccountMode.Guest) {
-                                stringResource(R.string.account_mode_guest)
-                            } else {
-                                stringResource(R.string.account_mode_account)
-                            },
-                        ),
-                    )
-                    Text(stringResource(R.string.shared_sync_state, stringResource(syncState.displayLabelRes())))
-                    Text(
-                        text = if (profile.isShared) {
-                            stringResource(R.string.shared_state_on)
+                Text(
+                    stringResource(
+                        R.string.shared_account_mode,
+                        if (accountMode == AccountMode.Guest) {
+                            stringResource(R.string.account_mode_guest)
                         } else {
-                            stringResource(R.string.shared_state_off)
+                            stringResource(R.string.account_mode_account)
                         },
-                    )
-                    Button(onClick = onSimulateSync) {
-                        Text(stringResource(R.string.shared_simulate_sync))
-                    }
+                    ),
+                )
+                Text(stringResource(R.string.shared_sync_state, stringResource(syncState.displayLabelRes())))
+                Text(
+                    text = if (profile.isShared) {
+                        stringResource(R.string.shared_state_on)
+                    } else {
+                        stringResource(R.string.shared_state_off)
+                    },
+                )
+                Button(onClick = onSimulateSync) {
+                    Text(stringResource(R.string.shared_simulate_sync))
                 }
             }
         }
@@ -123,15 +111,7 @@ fun SharedProfileScreen(
         }
 
         items(profile.activityFeed) { entry ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = entry.asString(),
-                    modifier = Modifier.padding(18.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
+            BodyTextCard(text = entry.asString())
         }
     }
 }

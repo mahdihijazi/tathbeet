@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -190,22 +189,6 @@ fun AppSelectionChip(
             containerColor = MaterialTheme.colorScheme.surface,
             labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
-    )
-}
-
-@Composable
-fun AppActionRow(
-    modifier: Modifier = Modifier,
-    horizontalArrangement: androidx.compose.foundation.layout.Arrangement.Horizontal = androidx.compose.foundation.layout.Arrangement.spacedBy(
-        TathbeetTokens.spacing.x1Half,
-    ),
-    content: @Composable RowScope.() -> Unit,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = horizontalArrangement,
-        verticalAlignment = Alignment.CenterVertically,
-        content = content,
     )
 }
 

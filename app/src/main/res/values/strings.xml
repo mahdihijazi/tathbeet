@@ -71,6 +71,24 @@
     <string name="option_rub_12">ربع الحزب 12</string>
     <string name="option_rub_13">ربع الحزب 13</string>
     <string name="option_rub_236">ربع الحزب 236</string>
+    <string name="sample_surah_fatiha_title">سورة الفاتحة</string>
+    <string name="sample_surah_al_imran_title">سورة آل عمران</string>
+    <string name="sample_surah_an_nisa_title">سورة النساء</string>
+    <string name="sample_range_juz_1">من الفاتحة 1 إلى البقرة 141</string>
+    <string name="sample_range_juz_2">من البقرة 142 إلى 252</string>
+    <string name="sample_range_juz_3">من البقرة 253 إلى آل عمران 92</string>
+    <string name="sample_range_juz_4">من آل عمران 93 إلى النساء 23</string>
+    <string name="sample_range_juz_5">من النساء 24 إلى 147</string>
+    <string name="sample_range_hizb_1">من الفاتحة 1 إلى البقرة 74</string>
+    <string name="sample_range_hizb_2">من البقرة 75 إلى 141</string>
+    <string name="sample_range_hizb_3">من البقرة 142 إلى 202</string>
+    <string name="sample_range_hizb_4">من البقرة 203 إلى 252</string>
+    <string name="sample_range_hizb_41">من العنكبوت إلى الأحزاب</string>
+    <string name="sample_range_rub_1">من الفاتحة 1 إلى البقرة 25</string>
+    <string name="sample_range_rub_2">من البقرة 26 إلى 43</string>
+    <string name="sample_range_rub_3">من البقرة 44 إلى 59</string>
+    <string name="sample_range_rub_4">من البقرة 60 إلى 74</string>
+    <string name="sample_range_rub_12">من البقرة 189 إلى 202</string>
 
     <string name="option_desc_surah_only">مقاطع السورة فقط</string>
     <string name="option_desc_quick_review">مراجعة سريعة</string>

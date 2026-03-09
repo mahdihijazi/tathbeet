@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
+import com.quran.tathbeet.ui.components.BodyTextCard
 import com.quran.tathbeet.ui.components.HeroCard
 import com.quran.tathbeet.ui.components.MetricCard
 import com.quran.tathbeet.ui.components.ScreenLayout
@@ -104,15 +105,7 @@ fun ProgressScreen(
         }
 
         items(insights) { insight ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = insight,
-                    modifier = Modifier.padding(18.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
+            BodyTextCard(text = insight)
         }
     }
 }

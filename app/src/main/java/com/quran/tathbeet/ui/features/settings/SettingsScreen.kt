@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.HeroCard
+import com.quran.tathbeet.ui.components.InfoActionCard
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
 import com.quran.tathbeet.ui.model.AccountMode
@@ -79,54 +80,34 @@ fun SettingsScreen(
         }
 
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
+            InfoActionCard(
+                title = stringResource(R.string.settings_reminder_title),
             ) {
-                Column(
-                    modifier = Modifier.padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.settings_reminder_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(stringResource(R.string.settings_reminder_current, uiState.reminderTime))
-                    Button(onClick = onReminderTimeChanged) {
-                        Text(stringResource(R.string.settings_reminder_change))
-                    }
+                Text(stringResource(R.string.settings_reminder_current, uiState.reminderTime))
+                Button(onClick = onReminderTimeChanged) {
+                    Text(stringResource(R.string.settings_reminder_change))
                 }
             }
         }
 
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
+            InfoActionCard(
+                title = stringResource(R.string.settings_account_title),
             ) {
-                Column(
-                    modifier = Modifier.padding(18.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.settings_account_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        stringResource(
-                            R.string.shared_account_mode,
-                            if (uiState.accountMode == AccountMode.Guest) {
-                                stringResource(R.string.account_mode_guest)
-                            } else {
-                                stringResource(R.string.account_mode_account)
-                            },
-                        ),
-                    )
-                    Text(stringResource(R.string.shared_sync_state, stringResource(uiState.syncState.displayLabelRes())))
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Button(onClick = onAccountModeChanged) {
-                            Text(stringResource(R.string.settings_toggle_account_mode))
-                        }
+                Text(
+                    stringResource(
+                        R.string.shared_account_mode,
+                        if (uiState.accountMode == AccountMode.Guest) {
+                            stringResource(R.string.account_mode_guest)
+                        } else {
+                            stringResource(R.string.account_mode_account)
+                        },
+                    ),
+                )
+                Text(stringResource(R.string.shared_sync_state, stringResource(uiState.syncState.displayLabelRes())))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Button(onClick = onAccountModeChanged) {
+                        Text(stringResource(R.string.settings_toggle_account_mode))
                     }
                 }
             }
