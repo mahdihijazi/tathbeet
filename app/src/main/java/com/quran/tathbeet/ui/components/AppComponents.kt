@@ -135,9 +135,25 @@ fun InfoActionCard(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    CardSection(
+    TitledCardSection(
+        title = title,
         modifier = modifier,
         tone = AppCardTone.Default,
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun TitledCardSection(
+    title: String,
+    modifier: Modifier = Modifier,
+    tone: AppCardTone = AppCardTone.Default,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    CardSection(
+        modifier = modifier,
+        tone = tone,
     ) {
         Text(
             text = title,

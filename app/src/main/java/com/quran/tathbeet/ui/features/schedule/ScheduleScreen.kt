@@ -27,6 +27,7 @@ import com.quran.tathbeet.ui.components.AppSelectionChip
 import com.quran.tathbeet.ui.components.CardSection
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
+import com.quran.tathbeet.ui.components.TitledCardSection
 import com.quran.tathbeet.ui.components.WizardHeader
 import com.quran.tathbeet.ui.model.CycleTarget
 import com.quran.tathbeet.ui.model.PaceMethod
@@ -80,50 +81,43 @@ fun ScheduleScreen(
         }
 
         item {
-            SectionHeader(
+            SelectedPoolSummaryCard(
                 title = stringResource(R.string.schedule_selected_pool_title),
-                subtitle = stringResource(R.string.schedule_selected_pool_subtitle),
+                selectionSummary = selectedPoolLabel,
             )
         }
 
-        item {
-            CardSection(tone = AppCardTone.Highlight) {
-                Text(
-                    text = selectedPoolLabel,
-                    style = MaterialTheme.typography.bodyLarge,
+        if (paceMethod == PaceMethod.CycleTarget) {
+            item {
+                SectionHeader(
+                    title = stringResource(R.string.schedule_cycle_target_title),
+                    subtitle = stringResource(R.string.schedule_cycle_target_subtitle),
                 )
             }
-        }
 
-        item {
-            SectionHeader(
-                title = stringResource(R.string.schedule_cycle_target_title),
-                subtitle = stringResource(R.string.schedule_cycle_target_subtitle),
-            )
-        }
-
-        item {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
-                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
-            ) {
-                CycleTarget.entries.forEach { target ->
-                    AppSelectionChip(
-                        selected = paceMethod == PaceMethod.CycleTarget && target == selectedCycleTarget,
-                        onClick = { onCycleTargetSelected(target) },
-                        text = stringResource(target.labelRes),
-                    )
+            item {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+                    verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+                ) {
+                    CycleTarget.entries.forEach { target ->
+                        AppSelectionChip(
+                            selected = target == selectedCycleTarget,
+                            onClick = { onCycleTargetSelected(target) },
+                            text = stringResource(target.labelRes),
+                        )
+                    }
                 }
             }
-        }
 
-        item {
-            if (paceMethod == PaceMethod.CycleTarget) {
+            item {
                 AppSecondaryButton(
                     text = stringResource(R.string.schedule_manual_sheet_open),
                     onClick = { showManualPaceSheet = true },
                 )
-            } else {
+            }
+        } else {
+            item {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
@@ -208,12 +202,10 @@ private fun RotationPreviewCard(
     segmentCount: Int,
     cycleLength: Int,
 ) {
-    CardSection(tone = AppCardTone.Muted) {
-        Text(
-            text = stringResource(R.string.schedule_preview_title),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-        )
+    TitledCardSection(
+        title = stringResource(R.string.schedule_preview_title),
+        tone = AppCardTone.Muted,
+    ) {
         AppKeyValueRow(
             label = stringResource(R.string.schedule_preview_pool_size, segmentCount),
             value = segmentCount.toString(),

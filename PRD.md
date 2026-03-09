@@ -279,6 +279,8 @@ For MVP, the scheduler should:
 - calculate the required daily load from either the selected cycle target or the selected manual pace
 - use real `rub-equivalent` coverage for that calculation
 - expose the resolved daily equivalent to the user even when they chose a cycle target
+- treat cycle-target mode and manual-pace mode as mutually exclusive UI states
+- when manual pace is chosen, hide the cycle-target picker and show the selected manual pace clearly in the step UI
 - create a daily task list from execution units rather than raw pool item labels
 - use `rub-equivalent` execution units while keeping task labels friendly and Quran-aware
 - continue from where the last completed task left off

@@ -116,3 +116,4 @@ Notes:
 - Full containment should be resolved internally by keeping the larger effective coverage.
 - Partial overlap should be resolved internally by counting shared coverage once.
 - The pace step should default to target cycle presets and keep manual pace in a secondary bottom sheet.
+- Manual pace and target-cycle pace should behave as two exclusive step states, not two visible sections at once.

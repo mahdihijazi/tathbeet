@@ -82,6 +82,7 @@ The default pace setup should be cycle-based:
 - app converts that target into a daily equivalent using real `rub al-hizb` coverage
 - app rounds up to the next practical pace milestone
 - app still shows the resolved daily equivalent clearly
+- manual pace is a separate override mode: once selected, it replaces the cycle picker in the visible step UI until the user switches back
 
 Manual pace remains available as a secondary override.
 

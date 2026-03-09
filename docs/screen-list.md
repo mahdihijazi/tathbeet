@@ -42,6 +42,7 @@
 - supports presets like `1 week`, `2 weeks`, `1 month`, `45 days`, and `2 months`
 - shows the resolved daily equivalent after conversion
 - offers manual pace as a secondary bottom-sheet flow
+- switches to a dedicated manual-mode state after manual selection, showing the chosen pace and hiding cycle presets until the user switches back
 - shows a lightweight preview before saving
 - saving takes the user directly to today’s review
 
