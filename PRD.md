@@ -383,6 +383,7 @@ The data model should support shared ownership and conflict-safe synchronization
 - category switching in the memorized-content screen should use swipeable tabs rather than button-like chips
 - after the first intro has been seen, reopening schedule setup should start from the memorized-content selection step
 - daily-ward setup should default to choosing when the user wants to finish one full revision cycle
+- when the user first reaches the daily-ward step, it should open in target-cycle mode rather than manual-pace mode
 - daily-ward setup should also allow a manual pace override through a secondary bottom-sheet flow
 - user can review a lightweight summary before saving, focused on pool size, target cycle, resolved daily equivalent, and estimated rotation length
 - saving the wizard should take the user directly to today’s review screen
