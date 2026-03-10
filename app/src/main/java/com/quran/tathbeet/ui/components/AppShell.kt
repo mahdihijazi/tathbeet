@@ -33,11 +33,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.model.AppDestination
-import com.quran.tathbeet.ui.model.AppUiState
 
 @Composable
 fun AppShell(
-    uiState: AppUiState,
+    currentDestination: AppDestination,
     onNavigate: (AppDestination) -> Unit,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
@@ -48,18 +47,18 @@ fun AppShell(
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.12f),
             topBar = {
-                if (uiState.destination != AppDestination.ScheduleIntro) {
+                if (currentDestination != AppDestination.ScheduleIntro) {
                     AppTopBar(
-                        uiState = uiState,
+                        currentDestination = currentDestination,
                         onBack = onBack,
                         onReviewPlanAction = onReviewPlanAction,
                     )
                 }
             },
             bottomBar = {
-                if (uiState.destination in mainDestinations) {
+                if (currentDestination in mainDestinations) {
                     AppBottomBar(
-                        currentDestination = uiState.destination,
+                        currentDestination = currentDestination,
                         onNavigate = onNavigate,
                     )
                 }
@@ -87,7 +86,7 @@ private val mainDestinations = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppTopBar(
-    uiState: AppUiState,
+    currentDestination: AppDestination,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
 ) {
@@ -97,14 +96,14 @@ private fun AppTopBar(
             titleContentColor = MaterialTheme.colorScheme.onBackground,
         ),
         title = {
-            if (uiState.destination != AppDestination.ScheduleIntro) {
+            if (currentDestination != AppDestination.ScheduleIntro) {
                 Text(
-                    text = stringResource(uiState.destination.titleRes),
+                    text = stringResource(currentDestination.titleRes),
                 )
             }
         },
         navigationIcon = {
-            if (uiState.destination !in mainDestinations && uiState.destination != AppDestination.ScheduleIntro) {
+            if (currentDestination !in mainDestinations && currentDestination != AppDestination.ScheduleIntro) {
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
@@ -114,7 +113,7 @@ private fun AppTopBar(
             }
         },
         actions = {
-            if (uiState.destination == AppDestination.Review) {
+            if (currentDestination == AppDestination.Review) {
                 IconButton(onClick = onReviewPlanAction) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,

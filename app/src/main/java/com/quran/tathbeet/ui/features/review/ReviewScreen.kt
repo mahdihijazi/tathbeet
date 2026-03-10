@@ -23,21 +23,13 @@ import com.quran.tathbeet.ui.components.AppCard
 import com.quran.tathbeet.ui.components.AppCardTone
 import com.quran.tathbeet.ui.components.AppPill
 import com.quran.tathbeet.ui.components.CardSection
-import com.quran.tathbeet.ui.model.AppProfile
-import com.quran.tathbeet.ui.model.TextSpec
-import com.quran.tathbeet.ui.model.asString
-import com.quran.tathbeet.ui.model.dailyProgress
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
 fun ReviewScreen(
-    profile: AppProfile,
-    completionRate: Int,
+    uiState: ReviewUiState,
     onToggleTask: (String) -> Unit,
 ) {
-    val remainingCount = profile.reviewTasks.count { !it.isDone }
-    val rolloverCount = profile.reviewTasks.count { it.isRollover && !it.isDone }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,9 +40,9 @@ fun ReviewScreen(
         verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x2),
     ) {
         ReviewSummaryCard(
-            remainingCount = remainingCount,
-            rolloverCount = rolloverCount,
-            progress = profile.dailyProgress,
+            remainingCount = uiState.remainingCount,
+            rolloverCount = uiState.rolloverCount,
+            progress = uiState.progress,
         )
 
         LazyColumn(
@@ -58,7 +50,7 @@ fun ReviewScreen(
             contentPadding = PaddingValues(bottom = TathbeetTokens.spacing.x1),
             verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
         ) {
-            items(profile.reviewTasks, key = { it.id }) { task ->
+            items(uiState.tasks, key = { it.id }) { task ->
                 ReviewTaskCard(
                     title = task.title,
                     detail = task.detail,
@@ -70,8 +62,8 @@ fun ReviewScreen(
         }
 
         ReviewStatusCard(
-            completionRate = completionRate,
-            isComplete = profile.reviewTasks.all { it.isDone },
+            completionRate = uiState.completionRate,
+            isComplete = uiState.tasks.isNotEmpty() && uiState.tasks.all { it.isDone },
         )
     }
 }
@@ -100,8 +92,8 @@ private fun ReviewSummaryCard(
 
 @Composable
 private fun ReviewTaskCard(
-    title: TextSpec,
-    detail: TextSpec,
+    title: String,
+    detail: String,
     isDone: Boolean,
     isRollover: Boolean,
     onToggle: () -> Unit,
@@ -126,12 +118,12 @@ private fun ReviewTaskCard(
                     verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half),
                 ) {
                     Text(
-                        text = title.asString(),
+                        text = title,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = detail.asString(),
+                        text = detail,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

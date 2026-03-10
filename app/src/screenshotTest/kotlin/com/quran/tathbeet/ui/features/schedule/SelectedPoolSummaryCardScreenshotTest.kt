@@ -45,3 +45,32 @@ fun SelectedPoolSummaryCardScreenshot() {
         }
     }
 }
+
+@PreviewTest
+@Preview(
+    name = "selected_pool_summary_card_disabled",
+    locale = "ar",
+    widthDp = SummaryCardPreviewWidth,
+    heightDp = SummaryCardPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun SelectedPoolSummaryCardDisabledScreenshot() {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        TathbeetTheme {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(TathbeetTokens.spacing.x3),
+            ) {
+                SelectedPoolSummaryCard(
+                    title = stringResource(R.string.pool_selector_current_selection),
+                    selectionSummary = stringResource(R.string.pool_selector_empty),
+                    actionLabel = stringResource(R.string.action_next),
+                    actionEnabled = false,
+                    onActionClick = {},
+                )
+            }
+        }
+    }
+}

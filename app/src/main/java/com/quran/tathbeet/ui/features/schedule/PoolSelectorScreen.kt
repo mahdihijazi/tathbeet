@@ -59,6 +59,7 @@ fun PoolSelectorScreen(
             title = stringResource(R.string.pool_selector_current_selection),
             selectionSummary = selectedPoolLabel,
             actionLabel = stringResource(R.string.action_next),
+            actionEnabled = selectedPool.isNotEmpty(),
             onActionClick = onDone,
         )
 

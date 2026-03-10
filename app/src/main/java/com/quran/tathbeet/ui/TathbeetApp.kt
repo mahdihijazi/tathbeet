@@ -1,11 +1,12 @@
 package com.quran.tathbeet.ui
 
 import android.content.Context
-import androidx.activity.compose.BackHandler
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,51 +15,81 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
 import com.quran.tathbeet.R
+import com.quran.tathbeet.app.AppContainer
+import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.ui.components.AppShell
 import com.quran.tathbeet.ui.features.progress.ProgressScreen
 import com.quran.tathbeet.ui.features.profiles.ProfilesScreen
 import com.quran.tathbeet.ui.features.review.ReviewScreen
+import com.quran.tathbeet.ui.features.review.ReviewViewModel
+import com.quran.tathbeet.ui.features.review.ReviewViewModelFactory
 import com.quran.tathbeet.ui.features.schedule.PoolSelectorScreen
-import com.quran.tathbeet.ui.features.schedule.ScheduleScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleIntroScreen
+import com.quran.tathbeet.ui.features.schedule.ScheduleScreen
+import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModel
+import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModelFactory
 import com.quran.tathbeet.ui.features.settings.SettingsScreen
 import com.quran.tathbeet.ui.features.shared.SharedProfileScreen
 import com.quran.tathbeet.ui.model.AccountMode
 import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.model.AppProfile
 import com.quran.tathbeet.ui.model.AppUiState
-import com.quran.tathbeet.ui.model.CycleTarget
 import com.quran.tathbeet.ui.model.Guardian
-import com.quran.tathbeet.ui.model.PaceMethod
 import com.quran.tathbeet.ui.model.SyncState
 import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.activeProfile
-import com.quran.tathbeet.ui.model.asString
 import com.quran.tathbeet.ui.model.completionRate
-import com.quran.tathbeet.ui.model.cycleLength
-import com.quran.tathbeet.ui.model.dailyProgress
 import com.quran.tathbeet.ui.model.displayLabelRes
-import com.quran.tathbeet.ui.model.generateTasksForProfile
 import com.quran.tathbeet.ui.model.loadQuranCatalog
-import com.quran.tathbeet.ui.model.poolSegmentCount
-import com.quran.tathbeet.ui.model.recommendedPace
 import com.quran.tathbeet.ui.model.reminderOptions
-import com.quran.tathbeet.ui.model.scheduleWizardStartDestination
 import com.quran.tathbeet.ui.model.seedAppState
-import com.quran.tathbeet.ui.model.updateActiveProfile
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+
+private const val RouteLaunch = "launch"
+private const val RouteScheduleGraph = "schedule_graph"
+private const val RouteScheduleIntro = "schedule_intro"
+private const val RoutePoolSelector = "pool_selector"
+private const val RouteScheduleDose = "schedule_dose"
+private const val RouteReview = "review"
+private const val RouteProfiles = "profiles"
+private const val RouteProgress = "progress"
+private const val RouteSettings = "settings"
+private const val RouteShared = "shared"
 
 @Composable
-fun TathbeetApp() {
+fun TathbeetApp(
+    appContainer: AppContainer,
+) {
     val context = LocalContext.current
     val quranCatalog = remember(context) { loadQuranCatalog(context) }
-    var uiState by remember(quranCatalog) { mutableStateOf(seedAppState(context, quranCatalog)) }
+    var legacyUiState by remember(quranCatalog) { mutableStateOf(seedAppState(context, quranCatalog)) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStackEntry?.destination?.route.toAppDestination()
 
-    fun mutate(message: TextSpec? = null, transform: (AppUiState) -> AppUiState) {
-        uiState = transform(uiState)
+    LaunchedEffect(appContainer) {
+        appContainer.profileRepository.ensureDefaultAccount(
+            name = context.getString(R.string.profile_name_self),
+        )
+    }
+
+    fun mutateLegacy(message: TextSpec? = null, transform: (AppUiState) -> AppUiState) {
+        legacyUiState = transform(legacyUiState)
         if (message != null) {
             scope.launch {
                 snackbarHostState.showSnackbar(message.resolve(context))
@@ -66,295 +97,309 @@ fun TathbeetApp() {
         }
     }
 
-    val activeProfile = uiState.activeProfile
-    val activePoolSelections = quranCatalog.resolveSelections(activeProfile.selectedPoolKeys)
-
-    fun openScheduleWizard(from: AppDestination) {
-        mutate {
-            it.copy(
-                destination = it.scheduleWizardStartDestination(),
-                scheduleReturnDestination = from,
-            )
-        }
-    }
-
-    fun handleBack() {
-        mutate {
-            when (it.destination) {
-                AppDestination.ScheduleIntro -> it
-                AppDestination.PoolSelector -> {
-                    if (it.hasCompletedScheduleOnboarding) {
-                        it.copy(destination = it.scheduleReturnDestination)
-                    } else {
-                        it.copy(destination = AppDestination.ScheduleIntro)
-                    }
-                }
-                AppDestination.ScheduleDose -> it.copy(destination = AppDestination.PoolSelector)
-                else -> it.copy(destination = AppDestination.Review)
-            }
-        }
-    }
-
-    BackHandler(
-        enabled = uiState.destination !in setOf(
-            AppDestination.Profiles,
-            AppDestination.Review,
-            AppDestination.Progress,
-            AppDestination.Settings,
-            AppDestination.ScheduleIntro,
-        ),
-    ) {
-        handleBack()
-    }
-
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         AppShell(
-            uiState = uiState,
+            currentDestination = currentDestination,
             onNavigate = { destination ->
-                mutate { it.copy(destination = destination) }
+                navController.navigateMain(destination.toRoute())
             },
-            onBack = ::handleBack,
+            onBack = { navController.navigateUp() },
             onReviewPlanAction = {
-                openScheduleWizard(AppDestination.Review)
+                navController.navigate(RoutePoolSelector)
             },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) {
-            when (uiState.destination) {
-                AppDestination.Profiles -> ProfilesScreen(
-                    uiState = uiState,
-                    onProfileSelected = { profileId ->
-                        mutate { it.copy(activeProfileId = profileId) }
-                    },
-                    onProfileNotificationsToggled = { profileId ->
-                        mutate {
-                            it.copy(
-                                profiles = it.profiles.map { profile ->
-                                    if (profile.id == profileId) {
-                                        profile.copy(notificationsEnabled = !profile.notificationsEnabled)
+            NavHost(
+                navController = navController,
+                startDestination = RouteLaunch,
+            ) {
+                composable(RouteLaunch) {
+                    LaunchRoute(
+                        appContainer = appContainer,
+                        onNavigate = { route ->
+                            navController.navigate(route) {
+                                popUpTo(RouteLaunch) { inclusive = true }
+                            }
+                        },
+                    )
+                }
+
+                navigation(
+                    startDestination = RouteScheduleIntro,
+                    route = RouteScheduleGraph,
+                ) {
+                    composable(RouteScheduleIntro) { backStackEntry ->
+                        val scheduleGraphEntry = remember(backStackEntry) {
+                            navController.getBackStackEntry(RouteScheduleGraph)
+                        }
+                        val wizardViewModel: ScheduleWizardViewModel = viewModel(
+                            viewModelStoreOwner = scheduleGraphEntry,
+                            factory = scheduleWizardViewModelFactory(appContainer),
+                        )
+                        ScheduleIntroScreen(
+                            onNext = {
+                                wizardViewModel.markIntroSeen()
+                                navController.navigate(RoutePoolSelector)
+                            },
+                        )
+                    }
+                    composable(RoutePoolSelector) { backStackEntry ->
+                        val scheduleGraphEntry = remember(backStackEntry) {
+                            navController.getBackStackEntry(RouteScheduleGraph)
+                        }
+                        val wizardViewModel: ScheduleWizardViewModel = viewModel(
+                            viewModelStoreOwner = scheduleGraphEntry,
+                            factory = scheduleWizardViewModelFactory(appContainer),
+                        )
+                        val uiState by wizardViewModel.uiState.collectAsState()
+                        if (!uiState.isLoading) {
+                            val catalog = appContainer.quranCatalogRepository.getCatalog()
+                            PoolSelectorScreen(
+                                selectedCategory = uiState.selectedCategory,
+                                optionsForCategory = catalog::itemsFor,
+                                selectedPool = uiState.selectedPool,
+                                showWizardHeader = uiState.isOnboarding,
+                                onCategorySelected = wizardViewModel::selectCategory,
+                                onToggleSelection = wizardViewModel::toggleSelection,
+                                onDone = { navController.navigate(RouteScheduleDose) },
+                            )
+                        }
+                    }
+                    composable(RouteScheduleDose) { backStackEntry ->
+                        val scheduleGraphEntry = remember(backStackEntry) {
+                            navController.getBackStackEntry(RouteScheduleGraph)
+                        }
+                        val wizardViewModel: ScheduleWizardViewModel = viewModel(
+                            viewModelStoreOwner = scheduleGraphEntry,
+                            factory = scheduleWizardViewModelFactory(appContainer),
+                        )
+                        val uiState by wizardViewModel.uiState.collectAsState()
+                        if (!uiState.isLoading) {
+                            ScheduleScreen(
+                                selectedPool = uiState.selectedPool,
+                                paceMethod = uiState.paceMethod,
+                                selectedCycleTarget = uiState.selectedCycleTarget,
+                                selectedPace = uiState.selectedPace,
+                                segmentCount = uiState.segmentCount,
+                                cycleLength = uiState.cycleLength,
+                                showWizardHeader = uiState.isOnboarding,
+                                onCycleTargetSelected = wizardViewModel::selectCycleTarget,
+                                onPaceSelected = wizardViewModel::selectManualPace,
+                                onResetToCycleMode = wizardViewModel::resetToCycleMode,
+                                onSaveSchedule = {
+                                    wizardViewModel.saveSchedule {
+                                        navController.navigate(RouteReview) {
+                                            popUpTo(RouteScheduleGraph) { inclusive = true }
+                                        }
+                                    }
+                                },
+                            )
+                        }
+                    }
+                }
+
+                composable(RouteReview) {
+                    val reviewViewModel: ReviewViewModel = viewModel(
+                        factory = ReviewViewModelFactory(
+                            profileRepository = appContainer.profileRepository,
+                            reviewRepository = appContainer.reviewRepository,
+                            timeProvider = appContainer.timeProvider,
+                        ),
+                    )
+                    val uiState by reviewViewModel.uiState.collectAsState()
+                    ReviewScreen(
+                        uiState = uiState,
+                        onToggleTask = reviewViewModel::toggleTask,
+                    )
+                }
+
+                composable(RouteProfiles) {
+                    ProfilesScreen(
+                        uiState = legacyUiState,
+                        onProfileSelected = { profileId ->
+                            mutateLegacy { it.copy(activeProfileId = profileId) }
+                        },
+                        onProfileNotificationsToggled = { profileId ->
+                            mutateLegacy {
+                                it.copy(
+                                    profiles = it.profiles.map { profile ->
+                                        if (profile.id == profileId) {
+                                            profile.copy(notificationsEnabled = !profile.notificationsEnabled)
+                                        } else {
+                                            profile
+                                        }
+                                    },
+                                )
+                            }
+                        },
+                        onAddChildProfile = {
+                            mutateLegacy(TextSpec(R.string.snackbar_child_profile_created)) { state ->
+                                state.addProfile()
+                            }
+                        },
+                        onOpenSchedule = { navController.navigate(RoutePoolSelector) },
+                        onOpenSharedProfile = { navController.navigate(RouteShared) },
+                    )
+                }
+
+                composable(RouteProgress) {
+                    val activeProfile = legacyUiState.activeProfile
+                    ProgressScreen(
+                        profile = activeProfile,
+                        completionRate = activeProfile.completionRate,
+                        onOpenReview = { navController.navigate(RouteReview) },
+                    )
+                }
+
+                composable(RouteSettings) {
+                    SettingsScreen(
+                        uiState = legacyUiState,
+                        activeProfile = legacyUiState.activeProfile,
+                        onGlobalNotificationsChanged = {
+                            mutateLegacy { it.copy(globalNotificationsEnabled = !it.globalNotificationsEnabled) }
+                        },
+                        onMotivationalMessagesChanged = {
+                            mutateLegacy { it.copy(motivationalMessagesEnabled = !it.motivationalMessagesEnabled) }
+                        },
+                        onProfileNotificationsChanged = {
+                            mutateLegacy {
+                                it.copy(
+                                    profiles = it.profiles.map { profile ->
+                                        if (profile.id == it.activeProfileId) {
+                                            profile.copy(notificationsEnabled = !profile.notificationsEnabled)
+                                        } else {
+                                            profile
+                                        }
+                                    },
+                                )
+                            }
+                        },
+                        onReminderTimeChanged = {
+                            mutateLegacy {
+                                val currentIndex = reminderOptions.indexOf(it.reminderTime)
+                                val nextIndex = (currentIndex + 1) % reminderOptions.size
+                                it.copy(reminderTime = reminderOptions[nextIndex])
+                            }
+                        },
+                        onAccountModeChanged = {
+                            mutateLegacy {
+                                it.copy(
+                                    accountMode = if (it.accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
+                                    syncState = if (it.accountMode == AccountMode.Guest) {
+                                        SyncState.Synced
                                     } else {
-                                        profile
-                                    }
-                                },
-                            )
-                        }
-                    },
-                    onAddChildProfile = {
-                        mutate(TextSpec(R.string.snackbar_child_profile_created)) { state ->
-                            state.addProfile()
-                        }
-                    },
-                    onOpenSchedule = {
-                        openScheduleWizard(AppDestination.Profiles)
-                    },
-                    onOpenSharedProfile = {
-                        mutate { it.copy(destination = AppDestination.Shared) }
-                    },
-                )
-
-                AppDestination.ScheduleIntro -> ScheduleIntroScreen(
-                    onNext = {
-                        mutate {
-                            it.copy(
-                                destination = AppDestination.PoolSelector,
-                                hasSeenScheduleIntro = true,
-                            )
-                        }
-                    },
-                )
-
-                AppDestination.PoolSelector -> PoolSelectorScreen(
-                    selectedCategory = uiState.activeSelectionCategory,
-                    optionsForCategory = quranCatalog::itemsFor,
-                    selectedPool = activePoolSelections,
-                    showWizardHeader = !uiState.hasCompletedScheduleOnboarding,
-                    onCategorySelected = { category ->
-                        mutate { it.copy(activeSelectionCategory = category) }
-                    },
-                    onToggleSelection = { option ->
-                        mutate {
-                            it.updateActiveProfile { profile ->
-                                val nextPool = profile.selectedPoolKeys.toMutableSet().apply {
-                                    if (!add(option.key)) {
-                                        remove(option.key)
-                                    }
-                                }
-                                profile.copy(selectedPoolKeys = nextPool)
-                            }
-                        }
-                    },
-                    onDone = {
-                        mutate { it.copy(destination = AppDestination.ScheduleDose) }
-                    },
-                )
-
-                AppDestination.ScheduleDose -> ScheduleScreen(
-                    selectedPool = activePoolSelections,
-                    paceMethod = activeProfile.paceMethod,
-                    selectedCycleTarget = activeProfile.cycleTarget,
-                    selectedPace = activeProfile.pace,
-                    segmentCount = uiState.poolSegmentCount(quranCatalog),
-                    cycleLength = uiState.cycleLength(quranCatalog),
-                    showWizardHeader = !uiState.hasCompletedScheduleOnboarding,
-                    onCycleTargetSelected = { cycleTarget ->
-                        mutate {
-                            val nextSegmentCount = it.poolSegmentCount(quranCatalog)
-                            it.updateActiveProfile { profile ->
-                                profile.copy(
-                                    paceMethod = PaceMethod.CycleTarget,
-                                    cycleTarget = cycleTarget,
-                                    pace = recommendedPace(nextSegmentCount, cycleTarget),
+                                        SyncState.OfflineReady
+                                    },
                                 )
                             }
-                        }
-                    },
-                    onPaceSelected = { pace ->
-                        mutate {
-                            it.updateActiveProfile { profile ->
-                                profile.copy(
-                                    paceMethod = PaceMethod.Manual,
-                                    pace = pace,
-                                )
-                            }
-                        }
-                    },
-                    onResetToCycleMode = {
-                        mutate {
-                            val nextSegmentCount = it.poolSegmentCount(quranCatalog)
-                            it.updateActiveProfile { profile ->
-                                profile.copy(
-                                    paceMethod = PaceMethod.CycleTarget,
-                                    pace = recommendedPace(nextSegmentCount, profile.cycleTarget),
-                                )
-                            }
-                        }
-                    },
-                    onSaveSchedule = {
-                        mutate(TextSpec(R.string.snackbar_schedule_updated)) {
-                            it.updateActiveProfile { profile ->
-                                val refreshed = profile.copy(reviewTasks = generateTasksForProfile(profile, quranCatalog, context))
-                                refreshed.copy(
-                                    weekCompletion = refreshed.weekCompletion.dropLast(1) + refreshed.dailyProgress,
-                                )
-                            }.copy(
-                                destination = AppDestination.Review,
-                                hasCompletedScheduleOnboarding = true,
-                                syncState = if (it.accountMode == AccountMode.Google) {
-                                    SyncState.SyncPending
-                                } else {
-                                    SyncState.OfflineReady
-                                },
-                            )
-                        }
-                    },
-                )
+                        },
+                    )
+                }
 
-                AppDestination.Review -> ReviewScreen(
-                    profile = activeProfile,
-                    completionRate = activeProfile.completionRate,
-                    onToggleTask = { taskId ->
-                        mutate {
-                            it.updateActiveProfile { profile ->
-                                val nextTasks = profile.reviewTasks.map { task ->
-                                    if (task.id == taskId) task.copy(isDone = !task.isDone) else task
-                                }
-                                profile.copy(
-                                    reviewTasks = nextTasks,
-                                    weekCompletion = profile.weekCompletion.dropLast(1) + (
-                                        if (nextTasks.isEmpty()) 0f else nextTasks.count { task -> task.isDone }.toFloat() / nextTasks.size
-                                    ),
+                composable(RouteShared) {
+                    SharedProfileScreen(
+                        profile = legacyUiState.activeProfile,
+                        accountMode = legacyUiState.accountMode,
+                        syncState = legacyUiState.syncState,
+                        onGuardianToggled = { guardian ->
+                            mutateLegacy {
+                                it.copy(
+                                    profiles = it.profiles.map { profile ->
+                                        if (profile.id == it.activeProfileId) {
+                                            val nextGuardians = profile.guardians.toMutableSet().apply {
+                                                if (!add(guardian)) {
+                                                    remove(guardian)
+                                                }
+                                            }
+                                            profile.copy(
+                                                guardians = nextGuardians,
+                                                isShared = nextGuardians.size > 1,
+                                            )
+                                        } else {
+                                            profile
+                                        }
+                                    },
                                 )
                             }
-                        }
-                    },
-                )
-
-                AppDestination.Progress -> ProgressScreen(
-                    profile = activeProfile,
-                    completionRate = activeProfile.completionRate,
-                    onOpenReview = {
-                        mutate { it.copy(destination = AppDestination.Review) }
-                    },
-                )
-
-                AppDestination.Shared -> SharedProfileScreen(
-                    profile = activeProfile,
-                    accountMode = uiState.accountMode,
-                    syncState = uiState.syncState,
-                    onGuardianToggled = { guardian ->
-                        mutate {
-                            it.updateActiveProfile { profile ->
-                                val nextGuardians = profile.guardians.toMutableSet().apply {
-                                    if (!add(guardian)) remove(guardian)
-                                }
-                                profile.copy(
-                                    guardians = nextGuardians,
-                                    isShared = nextGuardians.size > 1,
-                                )
-                            }
-                        }
-                    },
-                    onSimulateSync = {
-                        if (uiState.accountMode == AccountMode.Guest) {
-                            mutate(TextSpec(R.string.snackbar_create_account_for_sharing)) { it }
-                        } else {
-                            mutate(TextSpec(R.string.snackbar_sync_simulated)) {
+                        },
+                        onSimulateSync = {
+                            mutateLegacy {
                                 it.copy(
                                     syncState = when (it.syncState) {
                                         SyncState.OfflineReady -> SyncState.SyncPending
                                         SyncState.SyncPending -> SyncState.Synced
-                                        SyncState.Synced -> SyncState.SyncPending
+                                        SyncState.Synced -> SyncState.OfflineReady
                                     },
-                                ).updateActiveProfile { profile ->
-                                    profile.copy(
-                                        activityFeed = listOf(
-                                            TextSpec(R.string.feed_sync_now, listOf(profile.name.resolve(context))),
-                                            TextSpec(R.string.feed_shared_mother_time),
-                                            TextSpec(R.string.feed_shared_father_done),
-                                        ),
-                                    )
-                                }
+                                )
                             }
-                        }
-                    },
-                )
-
-                AppDestination.Settings -> SettingsScreen(
-                    uiState = uiState,
-                    activeProfile = activeProfile,
-                    onGlobalNotificationsChanged = {
-                        mutate { it.copy(globalNotificationsEnabled = !it.globalNotificationsEnabled) }
-                    },
-                    onMotivationalMessagesChanged = {
-                        mutate { it.copy(motivationalMessagesEnabled = !it.motivationalMessagesEnabled) }
-                    },
-                    onProfileNotificationsChanged = {
-                        mutate {
-                            it.updateActiveProfile { profile -> profile.copy(notificationsEnabled = !profile.notificationsEnabled) }
-                        }
-                    },
-                    onReminderTimeChanged = {
-                        mutate {
-                            val currentIndex = reminderOptions.indexOf(it.reminderTime)
-                            val nextIndex = (currentIndex + 1) % reminderOptions.size
-                            it.copy(reminderTime = reminderOptions[nextIndex])
-                        }
-                    },
-                    onAccountModeChanged = {
-                        mutate {
-                            it.copy(
-                                accountMode = if (it.accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
-                                syncState = if (it.accountMode == AccountMode.Guest) {
-                                    SyncState.Synced
-                                } else {
-                                    SyncState.OfflineReady
-                                },
-                            )
-                        }
-                    },
-                )
+                        },
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun LaunchRoute(
+    appContainer: AppContainer,
+    onNavigate: (String) -> Unit,
+) {
+    LaunchedEffect(appContainer) {
+        val settings = appContainer.settingsRepository.observeSettings().first()
+        val account = appContainer.profileRepository.observeActiveAccount().filterNotNull().first()
+        val schedule = appContainer.scheduleRepository.observeActiveSchedule(account.id).first()
+        val route = when {
+            schedule != null -> RouteReview
+            settings.hasSeenScheduleIntro -> RoutePoolSelector
+            else -> RouteScheduleIntro
+        }
+        withContext(Dispatchers.Main.immediate) {
+            onNavigate(route)
+        }
+    }
+}
+
+private fun scheduleWizardViewModelFactory(
+    appContainer: AppContainer,
+) = ScheduleWizardViewModelFactory(
+    profileRepository = appContainer.profileRepository,
+    scheduleRepository = appContainer.scheduleRepository,
+    settingsRepository = appContainer.settingsRepository,
+    quranCatalogRepository = appContainer.quranCatalogRepository,
+    revisionPlanner = appContainer.revisionPlanner,
+)
+
+private fun NavHostController.navigateMain(route: String) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+private fun AppDestination.toRoute(): String = when (this) {
+    AppDestination.Profiles -> RouteProfiles
+    AppDestination.ScheduleIntro -> RouteScheduleIntro
+    AppDestination.PoolSelector -> RoutePoolSelector
+    AppDestination.ScheduleDose -> RouteScheduleDose
+    AppDestination.Review -> RouteReview
+    AppDestination.Progress -> RouteProgress
+    AppDestination.Shared -> RouteShared
+    AppDestination.Settings -> RouteSettings
+}
+
+private fun String?.toAppDestination(): AppDestination = when (this) {
+    RouteProfiles -> AppDestination.Profiles
+    RouteScheduleIntro -> AppDestination.ScheduleIntro
+    RoutePoolSelector -> AppDestination.PoolSelector
+    RouteScheduleDose -> AppDestination.ScheduleDose
+    RouteProgress -> AppDestination.Progress
+    RouteShared -> AppDestination.Shared
+    RouteSettings -> AppDestination.Settings
+    else -> AppDestination.Review
 }
 
 private fun AppUiState.addProfile(): AppUiState {
@@ -383,7 +428,7 @@ private fun AppUiState.addProfile(): AppUiState {
         profiles = profiles + newProfile,
         activeProfileId = newProfileId,
         extraProfileCount = extraProfileCount + 1,
-        destination = scheduleWizardStartDestination(),
+        destination = AppDestination.PoolSelector,
         scheduleReturnDestination = AppDestination.Profiles,
     )
 }

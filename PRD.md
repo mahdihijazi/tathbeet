@@ -177,6 +177,27 @@ Prototype rules:
 - Arabic UI review should happen in RTL layouts
 - prototype feedback must be reflected back into this PRD and the README when it changes UX, scope, or flow expectations
 
+### 7.6 Implementation and Testing Rules
+
+Real feature implementation should follow test-driven development:
+
+- define the test first
+- implement the smallest feature slice needed to satisfy the test
+- make the test pass before moving to the next slice
+- a feature is not complete until its relevant tests pass
+
+Testing strategy should prefer:
+
+- screenshot tests for reusable visual components and important visual states
+- black-box Android UI/instrumentation tests for user journeys and screen behavior
+- JVM unit tests only where pure logic is better tested outside instrumentation
+
+Hard testing rules:
+
+- do not use mocking libraries
+- test doubles should be handwritten fakes, stubs, or no-op implementations
+- prefer in-memory Room and real repositories for integration-style tests where practical
+
 ## 8. Quran Content Model
 
 ### 8.1 User-Selectable Units
@@ -301,6 +322,14 @@ For MVP reporting, the visible outcome is still simple:
 
 Internally, partial segment completion can be used to determine whether the day becomes fully done.
 
+The review experience should also support early completion beyond today:
+
+- once the user finishes the currently visible ward, they can continue into future dated ward on demand
+- future dated ward should be appended inline in the review flow rather than exposed through tabs or a date picker in MVP
+- if the user completes tomorrow's ward today, tomorrow should appear already complete on its actual date
+- early completion should still count as work done on the day the user actually performed it
+- progress and history should distinguish scheduled-day completion from actual completion date
+
 ## 10. Notifications
 
 ### 10.1 MVP Notification Types
@@ -392,12 +421,17 @@ The data model should support shared ownership and conflict-safe synchronization
 ### 13.3 Daily Review
 
 - app shows today’s assigned review items
+- app should also support continuing into future dated review after the currently visible day is complete
 - review items should be execution units, not raw pool labels like `الجزء 30`
 - if a task spans multiple short surahs, the main task label should read like `من النبأ إلى المرسلات`
 - if a task stays inside one long surah, the labeling should use Quran range detail with ayah numbering
 - user can mark individual items done
 - app can determine when the day is complete
 - incomplete items roll over to the next day
+- review should support three categories of work:
+  - carried-over work from previous days
+  - current day assignments
+  - future dated assignments opened on demand
 - the review screen should stay structurally simple: compact summary, task list, and status-only bottom card
 - editing the revision plan should be available from the review screen top app bar rather than from the review body
 

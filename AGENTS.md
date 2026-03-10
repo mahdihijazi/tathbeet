@@ -3,18 +3,32 @@
 ## Project Structure & Module Organization
 `tathbeet` is a single-module Android app built with Gradle Kotlin DSL. The app code lives in `app/src/main/java/com/quran/tathbeet`.
 
-Current UI structure:
+Current repo structure:
 
-- `ui/features/` contains feature-specific screens and composables such as welcome, profiles, schedule, review, progress, shared-profile, and settings
-- `ui/components/` contains reusable app-level UI building blocks and shell components
-- `ui/model/` contains app state models, fake interaction state, and Quran selection data used by the current app skeleton
-- `ui/theme/` contains colors, typography, and theme setup
+- `app/` for the app container, navigation wiring, and ViewModel factories
+- `core/` for cross-cutting abstractions such as time
+- `data/local/` for Room entities, DAOs, and database setup
+- `data/repository/` for repository implementations
+- `domain/model/` for domain models exposed to the app layer
+- `domain/planner/` for revision-planning logic
+- `quran/` for Quran catalog/reference loading
+- `ui/features/` for feature-specific screens and composables such as profiles, schedule, review, progress, shared-profile, and settings
+- `ui/components/` for reusable app-level UI building blocks and shell components
+- `ui/model/` for transitional app state models and Quran selection models still used by the current app skeleton
+- `ui/theme/` for colors, typography, and theme setup
+- `app/src/androidTest/test/` for shared UI test infrastructure such as base test classes and helpers
 
 Android resources are in `app/src/main/res`, and user-facing strings should live in XML resources rather than Kotlin files.
 
 Product and planning documents live at the repo root in `README.md` and `PRD.md`, with supporting flow and screen docs under `docs/`.
 
 Testing should primarily live in `app/src/androidTest/...` using black-box UI and instrumentation coverage. Add tests by feature or user flow so they mirror the app structure from the user's perspective.
+
+Follow TDD for feature implementation:
+
+- write or update the failing test first
+- implement the smallest slice needed to make it pass
+- do not move to adjacent feature work until the relevant test is green
 
 ## Build, Test, and Development Commands
 Use the Gradle wrapper from the repository root:
@@ -53,7 +67,26 @@ Prefer black-box UI testing from the user's perspective over unit tests. Skip un
 
 Use `AndroidJUnitRunner` for instrumentation coverage. Name UI test files clearly by feature or flow, and prioritize end-to-end user scenarios such as onboarding, profile switching, schedule setup, daily review completion, shared-profile interactions, and notification/settings behavior.
 
+Any new navigation flow built with Navigation Compose must have black-box UI coverage for:
+
+- the happy path
+- back navigation
+- reopen or edit paths when the flow can be revisited
+
+Shared instrumentation setup must live in a base test class or dedicated helper package. Do not duplicate in-memory Room, fake time providers, or app-container setup across multiple UI test files.
+
+Default test commands:
+
+- `./gradlew testDebugUnitTest` to run local JVM unit tests
+- `./gradlew connectedDebugAndroidTest` to run instrumentation and black-box UI tests on a connected emulator or device
+
 Use Compose Preview Screenshot Testing for visual regression coverage of important screens and UI states. The standard screenshot workflow is:
+
+- aim for 100% screenshot coverage of screen components
+- do not capture the whole screen by default
+- break each screen into smaller UI elements that form one meaningful component with one clear purpose, then create screenshot tests for those components
+- if a component has multiple variants or changes its UI based on state, capture one screenshot per state or variant
+- avoid duplicating screenshot coverage when a reusable component is already covered elsewhere; add new coverage only for missing components or missing states
 
 - `./gradlew updateDebugScreenshotTest` to generate or refresh reference images
 - `./gradlew validateDebugScreenshotTest` to compare current renders against the saved references
@@ -62,5 +95,7 @@ Use Compose Preview Screenshot Testing for visual regression coverage of importa
 Each commit must have a clear title that explains what the commit does.
 
 Each commit message must also include a body. Keep the body to 4 lines or fewer. If more explanation seems necessary, ask first. Use everyday language and keep it easy to understand.
+
+Never create a commit, push, or use `git commit --amend` unless the user explicitly asks for that action.
 
 Pull requests should describe the user-facing change, note any Gradle commands run, link the relevant issue or planning doc, and include screenshots for Compose UI changes. Keep PRs focused so review stays tied to one feature or fix.
