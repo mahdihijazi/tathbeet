@@ -321,13 +321,12 @@ Internally, task completion determines whether the visible day becomes fully don
 
 Completing a task in MVP should also capture a simple retention rating:
 
-- when the user finishes a task, the app opens a lightweight rating dialog
-- the dialog asks `قيّم درجة حفظك`
-- rating uses a 1 to 5 star scale
-- first-time completion should default to 5 stars
-- if the task was rated before, reopening the dialog should reuse the previous rating
-- closing the dialog without changing the rating should keep the current selected/default value
-- completed tasks should show the saved rating and allow later editing
+- when the user taps `أنهيت المراجعة`, the task should be marked complete immediately
+- rating uses a 1 to 5 star scale shown inline in the completed task row rather than in a dialog
+- first-time completion should default to 3 stars
+- if the same task was rated before in a previous cycle, the app should reuse the previous rating as the default/current value
+- completed tasks should always show the saved rating inline
+- users should be able to edit the rating later by tapping the inline stars directly
 
 The review experience should also support early completion beyond today:
 

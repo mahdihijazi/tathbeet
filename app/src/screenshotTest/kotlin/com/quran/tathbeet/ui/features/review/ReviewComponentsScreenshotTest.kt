@@ -16,7 +16,6 @@ import com.quran.tathbeet.ui.theme.TathbeetTokens
 private const val ReviewPreviewWidth = 411
 private const val ReviewHeaderHeight = 120
 private const val ReviewRowHeight = 220
-private const val ReviewDialogHeight = 320
 private const val ReviewProgressHeight = 240
 
 @PreviewTest
@@ -107,7 +106,7 @@ fun ReviewTaskRowCompletedScreenshot() {
         ReviewTaskRow(
             task = ReviewMockFactory.initialState().toUiState().sections[1].tasks[0],
             onCompleteReview = {},
-            onEditRating = {},
+            onUpdateRating = {},
         )
     }
 }
@@ -126,26 +125,33 @@ fun ReviewTaskRowPendingScreenshot() {
         ReviewTaskRow(
             task = ReviewMockFactory.initialState().toUiState().sections[2].tasks[0],
             onCompleteReview = {},
-            onEditRating = {},
+            onUpdateRating = {},
         )
     }
 }
 
 @PreviewTest
 @Preview(
-    name = "review_rating_dialog_default",
+    name = "review_task_row_completed_default_rating",
     locale = "ar",
     widthDp = ReviewPreviewWidth,
-    heightDp = ReviewDialogHeight,
+    heightDp = ReviewRowHeight,
     showBackground = true,
 )
 @Composable
-fun ReviewRatingDialogDefaultScreenshot() {
+fun ReviewTaskRowCompletedDefaultRatingScreenshot() {
     ReviewScreenshotBox {
-        ReviewRatingDialog(
-            selectedRating = 5,
-            onSelectRating = {},
-            onDismiss = {},
+        ReviewTaskRow(
+            task = ReviewTaskUiState(
+                id = "default-rated-task",
+                title = com.quran.tathbeet.ui.model.TextSpec(rawText = "من الفاتحة إلى البقرة"),
+                detail = com.quran.tathbeet.ui.model.TextSpec(rawText = "ربع الحزب 1 · من الفاتحة 1 إلى البقرة 25"),
+                isDone = true,
+                rating = 3,
+                defaultRating = 3,
+            ),
+            onCompleteReview = {},
+            onUpdateRating = {},
         )
     }
 }
@@ -155,7 +161,7 @@ fun ReviewRatingDialogDefaultScreenshot() {
     name = "review_cycle_complete_dialog",
     locale = "ar",
     widthDp = ReviewPreviewWidth,
-    heightDp = ReviewDialogHeight,
+    heightDp = 320,
     showBackground = true,
 )
 @Composable
