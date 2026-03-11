@@ -1,3 +1,4 @@
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    jacoco
 }
 
 android {
@@ -24,6 +26,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -55,6 +62,80 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
     }
+}
+
+val coverageExclusions = listOf(
+    "**/R.class",
+    "**/R${'$'}*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/*Test*.*",
+    "**/*Preview*.*",
+    "**/*ComposableSingletons*.*",
+    "**/*${'$'}Lambda${'$'}*.*",
+    "**/*${'$'}inlined${'$'}*.*",
+    "**/*_Factory.class",
+    "**/*_Provide*Factory.class",
+    "**/*_Impl.class",
+    "**/*_Impl${'$'}*.class",
+)
+
+val debugCoverageSources = files(
+    "src/main/java",
+    "src/main/kotlin",
+)
+
+val debugCoverageClasses = files(
+    layout.buildDirectory.dir("tmp/kotlin-classes/debug"),
+    layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes"),
+).asFileTree.matching {
+    exclude(coverageExclusions)
+}
+
+val debugUnitCoverageData = fileTree(layout.buildDirectory) {
+    include(
+        "jacoco/testDebugUnitTest.exec",
+        "outputs/unit_test_code_coverage/debugUnitTest/**/*.exec",
+    )
+}
+
+val debugUiCoverageData = fileTree(layout.buildDirectory) {
+    include("outputs/code_coverage/debugAndroidTest/connected/**/*.ec")
+}
+
+fun JacocoReport.configureDebugCoverageReport() {
+    group = "verification"
+    description = "Generates a JaCoCo coverage report for the debug variant."
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    sourceDirectories.setFrom(debugCoverageSources)
+    classDirectories.setFrom(debugCoverageClasses)
+}
+
+tasks.register<JacocoReport>("jacocoDebugUnitTestReport") {
+    dependsOn("testDebugUnitTest")
+    configureDebugCoverageReport()
+    description = "Generates a JaCoCo coverage report for debug unit tests."
+    executionData.setFrom(debugUnitCoverageData)
+}
+
+tasks.register<JacocoReport>("jacocoDebugUiTestReport") {
+    dependsOn("connectedDebugAndroidTest")
+    configureDebugCoverageReport()
+    description = "Generates a JaCoCo coverage report for debug instrumentation tests."
+    executionData.setFrom(debugUiCoverageData)
+}
+
+tasks.register<JacocoReport>("jacocoDebugCombinedReport") {
+    dependsOn("testDebugUnitTest", "connectedDebugAndroidTest")
+    configureDebugCoverageReport()
+    description = "Generates a JaCoCo coverage report for debug unit and instrumentation tests."
+    executionData.setFrom(debugUnitCoverageData, debugUiCoverageData)
 }
 
 dependencies {

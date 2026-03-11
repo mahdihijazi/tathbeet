@@ -79,6 +79,17 @@ Default test commands:
 
 - `./gradlew testDebugUnitTest` to run local JVM unit tests
 - `./gradlew connectedDebugAndroidTest` to run instrumentation and black-box UI tests on a connected emulator or device
+- `./gradlew createDebugUnitTestCoverageReport` or `./gradlew jacocoDebugUnitTestReport` to generate debug unit-test coverage
+- `./gradlew createDebugAndroidTestCoverageReport` or `./gradlew jacocoDebugUiTestReport` to generate debug instrumentation/UI coverage
+- `./gradlew jacocoDebugCombinedReport` to merge debug unit-test and instrumentation/UI coverage into one JaCoCo report
+
+Coverage notes:
+
+- debug coverage is enabled in `app/build.gradle.kts` through `enableUnitTestCoverage` and `enableAndroidTestCoverage`
+- UI coverage requires a connected emulator or device; unit coverage does not
+- the combined report is only meaningful after both unit tests and instrumentation tests have run successfully
+- generated HTML and XML coverage reports live under `app/build/reports/jacoco/`
+- if the app does not compile, coverage numbers cannot be produced; fix compilation first, then rerun the relevant coverage task
 
 Use Compose Preview Screenshot Testing for visual regression coverage of important screens and UI states. The standard screenshot workflow is:
 
