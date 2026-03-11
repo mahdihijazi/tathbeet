@@ -18,11 +18,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -31,8 +33,47 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.quran.tathbeet.R
+import com.quran.tathbeet.ui.components.AppCardTone
+import com.quran.tathbeet.ui.components.TitledCardSection
 import com.quran.tathbeet.ui.model.asString
 import com.quran.tathbeet.ui.theme.TathbeetTokens
+
+@Composable
+fun ReviewProgressCard(
+    progress: ReviewProgressCardUiState,
+) {
+    TitledCardSection(
+        title = stringResource(R.string.review_progress_title),
+        tone = AppCardTone.Muted,
+        modifier = Modifier.testTag("review-progress-card"),
+    ) {
+        Text(
+            text = stringResource(
+                R.string.review_progress_ratio,
+                progress.completedCount,
+                progress.totalCount,
+            ),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = stringResource(R.string.review_progress_completed_label),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        LinearProgressIndicator(
+            progress = { progress.progress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = TathbeetTokens.spacing.x1Half),
+        )
+        Text(
+            text = stringResource(R.string.review_progress_remaining, progress.remainingCount),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
 
 @Composable
 fun ReviewSectionHeader(
@@ -51,7 +92,7 @@ fun ReviewSectionHeader(
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
-                .align(Alignment.TopStart),
+                .align(AbsoluteAlignment.TopRight),
             color = MaterialTheme.colorScheme.onSurface,
         )
         Icon(
@@ -62,7 +103,7 @@ fun ReviewSectionHeader(
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
             },
-            modifier = Modifier.align(Alignment.TopEnd),
+            modifier = Modifier.align(AbsoluteAlignment.TopLeft),
         )
     }
 }

@@ -189,6 +189,10 @@
     <string name="review_section_next_title">ورد الغد</string>
     <string name="review_section_day_after_next_title">ورد بعد الغد</string>
     <string name="review_section_cycle_last_title">آخر ورد في الدورة</string>
+    <string name="review_progress_title">تقدم الورد</string>
+    <string name="review_progress_ratio">%1$d من %2$d</string>
+    <string name="review_progress_completed_label">مهام مكتملة</string>
+    <string name="review_progress_remaining">المتبقي الآن: %1$d</string>
     <string name="review_cycle_complete_title">اكتملت الدورة الحالية</string>
     <string name="review_cycle_complete_body">أنهيت جميع مهام هذه الدورة. يمكنك بدء دورة جديدة من البداية.</string>
     <string name="review_cycle_restart">ابدأ دورة جديدة</string>

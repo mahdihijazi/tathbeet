@@ -309,10 +309,7 @@ For MVP, the scheduler should:
 
 ### 9.3 Task Completion
 
-Daily completion should support both:
-
-- marking the whole day as done
-- marking individual review segments as done
+Daily completion should happen at the individual review-task level rather than through a single "mark the whole day done" action.
 
 This is important because a selected surah or juz may be completed in smaller pieces even though the original selection was not entered as rub-level items.
 
@@ -320,7 +317,17 @@ For MVP reporting, the visible outcome is still simple:
 
 - day status: done or not done
 
-Internally, partial segment completion can be used to determine whether the day becomes fully done.
+Internally, task completion determines whether the visible day becomes fully done.
+
+Completing a task in MVP should also capture a simple retention rating:
+
+- when the user finishes a task, the app opens a lightweight rating dialog
+- the dialog asks `قيّم درجة حفظك`
+- rating uses a 1 to 5 star scale
+- first-time completion should default to 5 stars
+- if the task was rated before, reopening the dialog should reuse the previous rating
+- closing the dialog without changing the rating should keep the current selected/default value
+- completed tasks should show the saved rating and allow later editing
 
 The review experience should also support early completion beyond today:
 
@@ -429,17 +436,19 @@ The data model should support shared ownership and conflict-safe synchronization
 - app should also support continuing into future dated review after the currently visible day is complete
 - if the user keeps finishing visible future days early, the review flow should keep appending the next day inline until the current cycle is exhausted
 - once the full current cycle is complete, the user should be offered an explicit action to restart the cycle and begin again from the start
+- the review screen should show a compact top progress summary card for the currently visible work
+- that top summary should focus on completed count, remaining count, and clear progress through the visible work
 - review items should be execution units, not raw pool labels like `الجزء 30`
 - if a task spans multiple short surahs, the main task label should read like `من النبأ إلى المرسلات`
 - if a task stays inside one long surah, the labeling should use Quran range detail with ayah numbering
-- user can mark individual items done
+- user completes individual items from the task list
 - app can determine when the day is complete
 - incomplete items roll over to the next day
 - review should support three categories of work:
   - carried-over work from previous days
   - current day assignments
   - future dated assignments opened on demand
-- the review screen should stay structurally simple: compact summary, task list, and status-only bottom card
+- the review screen should stay structurally simple: compact top summary and a unified task list separated by section headers
 - editing the revision plan should be available from the review screen top app bar rather than from the review body
 
 ### 13.4 Offline Behavior

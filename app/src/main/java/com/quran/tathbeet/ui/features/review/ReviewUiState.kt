@@ -18,8 +18,16 @@ data class ReviewSectionUiState(
     val tasks: List<ReviewTaskUiState>,
 )
 
+data class ReviewProgressCardUiState(
+    val completedCount: Int,
+    val totalCount: Int,
+    val remainingCount: Int,
+    val progress: Float,
+)
+
 data class ReviewUiState(
     val isLoading: Boolean = true,
+    val progressCard: ReviewProgressCardUiState? = null,
     val sections: List<ReviewSectionUiState> = emptyList(),
     val showCycleResetDialog: Boolean = false,
     val ratingDialogTask: ReviewTaskUiState? = null,
@@ -34,15 +42,28 @@ internal data class ReviewMockState(
     val ratingDialogSelected: Int = 5,
 ) {
     fun toUiState(): ReviewUiState =
-        ReviewUiState(
-            isLoading = false,
-            sections = allSections.take(visibleSectionCount),
-            showCycleResetDialog = showCycleResetDialog,
-            ratingDialogTask = ratingDialogTaskId?.let { taskId ->
-                allSections.flatMap { it.tasks }.firstOrNull { it.id == taskId }
-            },
-            ratingDialogSelected = ratingDialogSelected,
-        )
+        allSections.take(visibleSectionCount).let { visibleSections ->
+            val visibleTasks = visibleSections.flatMap { it.tasks }
+            val completedCount = visibleTasks.count { it.isDone }
+            val totalCount = visibleTasks.size
+            val remainingCount = totalCount - completedCount
+
+            ReviewUiState(
+                isLoading = false,
+                progressCard = ReviewProgressCardUiState(
+                    completedCount = completedCount,
+                    totalCount = totalCount,
+                    remainingCount = remainingCount,
+                    progress = if (totalCount == 0) 0f else completedCount.toFloat() / totalCount.toFloat(),
+                ),
+                sections = visibleSections,
+                showCycleResetDialog = showCycleResetDialog,
+                ratingDialogTask = ratingDialogTaskId?.let { taskId ->
+                    allSections.flatMap { it.tasks }.firstOrNull { it.id == taskId }
+                },
+                ratingDialogSelected = ratingDialogSelected,
+            )
+        }
 }
 
 internal object ReviewMockFactory {

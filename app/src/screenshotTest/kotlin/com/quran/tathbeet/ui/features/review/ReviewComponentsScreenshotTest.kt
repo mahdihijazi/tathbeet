@@ -17,6 +17,47 @@ private const val ReviewPreviewWidth = 411
 private const val ReviewHeaderHeight = 120
 private const val ReviewRowHeight = 220
 private const val ReviewDialogHeight = 320
+private const val ReviewProgressHeight = 240
+
+@PreviewTest
+@Preview(
+    name = "review_progress_card_in_progress",
+    locale = "ar",
+    widthDp = ReviewPreviewWidth,
+    heightDp = ReviewProgressHeight,
+    showBackground = true,
+)
+@Composable
+fun ReviewProgressCardInProgressScreenshot() {
+    ReviewScreenshotBox {
+        ReviewProgressCard(
+            progress = ReviewMockFactory.initialState().toUiState().progressCard
+                ?: error("Expected progress card"),
+        )
+    }
+}
+
+@PreviewTest
+@Preview(
+    name = "review_progress_card_complete",
+    locale = "ar",
+    widthDp = ReviewPreviewWidth,
+    heightDp = ReviewProgressHeight,
+    showBackground = true,
+)
+@Composable
+fun ReviewProgressCardCompleteScreenshot() {
+    ReviewScreenshotBox {
+        ReviewProgressCard(
+            progress = ReviewProgressCardUiState(
+                completedCount = 5,
+                totalCount = 5,
+                remainingCount = 0,
+                progress = 1f,
+            ),
+        )
+    }
+}
 
 @PreviewTest
 @Preview(

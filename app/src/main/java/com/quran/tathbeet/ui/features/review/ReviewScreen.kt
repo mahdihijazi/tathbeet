@@ -31,6 +31,11 @@ fun ReviewScreen(
         contentPadding = PaddingValues(bottom = TathbeetTokens.spacing.x1),
         verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x2),
     ) {
+        uiState.progressCard?.let { progressCard ->
+            item(key = "review-progress-card") {
+                ReviewProgressCard(progress = progressCard)
+            }
+        }
         uiState.sections.forEach { section ->
             item(key = "${section.id}-header") {
                 ReviewSectionHeader(section = section)
