@@ -143,7 +143,8 @@ The current app build is:
 - uses a 3-step schedule wizard
 - shows a one-time intro on first app open
 - reopens the wizard from محفوظ selection after onboarding
-- keeps account creation as a later toolbar action in the prototype
+- sends users with an existing schedule straight to review on launch
+- keeps sign-in and account-mode changes as a later Settings action in the prototype
 - uses Arabic-only user-facing copy
 - renders in RTL for Arabic layout review even on non-Arabic devices
 - moves memorized-pool selection into a standalone screen
@@ -151,6 +152,8 @@ The current app build is:
 - loads the selector data from the Quran assets under `app/src/main/assets/quran`
 - shows real lists for all four tabs: surahs, juzs, hizbs, and rub al-hizb
 - generates fake review tasks from those real selections so the prototype feels closer to the final product
+- reveals future review days inline as the current visible work is completed
+- offers an explicit restart action when the visible cycle is finished
 - keeps strings in Android XML resources instead of hardcoded Kotlin literals
 
 Prototype review is part of product definition. If prototype feedback changes scope, flow, or UX expectations, update `README.md` and `PRD.md` before moving into implementation.

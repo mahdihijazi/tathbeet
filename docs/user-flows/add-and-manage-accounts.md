@@ -1,15 +1,18 @@
-# Add And Manage Accounts
+# Add And Manage Profiles
 
 ```mermaid
 flowchart TD
-    A["Open accounts"] --> B["View all local accounts"]
-    B --> C["Add learner account"]
-    B --> D["Switch active account"]
-    C --> E["Configure account locally"]
-    E --> F["Create schedule for that account"]
-    D --> G["Open review, progress, or settings"]
+    A["Open profiles"] --> B["View all local profiles"]
+    B --> C["Switch active profile"]
+    B --> D["Add learner profile inline"]
+    C --> E["Open review, progress, or settings for the active profile"]
+    D --> F["Make the new learner profile active"]
+    F --> G["Open schedule setup for that profile"]
+    F --> H["Open sharing controls for learner profiles"]
 ```
 
 Notes:
-- Accounts should support self and additional learners.
+- Profiles should support self and additional learners on one device.
 - This flow should work offline.
+- The current prototype keeps profile creation inline from the Profiles screen.
+- Edit and delete profile flows remain PRD requirements, but they are not yet represented as dedicated prototype screens.
