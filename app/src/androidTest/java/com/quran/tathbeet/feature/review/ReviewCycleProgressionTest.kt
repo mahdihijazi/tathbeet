@@ -26,8 +26,8 @@ class ReviewCycleProgressionTest : BaseUiFlowTest() {
             composeRule.activity.getString(R.string.review_section_day_after_next_title),
         ).assertCountEquals(0)
 
-        toggleReviewTask("rub-15")
-        toggleReviewTask("rub-16")
+        completeReviewTask("rub-15", rating = 5)
+        completeReviewTask("rub-16", rating = 4)
 
         composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
             hasText(composeRule.activity.getString(R.string.review_section_day_after_next_title)),
@@ -39,7 +39,7 @@ class ReviewCycleProgressionTest : BaseUiFlowTest() {
             composeRule.activity.getString(R.string.review_section_cycle_last_title),
         ).assertCountEquals(0)
 
-        toggleReviewTask("rub-17")
+        completeReviewTask("rub-17")
 
         composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
             hasText(composeRule.activity.getString(R.string.review_section_cycle_last_title)),
@@ -48,7 +48,7 @@ class ReviewCycleProgressionTest : BaseUiFlowTest() {
             composeRule.activity.getString(R.string.review_section_cycle_last_title),
         ).assertIsDisplayed()
 
-        toggleReviewTask("rub-18")
+        completeReviewTask("rub-18", rating = 3)
 
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodesWithText(

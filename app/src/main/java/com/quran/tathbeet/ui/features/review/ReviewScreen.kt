@@ -14,7 +14,9 @@ import com.quran.tathbeet.ui.theme.TathbeetTokens
 @Composable
 fun ReviewScreen(
     uiState: ReviewUiState,
-    onToggleTask: (String) -> Unit,
+    onRequestTaskCompletion: (String) -> Unit,
+    onSelectRating: (Int) -> Unit,
+    onDismissRatingDialog: () -> Unit,
     onRestartCycle: () -> Unit,
     onDismissCycleResetDialog: () -> Unit,
 ) {
@@ -37,12 +39,21 @@ fun ReviewScreen(
                 items = section.tasks,
                 key = { task -> task.id },
             ) { task ->
-                ReviewTaskCard(
+                ReviewTaskRow(
                     task = task,
-                    onToggle = { onToggleTask(task.id) },
+                    onCompleteReview = { onRequestTaskCompletion(task.id) },
+                    onEditRating = { onRequestTaskCompletion(task.id) },
                 )
             }
         }
+    }
+
+    uiState.ratingDialogTask?.let {
+        ReviewRatingDialog(
+            selectedRating = uiState.ratingDialogSelected,
+            onSelectRating = onSelectRating,
+            onDismiss = onDismissRatingDialog,
+        )
     }
 
     if (uiState.showCycleResetDialog) {

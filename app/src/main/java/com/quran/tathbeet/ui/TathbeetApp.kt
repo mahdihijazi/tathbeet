@@ -209,7 +209,11 @@ fun TathbeetApp(
                     val uiState by reviewViewModel.uiState.collectAsState()
                     ReviewScreen(
                         uiState = uiState,
-                        onToggleTask = reviewViewModel::toggleTask,
+                        onRequestTaskCompletion = reviewViewModel::requestCompleteTask,
+                        onSelectRating = reviewViewModel::updatePendingRating,
+                        onDismissRatingDialog = reviewViewModel::dismissRatingDialog,
+                        onRestartCycle = reviewViewModel::restartCycle,
+                        onDismissCycleResetDialog = reviewViewModel::dismissCycleResetDialog,
                     )
                 }
 

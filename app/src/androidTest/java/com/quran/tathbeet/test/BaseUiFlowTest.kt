@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -11,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.quran.tathbeet.R
@@ -112,8 +114,25 @@ abstract class BaseUiFlowTest {
         ).assertIsDisplayed()
     }
 
-    protected fun toggleReviewTask(taskId: String) {
-        composeRule.onNodeWithTag("review-task-$taskId").performClick()
+    protected fun completeReviewTask(
+        taskId: String,
+        rating: Int? = null,
+    ) {
+        composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
+            hasTestTag("review-complete-$taskId"),
+        )
+        composeRule.onNodeWithTag("review-complete-$taskId").performClick()
+        if (rating == null) {
+            composeRule.onNodeWithTag("review-rating-dismiss").performClick()
+        } else {
+            composeRule.onNodeWithTag("review-rating-$rating").performClick()
+        }
+    }
+
+    protected fun scrollReviewListToTag(tag: String) {
+        composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
+            hasTestTag(tag),
+        )
     }
 }
 

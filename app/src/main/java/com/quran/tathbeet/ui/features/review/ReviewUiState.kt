@@ -8,6 +8,7 @@ data class ReviewTaskUiState(
     val title: TextSpec,
     val detail: TextSpec,
     val isDone: Boolean,
+    val rating: Int? = null,
 )
 
 data class ReviewSectionUiState(
@@ -21,18 +22,26 @@ data class ReviewUiState(
     val isLoading: Boolean = true,
     val sections: List<ReviewSectionUiState> = emptyList(),
     val showCycleResetDialog: Boolean = false,
+    val ratingDialogTask: ReviewTaskUiState? = null,
+    val ratingDialogSelected: Int = 5,
 )
 
 internal data class ReviewMockState(
     val allSections: List<ReviewSectionUiState>,
     val visibleSectionCount: Int,
     val showCycleResetDialog: Boolean,
+    val ratingDialogTaskId: String? = null,
+    val ratingDialogSelected: Int = 5,
 ) {
     fun toUiState(): ReviewUiState =
         ReviewUiState(
             isLoading = false,
             sections = allSections.take(visibleSectionCount),
             showCycleResetDialog = showCycleResetDialog,
+            ratingDialogTask = ratingDialogTaskId?.let { taskId ->
+                allSections.flatMap { it.tasks }.firstOrNull { it.id == taskId }
+            },
+            ratingDialogSelected = ratingDialogSelected,
         )
 }
 
@@ -51,6 +60,7 @@ internal object ReviewMockFactory {
                         hizbNumber = 3,
                         rangeRes = R.string.sample_range_rub_12,
                         isDone = true,
+                        rating = 4,
                     ),
                 ),
             ),
@@ -65,6 +75,7 @@ internal object ReviewMockFactory {
                         hizbNumber = 4,
                         rangeRes = R.string.sample_range_rub_13,
                         isDone = true,
+                        rating = 5,
                     ),
                     rubTask(
                         id = "rub-14",
@@ -73,6 +84,7 @@ internal object ReviewMockFactory {
                         hizbNumber = 4,
                         rangeRes = R.string.sample_range_rub_14,
                         isDone = true,
+                        rating = 4,
                     ),
                 ),
             ),
@@ -132,6 +144,8 @@ internal object ReviewMockFactory {
             allSections = sections,
             visibleSectionCount = 3,
             showCycleResetDialog = false,
+            ratingDialogTaskId = null,
+            ratingDialogSelected = 5,
         )
     }
 
@@ -160,6 +174,7 @@ internal object ReviewMockFactory {
         hizbNumber: Int,
         rangeRes: Int,
         isDone: Boolean,
+        rating: Int? = null,
     ) = ReviewTaskUiState(
         id = id,
         title = TextSpec(R.string.quran_rub_title, listOf(rubNumber)),
@@ -172,5 +187,6 @@ internal object ReviewMockFactory {
             ),
         ),
         isDone = isDone,
+        rating = rating,
     )
 }

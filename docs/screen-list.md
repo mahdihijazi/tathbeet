@@ -14,6 +14,8 @@
 - shows all local profiles on the device
 - lets the user switch between self and learner profiles
 - highlights active schedule status, today’s load, and notification state
+- keeps learner-profile creation as an inline prototype action for now
+- exposes schedule setup and sharing from the active profile area
 
 ## 3. Create / Edit Profile
 
@@ -52,6 +54,8 @@
 - uses friendly Quran-range labels instead of raw pool labels like `الجزء 30`
 - shows ranges like `من النبأ إلى المرسلات` for multi-surah tasks
 - shows rollover items first when previous work was missed
+- appends future dated work inline once the currently visible day is finished
+- offers an explicit restart action when the current cycle is fully completed
 - lets the user mark individual segments complete
 - marks the day complete when all assigned segments are done
 - keeps the screen simple with a compact summary at the top and a status-only bottom card
@@ -74,7 +78,7 @@
 - reminder timing
 - motivational message toggle
 - language and account state
-- account creation can be reached later from the toolbar instead of blocking first launch
+- sign-in or account-mode changes can be reached later from Settings instead of blocking first launch
 
 ## Current App Mapping
 
@@ -93,12 +97,13 @@ Current app behavior:
 - all interactions are fake and local to the UI
 - first launch opens the one-time schedule intro screen
 - later schedule entry opens the محفوظ selection step directly
+- launching with an existing schedule goes straight to review
 - the prototype uses Arabic-only user-facing copy
 - the prototype is reviewed in RTL layout
 - user-facing strings come from Android XML resources
 - profile switching is wired
 - the schedule wizard is wired across intro, محفوظ selection, and daily ward
-- daily review completion is wired
+- daily review completion is wired, including inline future-day reveal and cycle restart
 - settings toggles are wired
 - shared-profile controls are wired
 

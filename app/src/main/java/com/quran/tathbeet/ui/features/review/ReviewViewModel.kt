@@ -2,9 +2,11 @@ package com.quran.tathbeet.ui.features.review
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.quran.tathbeet.R
 import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.domain.repository.ProfileRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
+import com.quran.tathbeet.ui.model.TextSpec
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,12 +22,47 @@ class ReviewViewModel(
     private val _uiState = MutableStateFlow(mockState.toUiState())
     val uiState: StateFlow<ReviewUiState> = _uiState.asStateFlow()
 
-    fun toggleTask(taskId: String) {
+    fun requestCompleteTask(taskId: String) {
+        val task = mockState.allSections.flatMap { it.tasks }.firstOrNull { it.id == taskId } ?: return
+        mockState = mockState.copy(
+            ratingDialogTaskId = taskId,
+            ratingDialogSelected = task.rating ?: 5,
+        )
+        _uiState.value = mockState.toUiState()
+    }
+
+    fun updatePendingRating(rating: Int) {
+        val taskId = mockState.ratingDialogTaskId ?: return
+        applyCompletion(taskId = taskId, rating = rating)
+    }
+
+    fun dismissRatingDialog() {
+        val taskId = mockState.ratingDialogTaskId ?: return
+        applyCompletion(taskId = taskId, rating = mockState.ratingDialogSelected)
+    }
+
+    fun restartCycle() {
+        mockState = ReviewMockFactory.initialState()
+        _uiState.value = mockState.toUiState()
+    }
+
+    fun dismissCycleResetDialog() {
+        mockState = mockState.copy(showCycleResetDialog = false)
+        _uiState.value = mockState.toUiState()
+    }
+
+    private fun applyCompletion(
+        taskId: String,
+        rating: Int,
+    ) {
         val updatedSections = mockState.allSections.map { section ->
             section.copy(
                 tasks = section.tasks.map { task ->
                     if (task.id == taskId) {
-                        task.copy(isDone = !task.isDone)
+                        task.copy(
+                            isDone = true,
+                            rating = rating,
+                        )
                     } else {
                         task
                     }
@@ -54,27 +91,19 @@ class ReviewViewModel(
             allSections = updatedSections,
             visibleSectionCount = nextVisibleCount,
             showCycleResetDialog = reachedCycleEnd && allVisibleSectionsComplete,
+            ratingDialogTaskId = null,
+            ratingDialogSelected = 5,
         )
-        _uiState.value = mockState.toUiState()
-    }
-
-    fun restartCycle() {
-        mockState = ReviewMockFactory.initialState()
-        _uiState.value = mockState.toUiState()
-    }
-
-    fun dismissCycleResetDialog() {
-        mockState = mockState.copy(showCycleResetDialog = false)
         _uiState.value = mockState.toUiState()
     }
 
     private fun ReviewSectionUiState.withDerivedStatus(): ReviewSectionUiState =
         copy(
-            status = com.quran.tathbeet.ui.model.TextSpec(
+            status = TextSpec(
                 if (tasks.all { it.isDone }) {
-                    com.quran.tathbeet.R.string.review_state_done
+                    R.string.review_state_done
                 } else {
-                    com.quran.tathbeet.R.string.review_state_available_now
+                    R.string.review_state_available_now
                 },
             ),
         )

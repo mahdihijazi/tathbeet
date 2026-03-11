@@ -15,7 +15,7 @@ import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 private const val ReviewPreviewWidth = 411
 private const val ReviewHeaderHeight = 120
-private const val ReviewCardHeight = 220
+private const val ReviewRowHeight = 220
 private const val ReviewDialogHeight = 320
 
 @PreviewTest
@@ -54,36 +54,57 @@ fun ReviewSectionHeaderAvailableScreenshot() {
 
 @PreviewTest
 @Preview(
-    name = "review_task_card_done",
+    name = "review_task_row_completed",
     locale = "ar",
     widthDp = ReviewPreviewWidth,
-    heightDp = ReviewCardHeight,
+    heightDp = ReviewRowHeight,
     showBackground = true,
 )
 @Composable
-fun ReviewTaskCardDoneScreenshot() {
+fun ReviewTaskRowCompletedScreenshot() {
     ReviewScreenshotBox {
-        ReviewTaskCard(
+        ReviewTaskRow(
             task = ReviewMockFactory.initialState().toUiState().sections[1].tasks[0],
-            onToggle = {},
+            onCompleteReview = {},
+            onEditRating = {},
         )
     }
 }
 
 @PreviewTest
 @Preview(
-    name = "review_task_card_pending",
+    name = "review_task_row_pending",
     locale = "ar",
     widthDp = ReviewPreviewWidth,
-    heightDp = ReviewCardHeight,
+    heightDp = ReviewRowHeight,
     showBackground = true,
 )
 @Composable
-fun ReviewTaskCardPendingScreenshot() {
+fun ReviewTaskRowPendingScreenshot() {
     ReviewScreenshotBox {
-        ReviewTaskCard(
+        ReviewTaskRow(
             task = ReviewMockFactory.initialState().toUiState().sections[2].tasks[0],
-            onToggle = {},
+            onCompleteReview = {},
+            onEditRating = {},
+        )
+    }
+}
+
+@PreviewTest
+@Preview(
+    name = "review_rating_dialog_default",
+    locale = "ar",
+    widthDp = ReviewPreviewWidth,
+    heightDp = ReviewDialogHeight,
+    showBackground = true,
+)
+@Composable
+fun ReviewRatingDialogDefaultScreenshot() {
+    ReviewScreenshotBox {
+        ReviewRatingDialog(
+            selectedRating = 5,
+            onSelectRating = {},
+            onDismiss = {},
         )
     }
 }
