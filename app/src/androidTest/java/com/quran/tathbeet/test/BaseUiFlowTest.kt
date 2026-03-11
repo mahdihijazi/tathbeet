@@ -107,6 +107,11 @@ abstract class BaseUiFlowTest {
         composeRule.onNodeWithContentDescription(
             composeRule.activity.getString(R.string.content_edit_plan),
         ).assertIsDisplayed()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(
+                composeRule.activity.getString(R.string.review_progress_title),
+            ).fetchSemanticsNodes().isNotEmpty()
+        }
     }
 
     protected fun assertPoolSelectorVisible() {
@@ -132,7 +137,7 @@ abstract class BaseUiFlowTest {
         rating: Int? = null,
     ) {
         composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
-            hasTestTag("review-complete-$taskId"),
+            hasTestTag("review-task-$taskId"),
         )
         composeRule.onNodeWithTag("review-complete-$taskId").performClick()
         if (rating == null) {
@@ -160,6 +165,13 @@ abstract class BaseUiFlowTest {
     }
 
     protected fun awaitTodayReviewDay(): ReviewDay = awaitReviewDay(todayDate())
+
+    protected fun awaitReviewTimeline(): List<ReviewDay> = runBlocking {
+        val account = appContainer.profileRepository.observeActiveAccount()
+            .filterNotNull()
+            .first()
+        appContainer.reviewRepository.observeReviewTimeline(account.id).first()
+    }
 
     protected fun firstTodayAssignment(): ReviewAssignment =
         awaitTodayReviewDay().assignments.first()

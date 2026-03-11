@@ -34,6 +34,7 @@ class ReviewViewModel(
     private var ratingDialogTaskId: String? = null
     private var pendingRating: Int = 5
     private var showCycleResetDialog: Boolean = false
+    private var cycleResetDialogDismissed: Boolean = false
 
     init {
         viewModelScope.launch {
@@ -44,6 +45,7 @@ class ReviewViewModel(
                     ratingDialogTaskId = null
                     pendingRating = 5
                     showCycleResetDialog = false
+                    cycleResetDialogDismissed = false
                     reviewRepository.ensureAssignmentsForDate(
                         learnerId = account.id,
                         assignedForDate = timeProvider.today(),
@@ -51,7 +53,9 @@ class ReviewViewModel(
                     reviewRepository.observeReviewTimeline(account.id)
                         .collect { reviewDays ->
                             timeline = reviewDays.sortedBy { it.assignedForDate }
-                            maybeExtendTimeline()
+                            if (populateFullCycleAssignments()) {
+                                return@collect
+                            }
                             publishUiState()
                         }
                 }
@@ -75,7 +79,6 @@ class ReviewViewModel(
             }
             ratingDialogTaskId = null
             pendingRating = 5
-            showCycleResetDialog = false
             publishUiState()
         }
     }
@@ -88,7 +91,6 @@ class ReviewViewModel(
             }
             ratingDialogTaskId = null
             pendingRating = 5
-            showCycleResetDialog = false
             publishUiState()
         }
     }
@@ -97,6 +99,7 @@ class ReviewViewModel(
         val learnerId = currentLearnerId ?: return
         viewModelScope.launch {
             showCycleResetDialog = false
+            cycleResetDialogDismissed = false
             ratingDialogTaskId = null
             pendingRating = 5
             reviewRepository.restartCycle(
@@ -108,44 +111,40 @@ class ReviewViewModel(
 
     fun dismissCycleResetDialog() {
         showCycleResetDialog = false
+        cycleResetDialogDismissed = true
         publishUiState()
     }
 
-    private suspend fun maybeExtendTimeline() {
-        val learnerId = currentLearnerId ?: return
+    private suspend fun populateFullCycleAssignments(): Boolean {
+        val learnerId = currentLearnerId ?: return false
         val today = timeProvider.today()
-        val currentAndFutureDays = timeline
-            .filter { !it.assignedForDate.isBefore(today) }
-            .sortedBy { it.assignedForDate }
+        var cursorDate = timeline
+            .lastOrNull { !it.assignedForDate.isBefore(today) }
+            ?.assignedForDate
+            ?: today
+        var addedAssignments = false
 
-        if (currentAndFutureDays.isEmpty()) {
-            return
+        while (true) {
+            val nextDate = if (addedAssignments || timeline.any { !it.assignedForDate.isBefore(today) }) {
+                cursorDate.plusDays(1)
+            } else {
+                cursorDate
+            }
+            val created = reviewRepository.ensureAssignmentsForDate(
+                learnerId = learnerId,
+                assignedForDate = nextDate,
+            )
+            if (!created) {
+                break
+            }
+            if (timeline.any { it.assignedForDate == nextDate }) {
+                cursorDate = nextDate
+                continue
+            }
+            addedAssignments = true
+            cursorDate = nextDate
         }
-
-        val visibleDays = buildVisibleCurrentAndFutureDays(currentAndFutureDays)
-        val allVisibleComplete = visibleDays.isNotEmpty() &&
-            visibleDays.all { day -> day.assignments.all { it.isDone } }
-
-        if (!allVisibleComplete) {
-            showCycleResetDialog = false
-            return
-        }
-
-        val lastVisibleDate = visibleDays.last().assignedForDate
-        val nextDate = lastVisibleDate.plusDays(1)
-        val nextExists = currentAndFutureDays.any { it.assignedForDate == nextDate }
-        if (nextExists) {
-            showCycleResetDialog = false
-            return
-        }
-
-        val createdNextDay = reviewRepository.ensureAssignmentsForDate(
-            learnerId = learnerId,
-            assignedForDate = nextDate,
-        )
-        if (!createdNextDay) {
-            showCycleResetDialog = true
-        }
+        return addedAssignments
     }
 
     private fun publishUiState() {
@@ -157,8 +156,6 @@ class ReviewViewModel(
         val currentAndFutureDays = timeline
             .filter { !it.assignedForDate.isBefore(today) }
             .sortedBy { it.assignedForDate }
-
-        val visibleCurrentAndFutureDays = buildVisibleCurrentAndFutureDays(currentAndFutureDays)
         val visibleSections = buildList {
             if (overdueAssignments.isNotEmpty()) {
                 add(
@@ -172,7 +169,7 @@ class ReviewViewModel(
                 )
             }
 
-            visibleCurrentAndFutureDays.forEach { day ->
+            currentAndFutureDays.forEach { day ->
                 add(
                     ReviewSectionUiState(
                         id = day.assignedForDate.toString(),
@@ -185,12 +182,18 @@ class ReviewViewModel(
             }
         }
 
-        val progressAssignments = overdueAssignments + (visibleCurrentAndFutureDays
+        val progressAssignments = overdueAssignments + (currentAndFutureDays
             .firstOrNull { it.assignedForDate == today }
             ?.assignments
             .orEmpty())
         val completedCount = progressAssignments.count { it.isDone }
         val totalCount = progressAssignments.size
+        val allCycleAssignments = overdueAssignments + currentAndFutureDays.flatMap { it.assignments }
+        val allDone = allCycleAssignments.isNotEmpty() && allCycleAssignments.all { it.isDone }
+        if (!allDone) {
+            cycleResetDialogDismissed = false
+        }
+        showCycleResetDialog = allDone && !cycleResetDialogDismissed
 
         _uiState.value = ReviewUiState(
             isLoading = false,
@@ -207,21 +210,6 @@ class ReviewViewModel(
             },
             ratingDialogSelected = pendingRating,
         )
-    }
-
-    private fun buildVisibleCurrentAndFutureDays(
-        days: List<ReviewDay>,
-    ): List<ReviewDay> {
-        if (days.isEmpty()) return emptyList()
-
-        val visible = mutableListOf<ReviewDay>()
-        var canRevealNext = true
-        for (day in days) {
-            if (!canRevealNext && visible.isNotEmpty()) break
-            visible += day
-            canRevealNext = day.assignments.all { it.isDone }
-        }
-        return visible
     }
 
     private fun sectionTitleFor(

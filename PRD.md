@@ -331,9 +331,15 @@ Completing a task in MVP should also capture a simple retention rating:
 
 The review experience should also support early completion beyond today:
 
-- once the user finishes the currently visible ward, they can continue into future dated ward on demand
-- this should continue day after day until the user reaches the end of the current revision cycle
-- future dated ward should be appended inline in the review flow rather than exposed through tabs or a date picker in MVP
+- the review screen should show the current cycle in one continuous list from the start
+- that list should include:
+  - carried-over work from previous days
+  - today’s work
+  - tomorrow’s work
+  - all later dates until the end of the current revision cycle
+- future dated ward should appear inline in the same list rather than through tabs or a date picker in MVP
+- tomorrow should use the relative label `ورد الغد`
+- dates after tomorrow should use explicit calendar dates
 - if the user completes tomorrow's ward today, tomorrow should appear already complete on its actual date
 - early completion should still count as work done on the day the user actually performed it
 - progress and history should distinguish scheduled-day completion from actual completion date
@@ -432,12 +438,17 @@ The data model should support shared ownership and conflict-safe synchronization
 
 ### 13.3 Daily Review
 
-- app shows today’s assigned review items
-- app should also support continuing into future dated review after the currently visible day is complete
-- if the user keeps finishing visible future days early, the review flow should keep appending the next day inline until the current cycle is exhausted
+- app shows the full current revision cycle in one unified list
+- the list begins with carried-over overdue work, then today’s work, then future dated work until the end of the current cycle
+- tomorrow should be labeled `ورد الغد`
+- days after tomorrow should use explicit date labels
 - once the full current cycle is complete, the user should be offered an explicit action to restart the cycle and begin again from the start
-- the review screen should show a compact top progress summary card for the currently visible work
-- that top summary should focus on completed count, remaining count, and clear progress through the visible work
+- the review screen should show a compact top progress summary card for today’s work scope
+- that top summary should count:
+  - carried-over overdue work
+  - today’s assigned work
+- the top summary should not represent the whole cycle
+- that top summary should focus on completed count, remaining count, and clear progress through today’s work scope
 - review items should be execution units, not raw pool labels like `الجزء 30`
 - if a task spans multiple short surahs, the main task label should read like `من النبأ إلى المرسلات`
 - if a task stays inside one long surah, the labeling should use Quran range detail with ayah numbering
@@ -447,7 +458,7 @@ The data model should support shared ownership and conflict-safe synchronization
 - review should support three categories of work:
   - carried-over work from previous days
   - current day assignments
-  - future dated assignments opened on demand
+  - future dated assignments already visible inline through the end of the current cycle
 - the review screen should stay structurally simple: compact top summary and a unified task list separated by section headers
 - editing the revision plan should be available from the review screen top app bar rather than from the review body
 

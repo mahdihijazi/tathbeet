@@ -1,6 +1,5 @@
 package com.quran.tathbeet.feature.review
 
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithText
@@ -15,29 +14,28 @@ import org.junit.Test
 class ReviewTimelineProgressionTest : BaseUiFlowTest() {
 
     @Test
-    fun completing_today_reveals_tomorrows_work_automatically() {
+    fun review_screen_shows_full_current_cycle_from_start() {
         completeOnboardingWithJuzOne()
         assertReviewVisible()
 
-        composeRule.onAllNodesWithText(
-            composeRule.activity.getString(R.string.review_section_next_title),
-        ).assertCountEquals(0)
+        val timeline = awaitReviewTimeline()
+        val todayAssignment = timeline.first { it.assignedForDate == todayDate() }.assignments.first()
+        val tomorrowAssignment = timeline.first { it.assignedForDate == todayDate().plusDays(1) }.assignments.first()
+        val lastDay = timeline.maxBy { it.assignedForDate }
+        val lastAssignment = lastDay.assignments.first()
 
-        val todayAssignment = firstTodayAssignment()
-        completeReviewTask(todayAssignment.id, rating = 4)
-
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText(
-                composeRule.activity.getString(R.string.review_section_next_title),
-            ).fetchSemanticsNodes().isNotEmpty()
-        }
-
+        composeRule.onNodeWithText(todayAssignment.title).assertIsDisplayed()
+        composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
+            hasText(composeRule.activity.getString(R.string.review_section_next_title)),
+        )
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.review_section_next_title),
         ).assertIsDisplayed()
-
-        val tomorrowDay = awaitReviewDay(todayDate().plusDays(1))
-        composeRule.onNodeWithText(tomorrowDay.assignments.first().title).assertIsDisplayed()
+        composeRule.onNodeWithText(tomorrowAssignment.title).assertIsDisplayed()
+        composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
+            hasText(lastAssignment.title),
+        )
+        composeRule.onNodeWithText(lastAssignment.title).assertIsDisplayed()
     }
 
     @Test
@@ -49,8 +47,10 @@ class ReviewTimelineProgressionTest : BaseUiFlowTest() {
         saveSchedule()
         assertReviewVisible()
 
-        val firstAssignment = firstTodayAssignment()
-        completeReviewTask(firstAssignment.id)
+        val initialTimeline = awaitReviewTimeline()
+        initialTimeline.flatMap { it.assignments }.forEach { assignment ->
+            completeReviewTask(assignment.id)
+        }
 
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodesWithText(
@@ -71,19 +71,20 @@ class ReviewTimelineProgressionTest : BaseUiFlowTest() {
             ).fetchSemanticsNodes().isEmpty()
         }
 
-        composeRule.onAllNodesWithText(
-            composeRule.activity.getString(R.string.review_section_next_title),
-        ).assertCountEquals(0)
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.review_section_today_title),
+        ).assertIsDisplayed()
+        composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
+            hasText(composeRule.activity.getString(R.string.review_section_next_title)),
+        )
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.review_section_next_title),
         ).assertIsDisplayed()
 
         val restartedToday = awaitTodayReviewDay()
         val restartedAssignment = restartedToday.assignments.first()
-        composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
-            hasText(restartedAssignment.title),
-        )
-        composeRule.onNodeWithText(restartedAssignment.title).assertIsDisplayed()
+        scrollReviewListToTag("review-task-${restartedAssignment.id}")
+        composeRule.onNodeWithTag("review-task-${restartedAssignment.id}").assertIsDisplayed()
         composeRule.onNodeWithTag("review-complete-${restartedAssignment.id}").assertIsDisplayed()
     }
 }
