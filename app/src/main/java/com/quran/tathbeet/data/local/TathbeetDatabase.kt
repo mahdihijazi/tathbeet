@@ -24,7 +24,7 @@ import com.quran.tathbeet.data.local.entity.ScheduleSelectionEntity
         ReviewDayEntity::class,
         ReviewAssignmentEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class TathbeetDatabase : RoomDatabase() {

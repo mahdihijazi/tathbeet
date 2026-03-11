@@ -30,7 +30,9 @@ open class AppContainer(
             appContext,
             TathbeetDatabase::class.java,
             "tathbeet.db",
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
     open val revisionPlanner: RevisionPlanner = DefaultRevisionPlanner()
     open val quranCatalogRepository: QuranCatalogRepository = AssetQuranCatalogRepository(appContext)

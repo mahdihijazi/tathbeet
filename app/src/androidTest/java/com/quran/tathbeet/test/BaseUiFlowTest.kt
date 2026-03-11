@@ -19,11 +19,16 @@ import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.data.local.TathbeetDatabase
+import com.quran.tathbeet.domain.model.ReviewAssignment
+import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.ui.TathbeetApp
 import com.quran.tathbeet.ui.theme.TathbeetTheme
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -90,6 +95,14 @@ abstract class BaseUiFlowTest {
         composeRule.onNodeWithText(title).performClick()
     }
 
+    protected fun selectVisibleSurah(surahNameArabic: String) {
+        val title = composeRule.activity.getString(R.string.quran_surah_title, surahNameArabic)
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(title).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithText(title).performClick()
+    }
+
     protected fun assertReviewVisible() {
         composeRule.onNodeWithContentDescription(
             composeRule.activity.getString(R.string.content_edit_plan),
@@ -134,6 +147,22 @@ abstract class BaseUiFlowTest {
             hasTestTag(tag),
         )
     }
+
+    protected fun todayDate(): LocalDate = appContainer.timeProvider.today()
+
+    protected fun awaitReviewDay(date: LocalDate): ReviewDay = runBlocking {
+        val account = appContainer.profileRepository.observeActiveAccount()
+            .filterNotNull()
+            .first()
+        appContainer.reviewRepository.observeReviewDay(account.id, date)
+            .filterNotNull()
+            .first()
+    }
+
+    protected fun awaitTodayReviewDay(): ReviewDay = awaitReviewDay(todayDate())
+
+    protected fun firstTodayAssignment(): ReviewAssignment =
+        awaitTodayReviewDay().assignments.first()
 }
 
 class TestAppContainer(

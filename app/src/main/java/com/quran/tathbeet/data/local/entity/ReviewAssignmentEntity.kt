@@ -24,6 +24,7 @@ data class ReviewAssignmentEntity(
     val isRollover: Boolean,
     @ColumnInfo(name = "is_done")
     val isDone: Boolean,
+    val rating: Int?,
     @ColumnInfo(name = "completed_at")
     val completedAt: String?,
 )

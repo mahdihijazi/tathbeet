@@ -12,10 +12,10 @@ import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.domain.repository.QuranCatalogRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
 import com.quran.tathbeet.domain.repository.ScheduleRepository
-import com.quran.tathbeet.ui.model.SelectionCategory
-import com.quran.tathbeet.ui.model.selectionKey
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import kotlin.math.min
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -28,6 +28,17 @@ class ReviewRepositoryImpl(
     private val quranCatalogRepository: QuranCatalogRepository,
     private val timeProvider: TimeProvider,
 ) : ReviewRepository {
+
+    override fun observeReviewTimeline(learnerId: String): Flow<List<ReviewDay>> =
+        combine(
+            database.reviewDayDao().observeReviewDays(learnerId),
+            database.reviewAssignmentDao().observeAssignmentsForLearner(learnerId),
+        ) { dayEntities, assignmentEntities ->
+            val assignmentsByDate = assignmentEntities.groupBy { it.assignedForDate }
+            dayEntities.map { dayEntity ->
+                dayEntity.toDomainModel(assignmentsByDate[dayEntity.assignedForDate].orEmpty())
+            }
+        }
 
     override fun observeReviewDay(
         learnerId: String,
@@ -45,29 +56,43 @@ class ReviewRepositoryImpl(
     override suspend fun ensureAssignmentsForDate(
         learnerId: String,
         assignedForDate: LocalDate,
-    ) {
+    ): Boolean {
         val dateKey = assignedForDate.toString()
         if (database.reviewDayDao().getReviewDay(learnerId, dateKey) != null) {
-            return
+            return true
         }
 
-        val schedule = scheduleRepository.observeActiveSchedule(learnerId).first() ?: return
+        val schedule = scheduleRepository.observeActiveSchedule(learnerId).first() ?: return false
         val quranCatalog = quranCatalogRepository.getCatalog()
-        val selectionKeys = schedule.selections.map { selection ->
-            selectionKey(
-                category = SelectionCategory.valueOf(selection.category.name),
-                itemId = selection.itemId,
-            )
-        }.toSet()
+        val selectionKeys = schedule.selections
+            .map { selection -> "${selection.category.name.lowercase()}-${selection.itemId}" }
+            .toSet()
+        val allUnits = quranCatalog.buildReviewUnits(
+            context = appContext,
+            keys = selectionKeys,
+        )
+        if (allUnits.isEmpty()) {
+            return false
+        }
         val maxAssignments = when (schedule.paceMethod) {
             PaceMethod.CycleTarget -> schedule.manualPace.dailySegments
             PaceMethod.Manual -> schedule.manualPace.dailySegments
         }
-        val assignments = quranCatalog.buildReviewUnits(
-            context = appContext,
-            keys = selectionKeys,
-        )
-            .take(maxAssignments)
+        val cycleStartDate = database.reviewDayDao().getFirstReviewDay(learnerId)
+            ?.assignedForDate
+            ?.let(LocalDate::parse)
+            ?: assignedForDate
+        val dayOffset = ChronoUnit.DAYS.between(cycleStartDate, assignedForDate).toInt()
+        if (dayOffset < 0) {
+            return false
+        }
+        val startIndex = dayOffset * maxAssignments
+        if (startIndex >= allUnits.size) {
+            return false
+        }
+        val endExclusive = min(startIndex + maxAssignments, allUnits.size)
+        val assignments = allUnits
+            .subList(startIndex, endExclusive)
             .mapIndexed { index, unit ->
                 ReviewAssignmentEntity(
                     id = "$dateKey-${unit.id}",
@@ -80,6 +105,7 @@ class ReviewRepositoryImpl(
                     displayOrder = index,
                     isRollover = false,
                     isDone = false,
+                    rating = null,
                     completedAt = null,
                 )
             }
@@ -95,13 +121,42 @@ class ReviewRepositoryImpl(
             )
             database.reviewAssignmentDao().insertAll(assignments)
         }
+        return true
     }
 
-    override suspend fun toggleAssignmentCompletion(assignmentId: String) {
+    override suspend fun completeAssignment(
+        assignmentId: String,
+        rating: Int,
+    ) {
         val completedAt = timeProvider.now().toString()
-        database.reviewAssignmentDao().toggleCompletion(
+        database.reviewAssignmentDao().completeAssignment(
             assignmentId = assignmentId,
+            rating = rating,
             completedAt = completedAt,
+        )
+    }
+
+    override suspend fun updateAssignmentRating(
+        assignmentId: String,
+        rating: Int,
+    ) {
+        database.reviewAssignmentDao().updateRating(
+            assignmentId = assignmentId,
+            rating = rating,
+        )
+    }
+
+    override suspend fun restartCycle(
+        learnerId: String,
+        restartDate: LocalDate,
+    ) {
+        database.withTransaction {
+            database.reviewAssignmentDao().deleteForLearner(learnerId)
+            database.reviewDayDao().deleteForLearner(learnerId)
+        }
+        ensureAssignmentsForDate(
+            learnerId = learnerId,
+            assignedForDate = restartDate,
         )
     }
 
@@ -129,6 +184,7 @@ class ReviewRepositoryImpl(
             displayOrder = displayOrder,
             isRollover = isRollover,
             isDone = isDone,
+            rating = rating,
             completedAt = completedAt?.let(ZonedDateTime::parse),
         )
 }

@@ -1,6 +1,7 @@
 package com.quran.tathbeet.ui.features.review
 
 import com.quran.tathbeet.R
+import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.ui.model.TextSpec
 
 data class ReviewTaskUiState(
@@ -33,6 +34,50 @@ data class ReviewUiState(
     val ratingDialogTask: ReviewTaskUiState? = null,
     val ratingDialogSelected: Int = 5,
 )
+
+fun ReviewDay.toUiState(
+    ratingDialogTaskId: String? = null,
+    ratingDialogSelected: Int = 5,
+): ReviewUiState {
+    val tasks = assignments.sortedBy { it.displayOrder }.map { assignment ->
+        ReviewTaskUiState(
+            id = assignment.id,
+            title = TextSpec(rawText = assignment.title),
+            detail = TextSpec(rawText = assignment.detail),
+            isDone = assignment.isDone,
+            rating = assignment.rating,
+        )
+    }
+    val completedCount = tasks.count { it.isDone }
+    val totalCount = tasks.size
+    val remainingCount = totalCount - completedCount
+    val section = ReviewSectionUiState(
+        id = assignedForDate.toString(),
+        title = TextSpec(R.string.review_section_today_title),
+        status = TextSpec(
+            if (tasks.isNotEmpty() && tasks.all { it.isDone }) {
+                R.string.review_state_done
+            } else {
+                R.string.review_state_available_now
+            },
+        ),
+        tasks = tasks,
+    )
+
+    return ReviewUiState(
+        isLoading = false,
+        progressCard = ReviewProgressCardUiState(
+            completedCount = completedCount,
+            totalCount = totalCount,
+            remainingCount = remainingCount,
+            progress = if (totalCount == 0) 0f else completedCount.toFloat() / totalCount.toFloat(),
+        ),
+        sections = listOf(section),
+        showCycleResetDialog = false,
+        ratingDialogTask = ratingDialogTaskId?.let { taskId -> tasks.firstOrNull { it.id == taskId } },
+        ratingDialogSelected = ratingDialogSelected,
+    )
+}
 
 internal data class ReviewMockState(
     val allSections: List<ReviewSectionUiState>,

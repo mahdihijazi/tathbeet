@@ -13,5 +13,6 @@ data class ReviewAssignment(
     val displayOrder: Int,
     val isRollover: Boolean,
     val isDone: Boolean,
+    val rating: Int?,
     val completedAt: ZonedDateTime?,
 )

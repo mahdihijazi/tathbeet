@@ -12,6 +12,15 @@ interface ReviewDayDao {
     @Query(
         """
         SELECT * FROM review_day
+        WHERE learner_id = :learnerId
+        ORDER BY assigned_for_date
+        """,
+    )
+    fun observeReviewDays(learnerId: String): Flow<List<ReviewDayEntity>>
+
+    @Query(
+        """
+        SELECT * FROM review_day
         WHERE learner_id = :learnerId AND assigned_for_date = :assignedForDate
         LIMIT 1
         """,
@@ -33,6 +42,19 @@ interface ReviewDayDao {
         assignedForDate: String,
     ): ReviewDayEntity?
 
+    @Query(
+        """
+        SELECT * FROM review_day
+        WHERE learner_id = :learnerId
+        ORDER BY assigned_for_date
+        LIMIT 1
+        """,
+    )
+    suspend fun getFirstReviewDay(learnerId: String): ReviewDayEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(entity: ReviewDayEntity)
+
+    @Query("DELETE FROM review_day WHERE learner_id = :learnerId")
+    suspend fun deleteForLearner(learnerId: String)
 }

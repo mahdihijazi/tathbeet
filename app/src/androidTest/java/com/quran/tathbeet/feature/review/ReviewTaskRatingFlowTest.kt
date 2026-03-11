@@ -13,16 +13,24 @@ class ReviewTaskRatingFlowTest : BaseUiFlowTest() {
         completeOnboardingWithJuzOne()
         assertReviewVisible()
 
-        completeReviewTask(taskId = "rub-15", rating = 3)
+        val assignment = firstTodayAssignment()
 
-        scrollReviewListToTag("review-edit-rating-rub-15")
-        composeRule.onNodeWithTag("review-edit-rating-rub-15").assertIsDisplayed()
-        composeRule.onNodeWithTag("review-completed-rating-rub-15-3").assertIsDisplayed()
+        completeReviewTask(taskId = assignment.id, rating = 3)
 
-        composeRule.onNodeWithTag("review-edit-rating-rub-15").performClick()
+        scrollReviewListToTag("review-edit-rating-${assignment.id}")
+        composeRule.onNodeWithTag("review-edit-rating-${assignment.id}").assertIsDisplayed()
+        composeRule.onNodeWithTag("review-completed-rating-${assignment.id}-3").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("review-edit-rating-${assignment.id}").performClick()
         composeRule.onNodeWithTag("review-rating-2").performClick()
 
-        composeRule.onNodeWithTag("review-completed-rating-rub-15-2").assertIsDisplayed()
+        composeRule.onNodeWithTag("review-completed-rating-${assignment.id}-2").assertIsDisplayed()
+
+        val updatedReviewDay = awaitTodayReviewDay()
+        val updatedAssignment = updatedReviewDay.assignments.first { it.id == assignment.id }
+
+        assert(updatedAssignment.isDone)
+        assert(updatedAssignment.rating == 2)
     }
 
     @Test
@@ -30,10 +38,18 @@ class ReviewTaskRatingFlowTest : BaseUiFlowTest() {
         completeOnboardingWithJuzOne()
         assertReviewVisible()
 
-        completeReviewTask(taskId = "rub-15")
+        val assignment = firstTodayAssignment()
 
-        scrollReviewListToTag("review-edit-rating-rub-15")
-        composeRule.onNodeWithTag("review-edit-rating-rub-15").assertIsDisplayed()
-        composeRule.onNodeWithTag("review-completed-rating-rub-15-5").assertIsDisplayed()
+        completeReviewTask(taskId = assignment.id)
+
+        scrollReviewListToTag("review-edit-rating-${assignment.id}")
+        composeRule.onNodeWithTag("review-edit-rating-${assignment.id}").assertIsDisplayed()
+        composeRule.onNodeWithTag("review-completed-rating-${assignment.id}-5").assertIsDisplayed()
+
+        val updatedReviewDay = awaitTodayReviewDay()
+        val updatedAssignment = updatedReviewDay.assignments.first { it.id == assignment.id }
+
+        assert(updatedAssignment.isDone)
+        assert(updatedAssignment.rating == 5)
     }
 }
