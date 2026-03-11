@@ -210,8 +210,7 @@ fun TathbeetApp(
                     ReviewScreen(
                         uiState = uiState,
                         onRequestTaskCompletion = reviewViewModel::requestCompleteTask,
-                        onSelectRating = reviewViewModel::updatePendingRating,
-                        onDismissRatingDialog = reviewViewModel::dismissRatingDialog,
+                        onUpdateTaskRating = reviewViewModel::updateTaskRating,
                         onRestartCycle = reviewViewModel::restartCycle,
                         onDismissCycleResetDialog = reviewViewModel::dismissCycleResetDialog,
                     )

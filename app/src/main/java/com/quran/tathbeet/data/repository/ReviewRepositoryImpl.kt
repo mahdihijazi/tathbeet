@@ -29,6 +29,8 @@ class ReviewRepositoryImpl(
     private val timeProvider: TimeProvider,
 ) : ReviewRepository {
 
+    private val preservedRatingsByLearner = mutableMapOf<String, Map<Int, Int>>()
+
     override fun observeReviewTimeline(learnerId: String): Flow<List<ReviewDay>> =
         combine(
             database.reviewDayDao().observeReviewDays(learnerId),
@@ -91,21 +93,23 @@ class ReviewRepositoryImpl(
             return false
         }
         val endExclusive = min(startIndex + maxAssignments, allUnits.size)
+        val preservedRatings = preservedRatingsByLearner[learnerId].orEmpty()
         val assignments = allUnits
             .subList(startIndex, endExclusive)
             .mapIndexed { index, unit ->
+                val rubId = unit.id.removePrefix("review-unit-").toIntOrNull() ?: index + 1
                 ReviewAssignmentEntity(
                     id = "$dateKey-${unit.id}",
                     reviewDayId = "$learnerId-$dateKey",
                     learnerId = learnerId,
                     assignedForDate = dateKey,
-                    rubId = index + 1,
+                    rubId = rubId,
                     title = unit.title,
                     detail = unit.detail,
                     displayOrder = index,
                     isRollover = false,
                     isDone = false,
-                    rating = null,
+                    rating = preservedRatings[rubId],
                     completedAt = null,
                 )
             }
@@ -150,6 +154,14 @@ class ReviewRepositoryImpl(
         learnerId: String,
         restartDate: LocalDate,
     ) {
+        preservedRatingsByLearner[learnerId] = database.reviewAssignmentDao()
+            .getRatedAssignments(learnerId)
+            .fold(linkedMapOf<Int, Int>()) { acc, assignment ->
+                if (assignment.rating != null && !acc.containsKey(assignment.rubId)) {
+                    acc[assignment.rubId] = assignment.rating
+                }
+                acc
+            }
         database.withTransaction {
             database.reviewAssignmentDao().deleteForLearner(learnerId)
             database.reviewDayDao().deleteForLearner(learnerId)

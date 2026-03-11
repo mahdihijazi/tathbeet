@@ -10,6 +10,7 @@ data class ReviewTaskUiState(
     val detail: TextSpec,
     val isDone: Boolean,
     val rating: Int? = null,
+    val defaultRating: Int = 3,
 )
 
 data class ReviewSectionUiState(
@@ -31,13 +32,9 @@ data class ReviewUiState(
     val progressCard: ReviewProgressCardUiState? = null,
     val sections: List<ReviewSectionUiState> = emptyList(),
     val showCycleResetDialog: Boolean = false,
-    val ratingDialogTask: ReviewTaskUiState? = null,
-    val ratingDialogSelected: Int = 5,
 )
 
 fun ReviewDay.toUiState(
-    ratingDialogTaskId: String? = null,
-    ratingDialogSelected: Int = 5,
 ): ReviewUiState {
     val tasks = assignments.sortedBy { it.displayOrder }.map { assignment ->
         ReviewTaskUiState(
@@ -46,6 +43,7 @@ fun ReviewDay.toUiState(
             detail = TextSpec(rawText = assignment.detail),
             isDone = assignment.isDone,
             rating = assignment.rating,
+            defaultRating = assignment.rating ?: 3,
         )
     }
     val completedCount = tasks.count { it.isDone }
@@ -74,8 +72,6 @@ fun ReviewDay.toUiState(
         ),
         sections = listOf(section),
         showCycleResetDialog = false,
-        ratingDialogTask = ratingDialogTaskId?.let { taskId -> tasks.firstOrNull { it.id == taskId } },
-        ratingDialogSelected = ratingDialogSelected,
     )
 }
 
@@ -83,8 +79,6 @@ internal data class ReviewMockState(
     val allSections: List<ReviewSectionUiState>,
     val visibleSectionCount: Int,
     val showCycleResetDialog: Boolean,
-    val ratingDialogTaskId: String? = null,
-    val ratingDialogSelected: Int = 5,
 ) {
     fun toUiState(): ReviewUiState =
         allSections.take(visibleSectionCount).let { visibleSections ->
@@ -103,10 +97,6 @@ internal data class ReviewMockState(
                 ),
                 sections = visibleSections,
                 showCycleResetDialog = showCycleResetDialog,
-                ratingDialogTask = ratingDialogTaskId?.let { taskId ->
-                    allSections.flatMap { it.tasks }.firstOrNull { it.id == taskId }
-                },
-                ratingDialogSelected = ratingDialogSelected,
             )
         }
 }
@@ -210,8 +200,6 @@ internal object ReviewMockFactory {
             allSections = sections,
             visibleSectionCount = 3,
             showCycleResetDialog = false,
-            ratingDialogTaskId = null,
-            ratingDialogSelected = 5,
         )
     }
 
@@ -241,7 +229,7 @@ internal object ReviewMockFactory {
         rangeRes: Int,
         isDone: Boolean,
         rating: Int? = null,
-    ) = ReviewTaskUiState(
+        ) = ReviewTaskUiState(
         id = id,
         title = TextSpec(R.string.quran_rub_title, listOf(rubNumber)),
         detail = TextSpec(
@@ -254,5 +242,6 @@ internal object ReviewMockFactory {
         ),
         isDone = isDone,
         rating = rating,
+        defaultRating = rating ?: 3,
     )
 }

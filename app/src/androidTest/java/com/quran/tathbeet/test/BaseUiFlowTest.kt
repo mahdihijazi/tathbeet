@@ -140,10 +140,8 @@ abstract class BaseUiFlowTest {
             hasTestTag("review-task-$taskId"),
         )
         composeRule.onNodeWithTag("review-complete-$taskId").performClick()
-        if (rating == null) {
-            composeRule.onNodeWithTag("review-rating-dismiss").performClick()
-        } else {
-            composeRule.onNodeWithTag("review-rating-$rating").performClick()
+        if (rating != null) {
+            composeRule.onNodeWithTag("review-inline-rating-$taskId-$rating").performClick()
         }
     }
 

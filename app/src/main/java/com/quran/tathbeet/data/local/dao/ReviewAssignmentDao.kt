@@ -42,6 +42,15 @@ interface ReviewAssignmentDao {
         assignedForDate: String,
     ): List<ReviewAssignmentEntity>
 
+    @Query(
+        """
+        SELECT * FROM review_assignment
+        WHERE learner_id = :learnerId AND rating IS NOT NULL
+        ORDER BY completed_at DESC, assigned_for_date DESC, display_order DESC
+        """,
+    )
+    suspend fun getRatedAssignments(learnerId: String): List<ReviewAssignmentEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entities: List<ReviewAssignmentEntity>)
 

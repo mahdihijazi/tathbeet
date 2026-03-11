@@ -31,8 +31,6 @@ class ReviewViewModel(
 
     private var currentLearnerId: String? = null
     private var timeline: List<ReviewDay> = emptyList()
-    private var ratingDialogTaskId: String? = null
-    private var pendingRating: Int = 5
     private var showCycleResetDialog: Boolean = false
     private var cycleResetDialogDismissed: Boolean = false
 
@@ -42,8 +40,6 @@ class ReviewViewModel(
                 .filterNotNull()
                 .collectLatest { account ->
                     currentLearnerId = account.id
-                    ratingDialogTaskId = null
-                    pendingRating = 5
                     showCycleResetDialog = false
                     cycleResetDialogDismissed = false
                     reviewRepository.ensureAssignmentsForDate(
@@ -64,34 +60,20 @@ class ReviewViewModel(
 
     fun requestCompleteTask(taskId: String) {
         val task = allAssignments().firstOrNull { it.id == taskId } ?: return
-        ratingDialogTaskId = taskId
-        pendingRating = task.rating ?: 5
-        publishUiState()
+        if (task.isDone) return
+        viewModelScope.launch {
+            reviewRepository.completeAssignment(task.id, task.rating ?: 3)
+        }
     }
 
-    fun updatePendingRating(rating: Int) {
-        val task = currentDialogTask() ?: return
+    fun updateTaskRating(taskId: String, rating: Int) {
+        val task = allAssignments().firstOrNull { it.id == taskId } ?: return
         viewModelScope.launch {
             if (task.isDone) {
                 reviewRepository.updateAssignmentRating(task.id, rating)
             } else {
                 reviewRepository.completeAssignment(task.id, rating)
             }
-            ratingDialogTaskId = null
-            pendingRating = 5
-            publishUiState()
-        }
-    }
-
-    fun dismissRatingDialog() {
-        val task = currentDialogTask() ?: return
-        viewModelScope.launch {
-            if (!task.isDone) {
-                reviewRepository.completeAssignment(task.id, pendingRating)
-            }
-            ratingDialogTaskId = null
-            pendingRating = 5
-            publishUiState()
         }
     }
 
@@ -100,8 +82,6 @@ class ReviewViewModel(
         viewModelScope.launch {
             showCycleResetDialog = false
             cycleResetDialogDismissed = false
-            ratingDialogTaskId = null
-            pendingRating = 5
             reviewRepository.restartCycle(
                 learnerId = learnerId,
                 restartDate = timeProvider.today(),
@@ -205,10 +185,6 @@ class ReviewViewModel(
             ),
             sections = visibleSections,
             showCycleResetDialog = showCycleResetDialog,
-            ratingDialogTask = ratingDialogTaskId?.let { taskId ->
-                visibleSections.flatMap { it.tasks }.firstOrNull { it.id == taskId }
-            },
-            ratingDialogSelected = pendingRating,
         )
     }
 
@@ -237,12 +213,8 @@ class ReviewViewModel(
             detail = TextSpec(rawText = detail),
             isDone = isDone,
             rating = rating,
+            defaultRating = rating ?: 3,
         )
-
-    private fun currentDialogTask(): ReviewAssignment? =
-        ratingDialogTaskId?.let { taskId ->
-            allAssignments().firstOrNull { it.id == taskId }
-        }
 
     private fun allAssignments(): List<ReviewAssignment> =
         timeline.flatMap { it.assignments }

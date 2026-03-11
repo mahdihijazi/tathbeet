@@ -1,6 +1,5 @@
 package com.quran.tathbeet.ui.features.review
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.AppCardTone
 import com.quran.tathbeet.ui.components.TitledCardSection
@@ -112,7 +112,7 @@ fun ReviewSectionHeader(
 fun ReviewTaskRow(
     task: ReviewTaskUiState,
     onCompleteReview: () -> Unit,
-    onEditRating: () -> Unit,
+    onUpdateRating: (Int) -> Unit,
 ) {
     val taskTitle = task.title.asString()
 
@@ -145,7 +145,7 @@ fun ReviewTaskRow(
                     CompletedTaskMeta(
                         taskId = task.id,
                         rating = task.rating,
-                        onEditRating = onEditRating,
+                        onUpdateRating = onUpdateRating,
                     )
                 }
             }
@@ -170,6 +170,7 @@ fun ReviewTaskRow(
                         text = stringResource(R.string.review_mark_done),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
@@ -185,7 +186,7 @@ fun ReviewTaskRow(
 private fun CompletedTaskMeta(
     taskId: String,
     rating: Int,
-    onEditRating: () -> Unit,
+    onUpdateRating: (Int) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
@@ -201,7 +202,16 @@ private fun CompletedTaskMeta(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             repeat(5) { index ->
-                Icon(
+                OutlinedButton(
+                    onClick = { onUpdateRating(index + 1) },
+                    modifier = Modifier.testTag("review-inline-rating-$taskId-${index + 1}"),
+                    contentPadding = PaddingValues(all = TathbeetTokens.spacing.half),
+                    shape = RoundedCornerShape(TathbeetTokens.radii.sm),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                        brush = ButtonDefaults.outlinedButtonBorder().brush,
+                    ),
+                ) {
+                    Icon(
                     imageVector = if (index < rating) Icons.Filled.Star else Icons.Outlined.StarBorder,
                     contentDescription = null,
                     tint = if (index < rating) {
@@ -209,66 +219,11 @@ private fun CompletedTaskMeta(
                     } else {
                         MaterialTheme.colorScheme.outline
                     },
-                )
-            }
-        }
-        TextButton(
-            onClick = onEditRating,
-            modifier = Modifier.testTag("review-edit-rating-$taskId"),
-        ) {
-            Text(text = stringResource(R.string.review_edit_rating))
-        }
-    }
-}
-
-@Composable
-fun ReviewRatingDialog(
-    selectedRating: Int,
-    onSelectRating: (Int) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = stringResource(R.string.review_rating_dialog_title))
-        },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x2),
-            ) {
-                Text(text = stringResource(R.string.review_rating_value, selectedRating))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    (1..5).forEach { rating ->
-                        Icon(
-                            imageVector = if (rating <= selectedRating) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                            contentDescription = stringResource(R.string.review_rating_value, rating),
-                            tint = if (rating <= selectedRating) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.outline
-                            },
-                            modifier = Modifier
-                                .testTag("review-rating-$rating")
-                                .clickable { onSelectRating(rating) },
-                        )
-                    }
+                    )
                 }
             }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                modifier = Modifier.testTag("review-rating-dismiss"),
-            ) {
-                Text(text = stringResource(R.string.action_close))
-            }
-        },
-    )
+        }
+    }
 }
 
 @Composable
