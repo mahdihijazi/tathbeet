@@ -325,10 +325,13 @@ Internally, partial segment completion can be used to determine whether the day 
 The review experience should also support early completion beyond today:
 
 - once the user finishes the currently visible ward, they can continue into future dated ward on demand
+- this should continue day after day until the user reaches the end of the current revision cycle
 - future dated ward should be appended inline in the review flow rather than exposed through tabs or a date picker in MVP
 - if the user completes tomorrow's ward today, tomorrow should appear already complete on its actual date
 - early completion should still count as work done on the day the user actually performed it
 - progress and history should distinguish scheduled-day completion from actual completion date
+- once the user finishes the whole current cycle, the app should offer a clear way to start the cycle again
+- restarting the cycle may use a confirmation dialog in MVP, as long as the action is explicit and intentional
 
 ## 10. Notifications
 
@@ -410,6 +413,8 @@ The data model should support shared ownership and conflict-safe synchronization
 - memorized-content selection should use a dedicated selection screen rather than a compact inline control
 - the memorized-content screen should keep the top summary and navigation area fixed while only the item list scrolls
 - category switching in the memorized-content screen should use swipeable tabs rather than button-like chips
+- the user must select at least one memorized-content item before moving from the memorized-content step to the daily-ward step
+- the next action on the memorized-content step should stay disabled until at least one item is selected
 - after the first intro has been seen, reopening schedule setup should start from the memorized-content selection step
 - daily-ward setup should default to choosing when the user wants to finish one full revision cycle
 - when the user first reaches the daily-ward step, it should open in target-cycle mode rather than manual-pace mode
@@ -422,6 +427,8 @@ The data model should support shared ownership and conflict-safe synchronization
 
 - app shows today’s assigned review items
 - app should also support continuing into future dated review after the currently visible day is complete
+- if the user keeps finishing visible future days early, the review flow should keep appending the next day inline until the current cycle is exhausted
+- once the full current cycle is complete, the user should be offered an explicit action to restart the cycle and begin again from the start
 - review items should be execution units, not raw pool labels like `الجزء 30`
 - if a task spans multiple short surahs, the main task label should read like `من النبأ إلى المرسلات`
 - if a task stays inside one long surah, the labeling should use Quran range detail with ayah numbering

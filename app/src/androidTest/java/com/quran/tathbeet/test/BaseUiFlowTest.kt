@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.room.Room
@@ -109,6 +110,10 @@ abstract class BaseUiFlowTest {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.schedule_intro_body),
         ).assertIsDisplayed()
+    }
+
+    protected fun toggleReviewTask(taskId: String) {
+        composeRule.onNodeWithTag("review-task-$taskId").performClick()
     }
 }
 

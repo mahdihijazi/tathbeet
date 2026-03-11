@@ -2,16 +2,12 @@ package com.quran.tathbeet.ui.features.review
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.domain.repository.ProfileRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
 
 class ReviewViewModel(
     private val profileRepository: ProfileRepository,
@@ -19,49 +15,69 @@ class ReviewViewModel(
     private val timeProvider: TimeProvider,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ReviewUiState())
+    private var mockState = ReviewMockFactory.initialState()
+
+    private val _uiState = MutableStateFlow(mockState.toUiState())
     val uiState: StateFlow<ReviewUiState> = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            profileRepository.observeActiveAccount()
-                .filterNotNull()
-                .collectLatest { account ->
-                    reviewRepository.ensureAssignmentsForDate(
-                        learnerId = account.id,
-                        assignedForDate = timeProvider.today(),
-                    )
-                    reviewRepository.observeReviewDay(
-                        learnerId = account.id,
-                        assignedForDate = timeProvider.today(),
-                    ).collect { reviewDay ->
-                        _uiState.value = if (reviewDay == null) {
-                            ReviewUiState(isLoading = false)
-                        } else {
-                            ReviewUiState(
-                                isLoading = false,
-                                completionRate = reviewDay.completionRate,
-                                tasks = reviewDay.assignments.map { assignment ->
-                                    ReviewTaskUiState(
-                                        id = assignment.id,
-                                        title = assignment.title,
-                                        detail = assignment.detail,
-                                        isDone = assignment.isDone,
-                                        isRollover = assignment.isRollover,
-                                    )
-                                },
-                            )
-                        }
+    fun toggleTask(taskId: String) {
+        val updatedSections = mockState.allSections.map { section ->
+            section.copy(
+                tasks = section.tasks.map { task ->
+                    if (task.id == taskId) {
+                        task.copy(isDone = !task.isDone)
+                    } else {
+                        task
                     }
-                }
+                },
+            ).withDerivedStatus()
         }
+
+        val currentVisibleLastIndex = mockState.visibleSectionCount - 1
+        val shouldRevealNextSection =
+            currentVisibleLastIndex in updatedSections.indices &&
+                updatedSections[currentVisibleLastIndex].tasks.all { it.isDone } &&
+                mockState.visibleSectionCount < updatedSections.size
+
+        val nextVisibleCount =
+            if (shouldRevealNextSection) {
+                mockState.visibleSectionCount + 1
+            } else {
+                mockState.visibleSectionCount
+            }
+
+        val allVisibleSectionsComplete = updatedSections.take(nextVisibleCount)
+            .all { section -> section.tasks.all { it.isDone } }
+        val reachedCycleEnd = nextVisibleCount == updatedSections.size
+
+        mockState = mockState.copy(
+            allSections = updatedSections,
+            visibleSectionCount = nextVisibleCount,
+            showCycleResetDialog = reachedCycleEnd && allVisibleSectionsComplete,
+        )
+        _uiState.value = mockState.toUiState()
     }
 
-    fun toggleTask(taskId: String) {
-        viewModelScope.launch {
-            reviewRepository.toggleAssignmentCompletion(taskId)
-        }
+    fun restartCycle() {
+        mockState = ReviewMockFactory.initialState()
+        _uiState.value = mockState.toUiState()
     }
+
+    fun dismissCycleResetDialog() {
+        mockState = mockState.copy(showCycleResetDialog = false)
+        _uiState.value = mockState.toUiState()
+    }
+
+    private fun ReviewSectionUiState.withDerivedStatus(): ReviewSectionUiState =
+        copy(
+            status = com.quran.tathbeet.ui.model.TextSpec(
+                if (tasks.all { it.isDone }) {
+                    com.quran.tathbeet.R.string.review_state_done
+                } else {
+                    com.quran.tathbeet.R.string.review_state_available_now
+                },
+            ),
+        )
 }
 
 class ReviewViewModelFactory(

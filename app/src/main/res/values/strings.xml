@@ -180,13 +180,25 @@
 
     <string name="review_title">ورد اليوم</string>
     <string name="review_subtitle">أكمل المقاطع المطلوبة لليوم</string>
-    <string name="review_summary_remaining">متبقي اليوم: %1$d</string>
-    <string name="review_summary_rollover">مؤجل من الأمس: %1$d</string>
-    <string name="review_task_segment_detail">المقطع %1$d من %2$d</string>
     <string name="review_rollover_chip">مؤجل</string>
-    <string name="review_status_rate">نسبة الإنجاز الحالية: %1$d%%</string>
-    <string name="review_status_done">تم إنهاء الورد.</string>
-    <string name="review_status_open">يبقى الورد مفتوحاً حتى يكتمل كل شيء.</string>
+    <string name="review_state_done">مكتمل</string>
+    <string name="review_state_available_now">متاح الآن</string>
+    <string name="review_section_rollover_title">مؤجل من أمس</string>
+    <string name="review_section_today_title">ورد اليوم</string>
+    <string name="review_section_next_title">ورد الغد</string>
+    <string name="review_section_day_after_next_title">ورد بعد الغد</string>
+    <string name="review_section_cycle_last_title">آخر ورد في الدورة</string>
+    <string name="review_cycle_complete_title">اكتملت الدورة الحالية</string>
+    <string name="review_cycle_complete_body">أنهيت جميع مهام هذه الدورة. يمكنك بدء دورة جديدة من البداية.</string>
+    <string name="review_cycle_restart">ابدأ دورة جديدة</string>
+    <string name="review_cycle_dismiss">لاحقاً</string>
+    <string name="review_toggle_task">تحديد %1$s</string>
+    <string name="sample_range_rub_13">من البقرة 203 إلى 252</string>
+    <string name="sample_range_rub_14">من البقرة 253 إلى آل عمران 25</string>
+    <string name="sample_range_rub_15">من آل عمران 26 إلى 49</string>
+    <string name="sample_range_rub_16">من آل عمران 50 إلى 74</string>
+    <string name="sample_range_rub_17">من آل عمران 75 إلى 91</string>
+    <string name="sample_range_rub_18">من آل عمران 92 إلى 109</string>
 
     <string name="progress_title">التقدم</string>
     <string name="progress_subtitle">مؤشرات بسيطة تساعد على الاستمرار</string>
