@@ -47,7 +47,7 @@ Follow Kotlin and Android Studio defaults: 4-space indentation, organized import
 
 Prefer small composables, clear state names, and RTL-aware UI decisions because the product is Arabic-first. Keep prototype screens and future feature UI grouped by domain instead of growing `MainActivity.kt`.
 
-Code files must never go beyond 400 lines. This is a hard limit. If a file crosses that limit, refactor it immediately into smaller, modular pieces instead of adding more code to the oversized file.
+Code files must never go beyond 400 lines. This is a hard limit. If a file crosses that limit, refactor it immediately into smaller, modular pieces instead of adding more code to the oversized file. Exception: build files and configuration files may exceed this when needed for setup, reporting, or task wiring, but keep them as small and organized as practical.
 
 ## Localization
 Do not hardcode user-facing strings in Kotlin code, even for prototypes. Put all user-facing app strings in Android XML resource files such as `strings.xml` and reference them from code.
@@ -82,6 +82,7 @@ Default test commands:
 - `./gradlew createDebugUnitTestCoverageReport` or `./gradlew jacocoDebugUnitTestReport` to generate debug unit-test coverage
 - `./gradlew createDebugAndroidTestCoverageReport` or `./gradlew jacocoDebugUiTestReport` to generate debug instrumentation/UI coverage
 - `./gradlew jacocoDebugCombinedReport` to merge debug unit-test and instrumentation/UI coverage into one JaCoCo report
+- `./gradlew :app:reportScreenshotCoverage` to generate the screenshot component/state coverage HTML report
 
 Coverage notes:
 
@@ -101,6 +102,7 @@ Use Compose Preview Screenshot Testing for visual regression coverage of importa
 
 - `./gradlew updateDebugScreenshotTest` to generate or refresh reference images
 - `./gradlew validateDebugScreenshotTest` to compare current renders against the saved references
+- `./gradlew :app:reportScreenshotCoverage` to generate the screenshot coverage HTML report
 
 ## Commit & Pull Request Guidelines
 Each commit must have a clear title that explains what the commit does.

@@ -1,0 +1,31 @@
+# group:id
+
+# Shared components
+components:wizard_header_step_1
+components:wizard_header_step_2
+components:wizard_header_step_3
+
+# Review
+review:review_progress_card_in_progress
+review:review_progress_card_complete
+review:review_section_header_done
+review:review_section_header_available
+review:review_task_row_completed
+review:review_task_row_pending
+review:review_rating_dialog_default
+review:review_cycle_complete_dialog
+
+# Schedule
+schedule:onboarding_message_card_default
+schedule:pool_selector_surahs_tab
+schedule:pool_selector_juz_tab
+schedule:pool_selector_hizb_tab
+schedule:pool_selector_rub_tab
+schedule:schedule_cycle_target_section_one_month
+schedule:schedule_cycle_target_section_two_months
+schedule:schedule_manual_pace_section
+schedule:schedule_rotation_preview_cycle_mode
+schedule:schedule_rotation_preview_manual_mode
+schedule:manual_pace_sheet_content
+schedule:selected_pool_summary_card_default
+schedule:selected_pool_summary_card_disabled
