@@ -6,14 +6,7 @@ data class SettingsUiState(
     val motivationalMessagesEnabled: Boolean = true,
     val reminderHour: Int = 19,
     val reminderMinute: Int = 0,
-    val reminderOptions: List<ReminderTimeOptionUiState> = emptyList(),
     val profiles: List<SettingsProfileUiState> = emptyList(),
-)
-
-data class ReminderTimeOptionUiState(
-    val hour: Int,
-    val minute: Int,
-    val label: String,
 )
 
 data class SettingsProfileUiState(

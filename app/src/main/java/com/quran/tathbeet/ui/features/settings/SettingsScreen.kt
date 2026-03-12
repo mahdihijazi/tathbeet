@@ -1,7 +1,7 @@
 package com.quran.tathbeet.ui.features.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -169,7 +172,6 @@ fun SettingsScreen(
         ReminderTimeDialog(
             selectedHour = uiState.reminderHour,
             selectedMinute = uiState.reminderMinute,
-            options = uiState.reminderOptions,
             onDismiss = { showReminderDialog = false },
             onSelected = { hour, minute ->
                 onReminderTimeSelected(hour, minute)
@@ -230,47 +232,37 @@ private fun ProfileReminderCard(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun ReminderTimeDialog(
     selectedHour: Int,
     selectedMinute: Int,
-    options: List<ReminderTimeOptionUiState>,
     onDismiss: () -> Unit,
     onSelected: (Int, Int) -> Unit,
 ) {
+    val timePickerState = rememberTimePickerState(
+        initialHour = selectedHour,
+        initialMinute = selectedMinute,
+        is24Hour = true,
+    )
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(text = stringResource(R.string.settings_reminder_dialog_title))
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                options.forEach { option ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSelected(option.hour, option.minute) }
-                            .padding(vertical = 8.dp)
-                            .testTag("settings-time-option-${option.hour}-${option.minute}"),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = option.label,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                        if (option.hour == selectedHour && option.minute == selectedMinute) {
-                            Text(
-                                text = stringResource(R.string.settings_reminder_selected),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                }
+            Box(modifier = Modifier.testTag("settings-time-input")) {
+                TimeInput(state = timePickerState)
             }
         },
-        confirmButton = {},
+        confirmButton = {
+            AppPrimaryButton(
+                text = stringResource(R.string.action_save),
+                onClick = {
+                    onSelected(timePickerState.hour, timePickerState.minute)
+                },
+                modifier = Modifier.testTag("settings-time-save"),
+            )
+        },
         dismissButton = {
             AppSecondaryButton(
                 text = stringResource(R.string.action_cancel),

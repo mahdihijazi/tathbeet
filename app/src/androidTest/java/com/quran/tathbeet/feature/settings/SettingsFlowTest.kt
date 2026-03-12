@@ -18,15 +18,15 @@ class SettingsFlowTest : BaseUiFlowTest() {
         toggleGlobalNotifications()
         toggleGlobalNotifications()
         toggleMotivationalMessages()
-        changeReminderTime()
+        changeReminderTime(hour = 6, minute = 0)
 
         runBlocking {
             val settings = appContainer.settingsRepository.observeSettings().first()
 
             assertTrue(settings.globalNotificationsEnabled)
             assertFalse(settings.motivationalMessagesEnabled)
-            assertEquals(19, settings.reminderHour)
-            assertEquals(30, settings.reminderMinute)
+            assertEquals(6, settings.reminderHour)
+            assertEquals(0, settings.reminderMinute)
         }
 
         val latestSchedule = appContainer.recordingReminderScheduler.scheduledProfiles.last()

@@ -65,13 +65,6 @@ class SettingsViewModel(
                         motivationalMessagesEnabled = settings.motivationalMessagesEnabled,
                         reminderHour = settings.reminderHour,
                         reminderMinute = settings.reminderMinute,
-                        reminderOptions = ReminderTimeOption.entries.map { option ->
-                            ReminderTimeOptionUiState(
-                                hour = option.hour,
-                                minute = option.minute,
-                                label = option.label,
-                            )
-                        },
                         profiles = profiles,
                     )
                 }
@@ -136,18 +129,4 @@ class SettingsViewModelFactory(
         }
         error("Unknown ViewModel class: ${modelClass.name}")
     }
-}
-
-private enum class ReminderTimeOption(
-    val hour: Int,
-    val minute: Int,
-) {
-    SixThirty(18, 30),
-    Seven(19, 0),
-    SevenThirty(19, 30),
-    Eight(20, 0),
-    ;
-
-    val label: String
-        get() = "%02d:%02d".format(hour, minute)
 }

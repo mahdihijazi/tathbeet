@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
@@ -65,6 +66,7 @@ abstract class BaseUiFlowTest {
 
     @After
     fun baseTearDown() {
+        composeRule.activityRule.scenario.close()
         appContainer.database.close()
     }
 
@@ -161,7 +163,12 @@ abstract class BaseUiFlowTest {
             hasTestTag("settings-reminder-open"),
         )
         composeRule.onNodeWithTag("settings-reminder-open").performClick()
-        composeRule.onNodeWithTag("settings-time-option-$hour-$minute").performClick()
+        val inputs = composeRule.onAllNodes(hasSetTextAction())
+        inputs[0].performTextClearance()
+        inputs[0].performTextInput("%02d".format(hour))
+        inputs[1].performTextClearance()
+        inputs[1].performTextInput("%02d".format(minute))
+        composeRule.onNodeWithTag("settings-time-save").performClick()
     }
 
     protected fun toggleProfileReminder(profileId: String) {
