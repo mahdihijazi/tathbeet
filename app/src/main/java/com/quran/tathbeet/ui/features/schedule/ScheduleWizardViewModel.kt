@@ -3,6 +3,7 @@ package com.quran.tathbeet.ui.features.schedule
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.quran.tathbeet.app.LocalReminderScheduler
 import com.quran.tathbeet.domain.model.RevisionSchedule
 import com.quran.tathbeet.domain.model.ScheduleSelection
 import com.quran.tathbeet.domain.planner.CoverageSelection
@@ -36,6 +37,7 @@ class ScheduleWizardViewModel(
     private val quranCatalogRepository: QuranCatalogRepository,
     private val revisionPlanner: RevisionPlanner,
     private val timeProvider: TimeProvider,
+    private val localReminderScheduler: LocalReminderScheduler,
 ) : ViewModel() {
 
     private val quranCatalog = quranCatalogRepository.getCatalog()
@@ -206,6 +208,7 @@ class ScheduleWizardViewModel(
                 learnerId = activeAccount.id,
                 restartDate = timeProvider.today(),
             )
+            localReminderScheduler.syncSchedules()
             onSaved()
         }
     }
@@ -271,6 +274,7 @@ class ScheduleWizardViewModelFactory(
     private val quranCatalogRepository: QuranCatalogRepository,
     private val revisionPlanner: RevisionPlanner,
     private val timeProvider: TimeProvider,
+    private val localReminderScheduler: LocalReminderScheduler,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ScheduleWizardViewModel::class.java)) {
@@ -283,6 +287,7 @@ class ScheduleWizardViewModelFactory(
                 quranCatalogRepository = quranCatalogRepository,
                 revisionPlanner = revisionPlanner,
                 timeProvider = timeProvider,
+                localReminderScheduler = localReminderScheduler,
             ) as T
         }
         error("Unknown ViewModel class: ${modelClass.name}")

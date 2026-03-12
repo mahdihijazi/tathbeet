@@ -46,7 +46,7 @@ class ProfileRepositoryImpl(
             name = name,
             isSelfProfile = false,
             isShared = false,
-            notificationsEnabled = true,
+            notificationsEnabled = false,
             isActive = true,
         )
         database.withTransaction {

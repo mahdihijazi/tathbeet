@@ -1,5 +1,11 @@
 package com.quran.tathbeet.ui
 
+import android.Manifest
+import android.content.Context
+import android.os.Build
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -15,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,6 +42,7 @@ import com.quran.tathbeet.ui.features.schedule.ScheduleIntroScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModel
 import com.quran.tathbeet.ui.features.settings.SettingsScreen
+import com.quran.tathbeet.ui.features.settings.SettingsViewModel
 import com.quran.tathbeet.ui.features.shared.SharedProfileScreen
 import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.model.AppUiState
@@ -43,13 +51,14 @@ import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.activeProfile
 import com.quran.tathbeet.ui.model.completionRate
 import com.quran.tathbeet.ui.model.loadQuranCatalog
-import com.quran.tathbeet.ui.model.reminderOptions
 import com.quran.tathbeet.ui.model.seedAppState
 import kotlinx.coroutines.launch
 
 @Composable
 fun TathbeetApp(
     appContainer: AppContainer,
+    notificationTargetProfileId: String? = null,
+    onNotificationTargetHandled: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val quranCatalog = remember(context) { loadQuranCatalog(context) }
@@ -66,12 +75,25 @@ fun TathbeetApp(
         appContainer.profileRepository.ensureDefaultAccount(
             name = context.getString(R.string.profile_name_self),
         )
+        appContainer.localReminderScheduler.syncSchedules()
     }
 
     LaunchedEffect(currentDestination) {
         if (currentDestination != AppDestination.Review) {
             onReviewResetAction = {}
         }
+    }
+
+    LaunchedEffect(notificationTargetProfileId) {
+        if (notificationTargetProfileId.isNullOrBlank()) {
+            return@LaunchedEffect
+        }
+        appContainer.profileRepository.setActiveAccount(notificationTargetProfileId)
+        navController.navigate(RouteReview) {
+            popUpTo(RouteLaunch) { inclusive = true }
+            launchSingleTop = true
+        }
+        onNotificationTargetHandled()
     }
 
     fun mutateLegacy(message: TextSpec? = null, transform: (AppUiState) -> AppUiState) {
@@ -104,14 +126,16 @@ fun TathbeetApp(
                 startDestination = RouteLaunch,
             ) {
                 composable(RouteLaunch) {
-                    LaunchRoute(
-                        appContainer = appContainer,
-                        onNavigate = { route ->
-                            navController.navigate(route) {
-                                popUpTo(RouteLaunch) { inclusive = true }
-                            }
-                        },
-                    )
+                    if (notificationTargetProfileId.isNullOrBlank()) {
+                        LaunchRoute(
+                            appContainer = appContainer,
+                            onNavigate = { route ->
+                                navController.navigate(route) {
+                                    popUpTo(RouteLaunch) { inclusive = true }
+                                }
+                            },
+                        )
+                    }
                 }
 
                 navigation(
@@ -264,37 +288,33 @@ fun TathbeetApp(
                 }
 
                 composable(RouteSettings) {
+                    val settingsViewModel: SettingsViewModel = viewModel(
+                        factory = settingsViewModelFactory(appContainer),
+                    )
+                    val uiState by settingsViewModel.uiState.collectAsState()
+                    var permissionRefreshToken by remember { mutableStateOf(0) }
+                    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestPermission(),
+                    ) {
+                        permissionRefreshToken++
+                        scope.launch {
+                            appContainer.localReminderScheduler.syncSchedules()
+                        }
+                    }
+                    val hasNotificationPermission = remember(context, permissionRefreshToken) {
+                        context.hasNotificationPermission()
+                    }
                     SettingsScreen(
-                        uiState = legacyUiState,
-                        activeProfile = legacyUiState.activeProfile,
-                        onGlobalNotificationsChanged = {
-                            mutateLegacy { it.copy(globalNotificationsEnabled = !it.globalNotificationsEnabled) }
-                        },
-                        onMotivationalMessagesChanged = {
-                            mutateLegacy { it.copy(motivationalMessagesEnabled = !it.motivationalMessagesEnabled) }
-                        },
-                        onProfileNotificationsChanged = {
-                            mutateLegacy {
-                                it.copy(
-                                    profiles = it.profiles.map { profile ->
-                                        if (profile.id == it.activeProfileId) {
-                                            profile.copy(notificationsEnabled = !profile.notificationsEnabled)
-                                        } else {
-                                            profile
-                                        }
-                                    },
-                                )
+                        uiState = uiState,
+                        hasNotificationPermission = hasNotificationPermission,
+                        onGlobalNotificationsChanged = settingsViewModel::toggleGlobalNotifications,
+                        onMotivationalMessagesChanged = settingsViewModel::toggleMotivationalMessages,
+                        onProfileNotificationsChanged = settingsViewModel::toggleProfileNotifications,
+                        onReminderTimeSelected = settingsViewModel::selectReminderTime,
+                        onRequestNotificationPermission = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                             }
-                        },
-                        onReminderTimeChanged = {
-                            mutateLegacy {
-                                val currentIndex = reminderOptions.indexOf(it.reminderTime)
-                                val nextIndex = (currentIndex + 1) % reminderOptions.size
-                                it.copy(reminderTime = reminderOptions[nextIndex])
-                            }
-                        },
-                        onAccountModeChanged = {
-                            mutateLegacy(transform = AppUiState::toggleAccountMode)
                         },
                     )
                 }
@@ -342,3 +362,13 @@ fun TathbeetApp(
         }
     }
 }
+
+private fun Context.hasNotificationPermission(): Boolean =
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        true
+    } else {
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+    }

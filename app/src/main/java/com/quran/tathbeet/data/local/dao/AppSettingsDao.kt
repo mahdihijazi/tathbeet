@@ -12,6 +12,9 @@ interface AppSettingsDao {
     @Query("SELECT * FROM app_settings WHERE id = 1")
     fun observeSettings(): Flow<AppSettingsEntity?>
 
+    @Query("SELECT * FROM app_settings WHERE id = 1")
+    suspend fun getSettings(): AppSettingsEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(entity: AppSettingsEntity)
 }

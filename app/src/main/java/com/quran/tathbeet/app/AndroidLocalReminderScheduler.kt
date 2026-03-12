@@ -1,0 +1,266 @@
+package com.quran.tathbeet.app
+
+import android.Manifest
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import com.quran.tathbeet.MainActivity
+import com.quran.tathbeet.R
+import com.quran.tathbeet.core.time.TimeProvider
+import com.quran.tathbeet.domain.model.LearnerAccount
+import com.quran.tathbeet.domain.repository.ProfileRepository
+import com.quran.tathbeet.domain.repository.ReviewRepository
+import com.quran.tathbeet.domain.repository.ScheduleRepository
+import com.quran.tathbeet.domain.repository.SettingsRepository
+import java.time.ZonedDateTime
+import kotlinx.coroutines.flow.first
+
+class AndroidLocalReminderScheduler(
+    context: Context,
+    private val timeProvider: TimeProvider,
+    private val profileRepository: ProfileRepository,
+    private val scheduleRepository: ScheduleRepository,
+    private val settingsRepository: SettingsRepository,
+    private val reviewRepository: ReviewRepository,
+) : LocalReminderScheduler {
+
+    private val appContext = context.applicationContext
+    private val alarmManager = appContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private val notificationManager = NotificationManagerCompat.from(appContext)
+
+    override suspend fun syncSchedules() {
+        createNotificationChannel()
+
+        val settings = settingsRepository.observeSettings().first()
+        val accounts = profileRepository.observeAccounts().first()
+
+        if (!settings.globalNotificationsEnabled || !canPostNotifications()) {
+            accounts.forEach { account -> cancelProfile(account.id) }
+            return
+        }
+
+        accounts.forEach { account ->
+            if (account.notificationsEnabled && hasSchedule(account.id)) {
+                scheduleReminder(
+                    profileId = account.id,
+                    hour = settings.reminderHour,
+                    minute = settings.reminderMinute,
+                    referenceTime = timeProvider.now(),
+                )
+            } else {
+                cancelProfile(account.id)
+            }
+        }
+    }
+
+    override suspend fun cancelProfile(profileId: String) {
+        alarmManager.cancel(reminderPendingIntent(profileId))
+    }
+
+    override suspend fun handleReminder(profileId: String) {
+        val settings = settingsRepository.observeSettings().first()
+        val account = profileRepository.observeAccounts().first()
+            .firstOrNull { profile -> profile.id == profileId }
+            ?: return
+
+        if (!settings.globalNotificationsEnabled || !account.notificationsEnabled || !hasSchedule(profileId)) {
+            cancelProfile(profileId)
+            return
+        }
+
+        reviewRepository.ensureAssignmentsForDate(
+            learnerId = profileId,
+            assignedForDate = timeProvider.today(),
+        )
+
+        if (canPostNotifications()) {
+            showReminderNotification(
+                account = account,
+                motivationalMessagesEnabled = settings.motivationalMessagesEnabled,
+            )
+        }
+
+        scheduleReminder(
+            profileId = profileId,
+            hour = settings.reminderHour,
+            minute = settings.reminderMinute,
+            referenceTime = timeProvider.now().plusMinutes(1),
+        )
+    }
+
+    private suspend fun showReminderNotification(
+        account: LearnerAccount,
+        motivationalMessagesEnabled: Boolean,
+    ) {
+        val title = if (shouldIncludeProfileName(account)) {
+            appContext.getString(R.string.reminder_notification_title_for_profile, account.name)
+        } else {
+            appContext.getString(R.string.reminder_notification_title)
+        }
+        val body = buildReminderBody(
+            learnerId = account.id,
+            motivationalMessagesEnabled = motivationalMessagesEnabled,
+        )
+        val openIntent = Intent(appContext, MainActivity::class.java).apply {
+            action = ReminderNotificationAction
+            putExtra(ReminderProfileIdExtra, account.id)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val contentIntent = PendingIntent.getActivity(
+            appContext,
+            notificationRequestCode(account.id),
+            openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        val notification = NotificationCompat.Builder(appContext, ReminderChannelId)
+            .setSmallIcon(R.drawable.tathbeet_logo)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(contentIntent)
+            .build()
+
+        notificationManager.notify(notificationRequestCode(account.id), notification)
+    }
+
+    private suspend fun buildReminderBody(
+        learnerId: String,
+        motivationalMessagesEnabled: Boolean,
+    ): String {
+        val timeline = reviewRepository.observeReviewTimeline(learnerId).first()
+        val today = timeProvider.today()
+        val hasRollover = timeline.any { day ->
+            day.assignedForDate.isBefore(today) && day.assignments.any { assignment -> !assignment.isDone }
+        }
+        val baseBody = appContext.getString(
+            if (hasRollover) {
+                R.string.reminder_notification_body_rollover
+            } else {
+                R.string.reminder_notification_body_today
+            },
+        )
+        if (!motivationalMessagesEnabled) {
+            return baseBody
+        }
+
+        val motivationalLines = listOf(
+            R.string.reminder_motivation_line_1,
+            R.string.reminder_motivation_line_2,
+            R.string.reminder_motivation_line_3,
+        )
+        val line = appContext.getString(
+            motivationalLines[timeProvider.today().dayOfYear % motivationalLines.size],
+        )
+        return appContext.getString(
+            R.string.reminder_notification_body_with_motivation,
+            baseBody,
+            line,
+        )
+    }
+
+    private suspend fun shouldIncludeProfileName(account: LearnerAccount): Boolean {
+        val accounts = profileRepository.observeAccounts().first()
+        return accounts.count { profile ->
+            profile.notificationsEnabled && hasSchedule(profile.id)
+        } > 1 || !account.isSelfProfile
+    }
+
+    private suspend fun hasSchedule(profileId: String): Boolean =
+        scheduleRepository.observeActiveSchedule(profileId).first() != null
+
+    private fun scheduleReminder(
+        profileId: String,
+        hour: Int,
+        minute: Int,
+        referenceTime: ZonedDateTime,
+    ) {
+        val triggerAt = nextTriggerAt(
+            referenceTime = referenceTime,
+            hour = hour,
+            minute = minute,
+        )
+        alarmManager.setAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerAt.toInstant().toEpochMilli(),
+            reminderPendingIntent(profileId),
+        )
+    }
+
+    private fun nextTriggerAt(
+        referenceTime: ZonedDateTime,
+        hour: Int,
+        minute: Int,
+    ): ZonedDateTime {
+        val targetToday = referenceTime
+            .withHour(hour)
+            .withMinute(minute)
+            .withSecond(0)
+            .withNano(0)
+        return if (targetToday.isAfter(referenceTime)) {
+            targetToday
+        } else {
+            targetToday.plusDays(1)
+        }
+    }
+
+    private fun reminderPendingIntent(profileId: String): PendingIntent =
+        PendingIntent.getBroadcast(
+            appContext,
+            reminderRequestCode(profileId),
+            Intent(appContext, ReminderBroadcastReceiver::class.java).apply {
+                action = ReminderAlarmAction
+                putExtra(ReminderProfileIdExtra, profileId)
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+    private fun reminderRequestCode(profileId: String): Int =
+        profileId.hashCode()
+
+    private fun notificationRequestCode(profileId: String): Int =
+        profileId.hashCode() + 31_000
+
+    private fun canPostNotifications(): Boolean =
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            notificationManager.areNotificationsEnabled()
+        } else {
+            ContextCompat.checkSelfPermission(
+                appContext,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return
+        }
+        val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(
+            NotificationChannel(
+                ReminderChannelId,
+                appContext.getString(R.string.reminder_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            ).apply {
+                description = appContext.getString(R.string.reminder_channel_description)
+            },
+        )
+    }
+
+    companion object {
+        const val ReminderChannelId = "daily_reminders"
+        const val ReminderAlarmAction = "com.quran.tathbeet.REMINDER_ALARM"
+        const val ReminderNotificationAction = "com.quran.tathbeet.REMINDER_NOTIFICATION"
+        const val ReminderProfileIdExtra = "reminder_profile_id"
+    }
+}

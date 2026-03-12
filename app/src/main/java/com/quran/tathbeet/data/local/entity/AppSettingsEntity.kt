@@ -8,4 +8,8 @@ data class AppSettingsEntity(
     @PrimaryKey
     val id: Int = 1,
     val hasSeenScheduleIntro: Boolean,
+    val globalNotificationsEnabled: Boolean,
+    val motivationalMessagesEnabled: Boolean,
+    val reminderHour: Int,
+    val reminderMinute: Int,
 )

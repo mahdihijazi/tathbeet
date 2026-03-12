@@ -121,6 +121,10 @@ The MVP notification strategy is intentionally simple:
 - motivational messages
 - per-profile notification controls in settings
 - notifications may include the relevant profile name when multiple profiles exist on one device
+- notifications should start as local on-device reminders before any auth or cloud-sync work
+- the app should use one app-wide reminder time with per-profile on/off controls
+- the self profile should default to reminders on once it has a schedule, while additional learner profiles default to off
+- missed work should be reflected in the next day's reminder instead of causing repeated same-day nudges
 
 ## Repository Intent
 

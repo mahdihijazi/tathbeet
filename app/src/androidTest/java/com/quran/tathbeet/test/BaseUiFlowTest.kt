@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
+import com.quran.tathbeet.app.LocalReminderScheduler
 import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.domain.model.ReviewAssignment
@@ -99,6 +100,13 @@ abstract class BaseUiFlowTest {
         assertProfilesVisible()
     }
 
+    protected fun openSettingsTab() {
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.destination_settings),
+        ).performClick()
+        assertSettingsVisible()
+    }
+
     protected fun openAddProfileDialog() {
         composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
             hasTestTag("profiles-add-button"),
@@ -129,6 +137,38 @@ abstract class BaseUiFlowTest {
 
     protected fun toggleProfileNotifications(profileId: String) {
         composeRule.onNodeWithTag("profiles-notifications-$profileId").performClick()
+    }
+
+    protected fun toggleGlobalNotifications() {
+        composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
+            hasTestTag("settings-global-toggle"),
+        )
+        composeRule.onNodeWithTag("settings-global-toggle").performClick()
+    }
+
+    protected fun toggleMotivationalMessages() {
+        composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
+            hasTestTag("settings-motivational-toggle"),
+        )
+        composeRule.onNodeWithTag("settings-motivational-toggle").performClick()
+    }
+
+    protected fun changeReminderTime(
+        hour: Int = 19,
+        minute: Int = 30,
+    ) {
+        composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
+            hasTestTag("settings-reminder-open"),
+        )
+        composeRule.onNodeWithTag("settings-reminder-open").performClick()
+        composeRule.onNodeWithTag("settings-time-option-$hour-$minute").performClick()
+    }
+
+    protected fun toggleProfileReminder(profileId: String) {
+        composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
+            hasTestTag("settings-profile-toggle-$profileId"),
+        )
+        composeRule.onNodeWithTag("settings-profile-toggle-$profileId").performClick()
     }
 
     protected fun navigateBack() {
@@ -216,6 +256,14 @@ abstract class BaseUiFlowTest {
         }
     }
 
+    protected fun assertSettingsVisible() {
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(
+                composeRule.activity.getString(R.string.settings_subtitle),
+            ).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
     protected fun completeReviewTask(
         taskId: String,
         rating: Int? = null,
@@ -288,6 +336,39 @@ class TestAppContainer(
         .build(),
 ) {
     val recordingQuranExternalLauncher = RecordingQuranExternalLauncher()
+    val recordingReminderScheduler = RecordingLocalReminderScheduler(
+        enabledProfilesProvider = {
+            val settings = settingsRepository.observeSettings().first()
+            if (!settings.globalNotificationsEnabled) {
+                emptyList()
+            } else {
+                profileRepository.observeAccounts().first()
+                    .filter { account ->
+                        account.notificationsEnabled &&
+                            scheduleRepository.observeActiveSchedule(account.id).first() != null
+                    }
+                    .map { account -> account.id }
+            }
+        },
+    )
 
     override val quranExternalLauncher = recordingQuranExternalLauncher
+    override val localReminderScheduler: LocalReminderScheduler = recordingReminderScheduler
+}
+
+class RecordingLocalReminderScheduler(
+    private val enabledProfilesProvider: suspend () -> List<String>,
+) : LocalReminderScheduler {
+    val scheduledProfiles = mutableListOf<List<String>>()
+    val cancelledProfiles = mutableListOf<String>()
+
+    override suspend fun syncSchedules() {
+        scheduledProfiles += enabledProfilesProvider()
+    }
+
+    override suspend fun cancelProfile(profileId: String) {
+        cancelledProfiles += profileId
+    }
+
+    override suspend fun handleReminder(profileId: String) = Unit
 }

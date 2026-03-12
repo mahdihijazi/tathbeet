@@ -9,6 +9,7 @@ import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.ui.features.profiles.ProfilesViewModelFactory
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModelFactory
+import com.quran.tathbeet.ui.features.settings.SettingsViewModelFactory
 import com.quran.tathbeet.ui.model.AccountMode
 import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.model.AppUiState
@@ -62,6 +63,7 @@ internal fun scheduleWizardViewModelFactory(
     quranCatalogRepository = appContainer.quranCatalogRepository,
     revisionPlanner = appContainer.revisionPlanner,
     timeProvider = appContainer.timeProvider,
+    localReminderScheduler = appContainer.localReminderScheduler,
 )
 
 internal fun profilesViewModelFactory(
@@ -72,6 +74,7 @@ internal fun profilesViewModelFactory(
     reviewRepository = appContainer.reviewRepository,
     settingsRepository = appContainer.settingsRepository,
     timeProvider = appContainer.timeProvider,
+    localReminderScheduler = appContainer.localReminderScheduler,
 )
 
 internal fun NavHostController.navigateMain(route: String) {
@@ -83,6 +86,15 @@ internal fun NavHostController.navigateMain(route: String) {
         restoreState = true
     }
 }
+
+internal fun settingsViewModelFactory(
+    appContainer: AppContainer,
+) = SettingsViewModelFactory(
+    settingsRepository = appContainer.settingsRepository,
+    profileRepository = appContainer.profileRepository,
+    scheduleRepository = appContainer.scheduleRepository,
+    localReminderScheduler = appContainer.localReminderScheduler,
+)
 
 internal fun AppDestination.toRoute(): String = when (this) {
     AppDestination.Profiles -> RouteProfiles

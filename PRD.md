@@ -357,6 +357,14 @@ The review experience should also support early completion beyond today:
 - daily reminder
 - motivational reminder
 
+For the offline single-device MVP, notifications should stay intentionally calm:
+
+- use local Android notifications only
+- do not depend on authentication, cloud sync, or push delivery
+- send at most one scheduled reminder per enabled profile per day
+- do not send repeated same-day nudges for skipped work
+- reflect overdue work in the next day's reminder instead of escalating notification volume
+
 ### 10.2 Notification Controls
 
 Notification settings must be configurable from the settings page.
@@ -367,9 +375,25 @@ Controls should allow:
 - enable/disable notifications per profile
 - configure preferred reminder time
 
+MVP settings behavior:
+
+- use one app-wide preferred reminder time rather than separate times per profile
+- keep per-profile control as a simple enable/disable toggle
+- save settings locally on device
+- allow the user to configure reminder settings even if Android notification permission has not yet been granted
+- show a clear permission prompt entry point in Settings when notification permission is missing
+
 ### 10.3 Multi-Profile Notifications
 
 If multiple profiles exist on one device, notifications may include the profile name to avoid ambiguity.
+
+MVP defaults for multi-profile reminders:
+
+- the self/main profile should start with reminders enabled once it has a schedule
+- newly created additional learner profiles should start with reminders disabled
+- users can enable reminders for additional profiles individually
+- notification taps should open the app directly to the review screen for the relevant profile
+- if overdue work exists, the reminder copy should mention that today's work includes carried-over tasks
 
 ## 11. Motivation and Progress
 
@@ -501,8 +525,23 @@ The data model should support shared ownership and conflict-safe synchronization
 - daily reminders supported
 - motivational notifications supported
 - notification settings are user-configurable
+- notifications use local scheduling before any authentication or cloud sync work is implemented
+- reminder scheduling uses one app-wide preferred time with per-profile enable/disable controls
+- the app should persist notification settings locally and restore scheduled reminders on device restart
 
-### 13.7 Localization and UI Composition
+### 13.7 Settings Screen
+
+- the MVP settings screen should focus on local reminder behavior rather than account management
+- the screen should expose:
+  - app-level notification enable/disable
+  - motivational reminder enable/disable
+  - one preferred reminder time for the whole app
+  - per-profile reminder toggles
+- the per-profile list should show profiles directly when the list is short
+- if the profile list grows beyond five entries, the extra entries may be collapsed behind an expandable section
+- the active profile, self profile, and profiles with reminders already enabled should remain visible before collapsed overflow when practical
+
+### 13.8 Localization and UI Composition
 
 - the product UI should be designed as RTL-first
 - screen layouts, navigation placement, chip flow, and action alignment should be reviewed from an Arabic reading direction first

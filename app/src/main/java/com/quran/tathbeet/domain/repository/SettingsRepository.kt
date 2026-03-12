@@ -7,4 +7,13 @@ interface SettingsRepository {
     fun observeSettings(): Flow<AppSettings>
 
     suspend fun markScheduleIntroSeen()
+
+    suspend fun setGlobalNotificationsEnabled(enabled: Boolean)
+
+    suspend fun setMotivationalMessagesEnabled(enabled: Boolean)
+
+    suspend fun setReminderTime(
+        hour: Int,
+        minute: Int,
+    )
 }

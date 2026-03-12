@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.quran.tathbeet.R
+import com.quran.tathbeet.app.LocalReminderScheduler
 import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.domain.model.PaceOption
 import com.quran.tathbeet.domain.model.ReviewDay
@@ -28,6 +29,7 @@ class ProfilesViewModel(
     private val reviewRepository: ReviewRepository,
     private val settingsRepository: SettingsRepository,
     private val timeProvider: TimeProvider,
+    private val localReminderScheduler: LocalReminderScheduler,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfilesUiState())
@@ -113,6 +115,7 @@ class ProfilesViewModel(
                 accountId = profileId,
                 enabled = !profile.notificationsEnabled,
             )
+            localReminderScheduler.syncSchedules()
         }
     }
 
@@ -159,6 +162,7 @@ class ProfilesViewModel(
             if (editor.isNew) {
                 profileRepository.createProfile(trimmedName)
                 _uiState.value = _uiState.value.copy(editor = null)
+                localReminderScheduler.syncSchedules()
                 onCreated()
             } else {
                 profileRepository.updateAccountName(
@@ -166,6 +170,7 @@ class ProfilesViewModel(
                     name = trimmedName,
                 )
                 _uiState.value = _uiState.value.copy(editor = null)
+                localReminderScheduler.syncSchedules()
             }
         }
     }
@@ -191,11 +196,13 @@ class ProfilesViewModel(
     fun confirmDelete() {
         val confirmation = _uiState.value.deleteConfirmation ?: return
         viewModelScope.launch {
+            localReminderScheduler.cancelProfile(confirmation.profileId)
             profileRepository.deleteProfile(confirmation.profileId)
             _uiState.value = _uiState.value.copy(
                 editor = null,
                 deleteConfirmation = null,
             )
+            localReminderScheduler.syncSchedules()
         }
     }
 
@@ -231,6 +238,7 @@ class ProfilesViewModelFactory(
     private val reviewRepository: ReviewRepository,
     private val settingsRepository: SettingsRepository,
     private val timeProvider: TimeProvider,
+    private val localReminderScheduler: LocalReminderScheduler,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ProfilesViewModel::class.java)) {
@@ -241,6 +249,7 @@ class ProfilesViewModelFactory(
                 reviewRepository = reviewRepository,
                 settingsRepository = settingsRepository,
                 timeProvider = timeProvider,
+                localReminderScheduler = localReminderScheduler,
             ) as T
         }
         error("Unknown ViewModel class: ${modelClass.name}")

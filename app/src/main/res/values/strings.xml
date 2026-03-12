@@ -276,18 +276,47 @@
     <string name="account_mode_account">حساب</string>
 
     <string name="settings_title">الإعدادات</string>
-    <string name="settings_subtitle">تحكم سريع في الإشعارات والحساب</string>
-    <string name="settings_eyebrow">النموذج</string>
-    <string name="settings_body_title">واجهة فقط</string>
-    <string name="settings_body">كل المفاتيح تفاعلية لكنها غير مرتبطة بخدمة حقيقية.</string>
-    <string name="settings_notifications_title">الإشعارات</string>
-    <string name="settings_notifications_subtitle">هذه المفاتيح تغير الحالة المرئية مباشرة</string>
+    <string name="settings_subtitle">إدارة التذكيرات المحلية ووقت التنبيه</string>
+    <string name="settings_eyebrow">التذكيرات</string>
+    <string name="settings_body_title">ورد يومي هادئ وواضح</string>
+    <string name="settings_body">اختر وقتاً واحداً للتذكير اليومي، ثم فعّل الحسابات التي تريد أن يصلها التنبيه على هذا الجهاز.</string>
+    <string name="settings_permission_title">السماح بإشعارات الجهاز</string>
+    <string name="settings_permission_body">لن تصل التذكيرات اليومية إلا بعد السماح للإشعارات من إعدادات أندرويد أو من الزر التالي.</string>
+    <string name="settings_permission_action">تفعيل الإشعارات</string>
+    <string name="settings_notifications_title">التذكيرات اليومية</string>
+    <string name="settings_notifications_subtitle">تحكم عام ثم تخصيص لكل حساب</string>
     <string name="settings_global_notifications">الإشعارات العامة</string>
+    <string name="settings_global_notifications_supporting">عند إيقافها تتوقف كل التذكيرات المحلية لهذا الجهاز.</string>
     <string name="settings_motivational_messages">الرسائل التحفيزية</string>
+    <string name="settings_motivational_messages_supporting">تضيف عبارة مشجعة قصيرة إلى التذكير اليومي دون زيادة عدد الإشعارات.</string>
     <string name="settings_profile_notifications">إشعارات %1$s</string>
     <string name="settings_reminder_title">وقت التذكير</string>
     <string name="settings_reminder_current">الوقت الحالي: %1$s</string>
+    <string name="settings_reminder_supporting">يستخدم التطبيق وقتاً واحداً لكل الحسابات، ثم يطبّق تفعيل كل حساب على حدة.</string>
     <string name="settings_reminder_change">تغيير الوقت</string>
+    <string name="settings_reminder_dialog_title">اختر وقت التذكير اليومي</string>
+    <string name="settings_reminder_selected">الحالي</string>
+    <string name="settings_profiles_title">الحسابات</string>
+    <string name="settings_profiles_subtitle">الحساب الرئيسي يظهر أولاً، والحسابات الإضافية تبدأ بإشعارات متوقفة افتراضياً.</string>
+    <string name="settings_profiles_show_more">عرض %1$d حسابات أخرى</string>
+    <string name="settings_profiles_show_less">إخفاء الحسابات الإضافية (%1$d)</string>
+    <string name="settings_profile_status_active">الحساب الحالي</string>
+    <string name="settings_profile_status_self">الحساب الرئيسي</string>
+    <string name="settings_profile_status_additional">حساب إضافي</string>
+    <string name="settings_profile_schedule_ready">ستصل التذكيرات لهذا الحساب في الوقت المحدد إذا بقي مفعّلاً.</string>
+    <string name="settings_profile_schedule_missing">لن يظهر تذكير لهذا الحساب حتى تُحفظ له خطة مراجعة، لكن تفضيله سيبقى محفوظاً.</string>
     <string name="settings_account_title">الحساب</string>
     <string name="settings_toggle_account_mode">تبديل وضع الحساب</string>
+
+    <string name="reminder_channel_name">تذكيرات الورد اليومي</string>
+    <string name="reminder_channel_description">إشعارات محلية لتذكيرك بورد اليوم والحسابات المفعّلة على هذا الجهاز.</string>
+    <string name="reminder_notification_title">ورد اليوم جاهز</string>
+    <string name="reminder_notification_title_for_profile">الورد لـ %1$s</string>
+    <string name="reminder_notification_body_today">ورد اليوم جاهز للمراجعة.</string>
+    <string name="reminder_notification_body_rollover">لديك ورد مؤجل مع ورد اليوم.</string>
+    <string name="reminder_notification_body_with_motivation">%1$s
+%2$s</string>
+    <string name="reminder_motivation_line_1">ثبّت اليوم بما تيسّر ولا تثقل على نفسك.</string>
+    <string name="reminder_motivation_line_2">القليل الدائم أنفع للمراجعة من الكثير المنقطع.</string>
+    <string name="reminder_motivation_line_3">ابدأ الآن بمقطع واحد، ثم أكمل ما استطعت.</string>
 </resources>

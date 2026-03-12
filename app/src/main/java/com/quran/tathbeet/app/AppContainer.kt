@@ -47,4 +47,12 @@ open class AppContainer(
         quranCatalogRepository = quranCatalogRepository,
         timeProvider = timeProvider,
     )
+    open val localReminderScheduler: LocalReminderScheduler = AndroidLocalReminderScheduler(
+        context = appContext,
+        timeProvider = timeProvider,
+        profileRepository = profileRepository,
+        scheduleRepository = scheduleRepository,
+        settingsRepository = settingsRepository,
+        reviewRepository = reviewRepository,
+    )
 }

@@ -17,14 +17,54 @@ class SettingsRepositoryImpl(
             .map { entity ->
                 AppSettings(
                     hasSeenScheduleIntro = entity?.hasSeenScheduleIntro ?: false,
+                    globalNotificationsEnabled = entity?.globalNotificationsEnabled ?: true,
+                    motivationalMessagesEnabled = entity?.motivationalMessagesEnabled ?: true,
+                    reminderHour = entity?.reminderHour ?: DEFAULT_REMINDER_HOUR,
+                    reminderMinute = entity?.reminderMinute ?: DEFAULT_REMINDER_MINUTE,
                 )
             }
 
     override suspend fun markScheduleIntroSeen() {
-        database.appSettingsDao().upsert(
-            AppSettingsEntity(
-                hasSeenScheduleIntro = true,
-            ),
-        )
+        updateSettings { entity -> entity.copy(hasSeenScheduleIntro = true) }
+    }
+
+    override suspend fun setGlobalNotificationsEnabled(enabled: Boolean) {
+        updateSettings { entity -> entity.copy(globalNotificationsEnabled = enabled) }
+    }
+
+    override suspend fun setMotivationalMessagesEnabled(enabled: Boolean) {
+        updateSettings { entity -> entity.copy(motivationalMessagesEnabled = enabled) }
+    }
+
+    override suspend fun setReminderTime(
+        hour: Int,
+        minute: Int,
+    ) {
+        updateSettings { entity ->
+            entity.copy(
+                reminderHour = hour,
+                reminderMinute = minute,
+            )
+        }
+    }
+
+    private suspend fun updateSettings(
+        transform: (AppSettingsEntity) -> AppSettingsEntity,
+    ) {
+        val current = database.appSettingsDao().getSettings() ?: defaultEntity()
+        database.appSettingsDao().upsert(transform(current))
+    }
+
+    private fun defaultEntity() = AppSettingsEntity(
+        hasSeenScheduleIntro = false,
+        globalNotificationsEnabled = true,
+        motivationalMessagesEnabled = true,
+        reminderHour = DEFAULT_REMINDER_HOUR,
+        reminderMinute = DEFAULT_REMINDER_MINUTE,
+    )
+
+    companion object {
+        const val DEFAULT_REMINDER_HOUR = 19
+        const val DEFAULT_REMINDER_MINUTE = 0
     }
 }
