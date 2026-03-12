@@ -23,6 +23,7 @@ import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.domain.model.ReviewAssignment
 import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.ui.TathbeetApp
+import com.quran.tathbeet.ui.model.CycleTarget
 import com.quran.tathbeet.ui.model.SelectionCategory
 import com.quran.tathbeet.ui.theme.TathbeetTheme
 import java.time.LocalDate
@@ -98,6 +99,12 @@ abstract class BaseUiFlowTest {
     protected fun openRubTab() {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.selection_category_rub),
+        ).performClick()
+    }
+
+    protected fun selectCycleTarget(cycleTarget: CycleTarget) {
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(cycleTarget.labelRes),
         ).performClick()
     }
 
