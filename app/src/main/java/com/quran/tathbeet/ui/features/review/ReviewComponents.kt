@@ -86,6 +86,10 @@ fun ReviewSectionHeader(
     section: ReviewSectionUiState,
 ) {
     val sectionDone = section.tasks.all { it.isDone }
+    val sectionHeaderStyle = MaterialTheme.typography.headlineSmall.copy(
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+    )
 
     Box(
         modifier = Modifier
@@ -95,7 +99,7 @@ fun ReviewSectionHeader(
     ) {
         Text(
             text = section.title.asString(),
-            style = MaterialTheme.typography.headlineSmall,
+            style = sectionHeaderStyle,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .align(AbsoluteAlignment.TopRight),
