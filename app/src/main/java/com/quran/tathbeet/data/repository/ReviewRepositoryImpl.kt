@@ -10,6 +10,7 @@ import com.quran.tathbeet.data.local.entity.ReviewDayEntity
 import com.quran.tathbeet.domain.model.ReviewAssignment
 import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.domain.model.RevisionSchedule
+import com.quran.tathbeet.domain.model.PaceMethod
 import com.quran.tathbeet.domain.repository.QuranCatalogRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
 import com.quran.tathbeet.domain.repository.ScheduleRepository
@@ -17,6 +18,7 @@ import com.quran.tathbeet.ui.model.ReviewUnitTemplate
 import com.quran.tathbeet.ui.model.buildReviewUnits
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -200,7 +202,6 @@ class ReviewRepositoryImpl(
         }
 
         val generatedAssignments = mutableListOf<ReviewAssignmentEntity>()
-        val dailyCapacity = schedule.manualPace.dailySegments.toDouble()
         val preservedRatings = preservedRatingsByLearner[learnerId].orEmpty()
         var cursorDate = restartDate
 
@@ -208,6 +209,12 @@ class ReviewRepositoryImpl(
             val dateKey = cursorDate.toString()
             val assignmentsForDate = (existingAssignments + generatedAssignments)
                 .filter { assignment -> assignment.assignedForDate == dateKey }
+            val dailyCapacity = dailyCapacityForDate(
+                schedule = schedule,
+                restartDate = restartDate,
+                cursorDate = cursorDate,
+                remainingUnits = remainingUnits.toList(),
+            )
             val remainingCapacity = dailyCapacity - assignmentsForDate.sumOf { it.weight }
 
             if (remainingCapacity > EPSILON) {
@@ -243,6 +250,21 @@ class ReviewRepositoryImpl(
         }
 
         return generatedAssignments
+    }
+
+    private fun dailyCapacityForDate(
+        schedule: RevisionSchedule,
+        restartDate: LocalDate,
+        cursorDate: LocalDate,
+        remainingUnits: List<ReviewUnitTemplate>,
+    ): Double = when (schedule.paceMethod) {
+        PaceMethod.Manual -> schedule.manualPace.dailySegments.toDouble()
+        PaceMethod.CycleTarget -> {
+            val elapsedDays = ChronoUnit.DAYS.between(restartDate, cursorDate).toInt()
+            val remainingDays = (schedule.cycleTarget.days - elapsedDays).coerceAtLeast(1)
+            val remainingWeight = remainingUnits.sumOf { unit -> unit.weight }
+            (remainingWeight / remainingDays.toDouble()).coerceAtLeast(EPSILON)
+        }
     }
 
     private suspend fun collectPreservedRatings(learnerId: String): Map<String, Int> =

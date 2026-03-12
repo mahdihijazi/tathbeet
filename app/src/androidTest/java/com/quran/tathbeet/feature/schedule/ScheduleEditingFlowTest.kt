@@ -159,6 +159,7 @@ class ScheduleEditingFlowTest : BaseUiFlowTest() {
         openJuzTab()
         selectVisibleJuz(30)
         tapNext()
+        selectCycleTarget(com.quran.tathbeet.ui.model.CycleTarget.OneWeek)
         saveSchedule()
         assertReviewVisible()
 
@@ -172,6 +173,7 @@ class ScheduleEditingFlowTest : BaseUiFlowTest() {
         }
 
         val seededYesterday = awaitReviewDay(yesterday)
+        assertTrue(seededYesterday.assignments.size >= 2)
         val completedYesterday = seededYesterday.assignments.first()
         val overdueYesterday = seededYesterday.assignments.last()
         val completedToday = awaitTodayReviewDay().assignments.first()

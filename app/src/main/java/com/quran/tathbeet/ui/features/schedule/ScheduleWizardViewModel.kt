@@ -89,7 +89,12 @@ class ScheduleWizardViewModel(
                             selectedCycleTarget = uiCycleTarget,
                             selectedPace = uiSelectedPace,
                             segmentCount = segmentCount,
-                            cycleLength = calculateCycleLength(segmentCount, uiSelectedPace),
+                            cycleLength = calculateCycleLength(
+                                paceMethod = uiPaceMethod,
+                                cycleTarget = uiCycleTarget,
+                                segmentCount = segmentCount,
+                                pace = uiSelectedPace,
+                            ),
                         )
                     }
                 }
@@ -123,6 +128,8 @@ class ScheduleWizardViewModel(
             selectedCycleTarget = cycleTarget,
             selectedPace = recommendedPace,
             cycleLength = calculateCycleLength(
+                paceMethod = UiPaceMethod.CycleTarget,
+                cycleTarget = cycleTarget,
                 segmentCount = effectiveSegmentCount(selectedKeys),
                 pace = recommendedPace,
             ),
@@ -134,6 +141,8 @@ class ScheduleWizardViewModel(
             paceMethod = UiPaceMethod.Manual,
             selectedPace = paceOption,
             cycleLength = calculateCycleLength(
+                paceMethod = UiPaceMethod.Manual,
+                cycleTarget = _uiState.value.selectedCycleTarget,
                 segmentCount = effectiveSegmentCount(selectedKeys),
                 pace = paceOption,
             ),
@@ -187,7 +196,12 @@ class ScheduleWizardViewModel(
             selectedPool = quranCatalog.resolveSelections(selectedKeys),
             selectedPace = pace,
             segmentCount = segmentCount,
-            cycleLength = calculateCycleLength(segmentCount, pace),
+            cycleLength = calculateCycleLength(
+                paceMethod = _uiState.value.paceMethod,
+                cycleTarget = _uiState.value.selectedCycleTarget,
+                segmentCount = segmentCount,
+                pace = pace,
+            ),
         )
     }
 
@@ -213,9 +227,14 @@ class ScheduleWizardViewModel(
     }
 
     private fun calculateCycleLength(
+        paceMethod: UiPaceMethod,
+        cycleTarget: UiCycleTarget,
         segmentCount: Int,
         pace: UiPaceOption,
-    ): Int = ((segmentCount + pace.dailySegments - 1) / pace.dailySegments).coerceAtLeast(1)
+    ): Int = when (paceMethod) {
+        UiPaceMethod.CycleTarget -> cycleTarget.days
+        UiPaceMethod.Manual -> ((segmentCount + pace.dailySegments - 1) / pace.dailySegments).coerceAtLeast(1)
+    }
 }
 
 class ScheduleWizardViewModelFactory(

@@ -278,6 +278,8 @@ For cycle-based setup:
 - `1 month` should mean `30 days`
 - weeks and months should convert internally to days
 - the engine should calculate the needed daily load from real `rub-equivalent` coverage
+- the generated assignments should be spread across the full selected duration rather than front-loading early days
+- cycle-target mode should use the selected target duration as the real assignment-distribution window, not just as a rounded manual-pace recommendation
 - if the exact pace is awkward, the app should round up to the next practical pace milestone
 
 Supported manual pace milestones:
