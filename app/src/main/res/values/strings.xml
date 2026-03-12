@@ -288,7 +288,7 @@
     <string name="settings_global_notifications">الإشعارات العامة</string>
     <string name="settings_global_notifications_supporting">عند إيقافها تتوقف كل التذكيرات المحلية لهذا الجهاز.</string>
     <string name="settings_motivational_messages">الرسائل التحفيزية</string>
-    <string name="settings_motivational_messages_supporting">تضيف عبارة مشجعة قصيرة إلى التذكير اليومي دون زيادة عدد الإشعارات.</string>
+    <string name="settings_motivational_messages_supporting">تضيف حديثًا صحيحًا قصيرًا عن القرآن إلى التذكير اليومي دون زيادة عدد الإشعارات.</string>
     <string name="settings_profile_notifications">إشعارات %1$s</string>
     <string name="settings_reminder_title">وقت التذكير</string>
     <string name="settings_reminder_current">الوقت الحالي: %1$s</string>
@@ -315,8 +315,20 @@
     <string name="reminder_notification_body_today">ورد اليوم جاهز للمراجعة.</string>
     <string name="reminder_notification_body_rollover">لديك ورد مؤجل مع ورد اليوم.</string>
     <string name="reminder_notification_body_with_motivation">%1$s
-%2$s</string>
-    <string name="reminder_motivation_line_1">ثبّت اليوم بما تيسّر ولا تثقل على نفسك.</string>
-    <string name="reminder_motivation_line_2">القليل الدائم أنفع للمراجعة من الكثير المنقطع.</string>
-    <string name="reminder_motivation_line_3">ابدأ الآن بمقطع واحد، ثم أكمل ما استطعت.</string>
+%2$s
+%3$s</string>
+    <string name="reminder_hadith_notification_1_text">إِنَّمَا مَثَلُ صَاحِبِ الْقُرْآنِ كَمَثَلِ صَاحِبِ الْإِبِلِ الْمُعَقَّلَةِ، إِنْ عَاهَدَ عَلَيْهَا أَمْسَكَهَا، وَإِنْ أَطْلَقَهَا ذَهَبَتْ.</string>
+    <string name="reminder_hadith_notification_1_source">صحيح البخاري 5031</string>
+    <string name="reminder_hadith_notification_2_text">تَعَاهَدُوا الْقُرْآنَ، فَوَالَّذِي نَفْسِي بِيَدِهِ لَهُوَ أَشَدُّ تَفَصِّيًا مِنَ الْإِبِلِ فِي عُقُلِهَا.</string>
+    <string name="reminder_hadith_notification_2_source">صحيح البخاري 5033</string>
+    <string name="reminder_hadith_notification_3_text">الْمَاهِرُ بِالْقُرْآنِ مَعَ السَّفَرَةِ الْكِرَامِ الْبَرَرَةِ، وَالَّذِي يَقْرَأُ الْقُرْآنَ وَيَتَتَعْتَعُ فِيهِ وَهُوَ عَلَيْهِ شَاقٌّ لَهُ أَجْرَانِ.</string>
+    <string name="reminder_hadith_notification_3_source">صحيح مسلم 798a</string>
+    <string name="reminder_hadith_notification_4_text">إِنَّ اللَّهَ يَرْفَعُ بِهَذَا الْكِتَابِ أَقْوَامًا، وَيَضَعُ بِهِ آخَرِينَ.</string>
+    <string name="reminder_hadith_notification_4_source">صحيح مسلم 817a</string>
+    <string name="reminder_hadith_card_1_text">بِئْسَمَا لِأَحَدِهِمْ أَنْ يَقُولَ: نَسِيتُ آيَةَ كَيْتَ وَكَيْتَ، بَلْ هُوَ نُسِّيَ، اسْتَذْكِرُوا الْقُرْآنَ، فَلَهُوَ أَشَدُّ تَفَصِّيًا مِنْ صُدُورِ الرِّجَالِ مِنَ النَّعَمِ بِعُقُلِهَا.</string>
+    <string name="reminder_hadith_card_1_source">صحيح مسلم 790a</string>
+    <string name="reminder_hadith_card_2_text">اقْرَؤُوا الْقُرْآنَ؛ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لِأَصْحَابِهِ، اقْرَؤُوا الزَّهْرَاوَيْنِ: الْبَقَرَةَ وَسُورَةَ آلِ عِمْرَانَ، فَإِنَّهُمَا تَأْتِيَانِ يَوْمَ الْقِيَامَةِ كَأَنَّهُمَا غَمَامَتَانِ أَوْ كَأَنَّهُمَا غَيَايَتَانِ أَوْ كَأَنَّهُمَا فِرْقَانِ مِنْ طَيْرٍ صَوَافَّ، تُحَاجَّانِ عَنْ أَصْحَابِهِمَا، اقْرَؤُوا سُورَةَ الْبَقَرَةِ، فَإِنَّ أَخْذَهَا بَرَكَةٌ، وَتَرْكَهَا حَسْرَةٌ، وَلَا تَسْتَطِيعُهَا الْبَطَلَةُ.</string>
+    <string name="reminder_hadith_card_2_source">صحيح مسلم 804a</string>
+    <string name="reminder_hadith_card_3_text">مَثَلُ الْمُؤْمِنِ الَّذِي يَقْرَأُ الْقُرْآنَ كَمَثَلِ الْأُتْرُجَّةِ، رِيحُهَا طَيِّبٌ وَطَعْمُهَا طَيِّبٌ، وَمَثَلُ الْمُؤْمِنِ الَّذِي لَا يَقْرَأُ الْقُرْآنَ كَمَثَلِ التَّمْرَةِ، لَا رِيحَ لَهَا وَطَعْمُهَا حُلْوٌ، وَمَثَلُ الْمُنَافِقِ الَّذِي يَقْرَأُ الْقُرْآنَ كَمَثَلِ الرَّيْحَانَةِ، رِيحُهَا طَيِّبٌ وَطَعْمُهَا مُرٌّ، وَمَثَلُ الْمُنَافِقِ الَّذِي لَا يَقْرَأُ الْقُرْآنَ كَمَثَلِ الْحَنْظَلَةِ، لَيْسَ لَهَا رِيحٌ وَطَعْمُهَا مُرٌّ.</string>
+    <string name="reminder_hadith_card_3_source">صحيح البخاري 5427</string>
 </resources>

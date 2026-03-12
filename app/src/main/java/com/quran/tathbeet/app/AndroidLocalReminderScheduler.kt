@@ -154,18 +154,12 @@ class AndroidLocalReminderScheduler(
             return baseBody
         }
 
-        val motivationalLines = listOf(
-            R.string.reminder_motivation_line_1,
-            R.string.reminder_motivation_line_2,
-            R.string.reminder_motivation_line_3,
-        )
-        val line = appContext.getString(
-            motivationalLines[timeProvider.today().dayOfYear % motivationalLines.size],
-        )
+        val hadith = ReminderHadithCatalog.notificationEntryFor(timeProvider.today().dayOfYear)
         return appContext.getString(
             R.string.reminder_notification_body_with_motivation,
             baseBody,
-            line,
+            appContext.getString(hadith.textResId),
+            appContext.getString(hadith.sourceResId),
         )
     }
 
