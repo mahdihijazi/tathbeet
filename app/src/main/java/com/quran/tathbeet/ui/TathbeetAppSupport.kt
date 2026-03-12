@@ -1,0 +1,145 @@
+package com.quran.tathbeet.ui
+
+import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import com.quran.tathbeet.R
+import com.quran.tathbeet.app.AppContainer
+import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModelFactory
+import com.quran.tathbeet.ui.model.AccountMode
+import com.quran.tathbeet.ui.model.AppDestination
+import com.quran.tathbeet.ui.model.AppUiState
+import com.quran.tathbeet.ui.model.Guardian
+import com.quran.tathbeet.ui.model.SyncState
+import com.quran.tathbeet.ui.model.TextSpec
+import com.quran.tathbeet.ui.model.activeProfile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
+
+internal const val RouteLaunch = "launch"
+internal const val RouteScheduleGraph = "schedule_graph"
+internal const val RouteScheduleIntro = "schedule_intro"
+internal const val RoutePoolSelector = "pool_selector"
+internal const val RouteScheduleDose = "schedule_dose"
+internal const val RouteReview = "review"
+internal const val RouteProfiles = "profiles"
+internal const val RouteProgress = "progress"
+internal const val RouteSettings = "settings"
+internal const val RouteShared = "shared"
+
+@Composable
+internal fun LaunchRoute(
+    appContainer: AppContainer,
+    onNavigate: (String) -> Unit,
+) {
+    LaunchedEffect(appContainer) {
+        val settings = appContainer.settingsRepository.observeSettings().first()
+        val account = appContainer.profileRepository.observeActiveAccount().filterNotNull().first()
+        val schedule = appContainer.scheduleRepository.observeActiveSchedule(account.id).first()
+        val route = when {
+            schedule != null -> RouteReview
+            settings.hasSeenScheduleIntro -> RoutePoolSelector
+            else -> RouteScheduleIntro
+        }
+        withContext(Dispatchers.Main.immediate) {
+            onNavigate(route)
+        }
+    }
+}
+
+internal fun scheduleWizardViewModelFactory(
+    appContainer: AppContainer,
+) = ScheduleWizardViewModelFactory(
+    profileRepository = appContainer.profileRepository,
+    scheduleRepository = appContainer.scheduleRepository,
+    reviewRepository = appContainer.reviewRepository,
+    settingsRepository = appContainer.settingsRepository,
+    quranCatalogRepository = appContainer.quranCatalogRepository,
+    revisionPlanner = appContainer.revisionPlanner,
+    timeProvider = appContainer.timeProvider,
+)
+
+internal fun NavHostController.navigateMain(route: String) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+internal fun AppDestination.toRoute(): String = when (this) {
+    AppDestination.Profiles -> RouteProfiles
+    AppDestination.ScheduleIntro -> RouteScheduleIntro
+    AppDestination.PoolSelector -> RoutePoolSelector
+    AppDestination.ScheduleDose -> RouteScheduleDose
+    AppDestination.Review -> RouteReview
+    AppDestination.Progress -> RouteProgress
+    AppDestination.Shared -> RouteShared
+    AppDestination.Settings -> RouteSettings
+}
+
+internal fun String?.toAppDestination(): AppDestination = when (this) {
+    RouteProfiles -> AppDestination.Profiles
+    RouteScheduleIntro -> AppDestination.ScheduleIntro
+    RoutePoolSelector -> AppDestination.PoolSelector
+    RouteScheduleDose -> AppDestination.ScheduleDose
+    RouteProgress -> AppDestination.Progress
+    RouteShared -> AppDestination.Shared
+    RouteSettings -> AppDestination.Settings
+    else -> AppDestination.Review
+}
+
+internal fun AppUiState.addProfile(): AppUiState {
+    val nextName = listOf(
+        TextSpec(R.string.profile_name_hafsah),
+        TextSpec(R.string.profile_name_ibrahim),
+        TextSpec(R.string.profile_name_zaynab),
+        TextSpec(R.string.profile_name_abdullah),
+    ).getOrElse(extraProfileCount) {
+        TextSpec(R.string.profile_name_child_generic, listOf(extraProfileCount + 1))
+    }
+    val newProfileId = "child-$extraProfileCount"
+    val newProfile = activeProfile.copy(
+        id = newProfileId,
+        name = nextName,
+        isSelfProfile = false,
+        isShared = false,
+        guardians = setOf(Guardian.Mother),
+        notificationsEnabled = true,
+        activityFeed = listOf(
+            TextSpec(R.string.feed_new_child_created, listOf(nextName)),
+            TextSpec(R.string.feed_new_child_next_step),
+        ),
+    )
+    return copy(
+        profiles = profiles + newProfile,
+        activeProfileId = newProfileId,
+        extraProfileCount = extraProfileCount + 1,
+        destination = AppDestination.PoolSelector,
+        scheduleReturnDestination = AppDestination.Profiles,
+    )
+}
+
+internal fun TextSpec.resolve(context: Context): String =
+    rawText ?: context.getString(resId!!, *formatArgs.map { arg ->
+        when (arg) {
+            is TextSpec -> arg.resolve(context)
+            else -> arg
+        }
+    }.toTypedArray())
+
+internal fun AppUiState.toggleAccountMode(): AppUiState =
+    copy(
+        accountMode = if (accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
+        syncState = if (accountMode == AccountMode.Guest) {
+            SyncState.Synced
+        } else {
+            SyncState.OfflineReady
+        },
+    )

@@ -11,6 +11,7 @@ data class ReviewAssignment(
     val title: String,
     val detail: String,
     val rubId: Int,
+    val readingTarget: QuranReadingTarget?,
     val weight: Double,
     val displayOrder: Int,
     val isRollover: Boolean,

@@ -131,6 +131,10 @@ class ReviewTaskGenerationFlowTest : BaseUiFlowTest() {
                         assignedForDate = tomorrowKey,
                         taskKey = "segment-239-100-1-100-8",
                         rubId = 239,
+                        startSurahId = 100,
+                        startAyah = 1,
+                        endSurahId = 100,
+                        endAyah = 8,
                         title = composeRule.activity.getString(
                             R.string.quran_range_single_surah,
                             "العاديات",
@@ -152,6 +156,10 @@ class ReviewTaskGenerationFlowTest : BaseUiFlowTest() {
                         assignedForDate = tomorrowKey,
                         taskKey = "segment-240-100-9-100-11",
                         rubId = 240,
+                        startSurahId = 100,
+                        startAyah = 9,
+                        endSurahId = 100,
+                        endAyah = 11,
                         title = composeRule.activity.getString(
                             R.string.quran_range_single_surah,
                             "العاديات",

@@ -118,6 +118,7 @@ Core schedule and review functionality must work offline:
 - create and edit a schedule
 - view today’s review tasks
 - mark tasks as completed
+- launch the assigned Quran portion in an external reader if one is installed locally
 - view completion rate
 - manage notification settings already stored on device
 
@@ -127,6 +128,7 @@ Internet is only required for:
 - cloud sync
 - shared profile collaboration across devices
 - remote push delivery where applicable
+- opening a web fallback for Quran reading when no supported Quran app is installed
 
 ### 7.2 Account Model
 
@@ -444,6 +446,8 @@ The data model should support shared ownership and conflict-safe synchronization
 - tomorrow should be labeled `ورد الغد`
 - days after tomorrow should use explicit date labels
 - once the full current cycle is complete, the user should be offered an explicit action to restart the cycle and begin again from the start
+- the review screen top app bar should also allow the user to reset the current cycle at any time
+- resetting the current cycle is destructive and must show a warning confirmation before removing current-cycle progress
 - the review screen should show a compact top progress summary card for today’s work scope
 - that top summary should count:
   - carried-over overdue work
@@ -467,9 +471,15 @@ The data model should support shared ownership and conflict-safe synchronization
 - review should support three categories of work:
   - carried-over work from previous days
   - current day assignments
-  - future dated assignments already visible inline through the end of the current cycle
+- future dated assignments already visible inline through the end of the current cycle
 - the review screen should stay structurally simple: compact top summary and a unified task list separated by section headers
+- each task row should include a secondary action to open that exact Quran range in an external reader
+- if Quran for Android is installed, tapping that action should open the task directly with a `quran://surah/ayah` deep link
+- if Quran for Android is not installed, the app should show a dialog offering:
+  - install Quran for Android from the Play Store
+  - open the same range on `quran.com` in the system browser
 - editing the revision plan should be available from the review screen top app bar rather than from the review body
+- cycle reset should also be available from the review screen top app bar as a separate action from editing the plan
 - saving an edited revision plan should rebuild the active visible review cycle from the updated pool so the review list reflects the latest selections immediately
 
 ### 13.4 Offline Behavior

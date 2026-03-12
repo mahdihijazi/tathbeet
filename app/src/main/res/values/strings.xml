@@ -15,6 +15,7 @@
     <string name="content_create_account">إنشاء حساب</string>
     <string name="content_account_active">الحساب مفعّل</string>
     <string name="content_edit_plan">تعديل الخطة</string>
+    <string name="content_reset_cycle">إعادة الدورة من البداية</string>
     <string name="action_next">التالي</string>
     <string name="action_close">إغلاق</string>
     <string name="wizard_step_counter">الخطوة %1$d من %2$d</string>
@@ -197,7 +198,16 @@
     <string name="review_cycle_complete_body">أنهيت جميع مهام هذه الدورة. يمكنك بدء دورة جديدة من البداية.</string>
     <string name="review_cycle_restart">ابدأ دورة جديدة</string>
     <string name="review_cycle_dismiss">لاحقاً</string>
+    <string name="review_cycle_reset_title">إعادة الدورة الحالية</string>
+    <string name="review_cycle_reset_body">سيؤدي هذا إلى حذف تقدمك في الدورة الحالية والبدء من أولها من جديد. هل تريد المتابعة؟</string>
+    <string name="review_cycle_reset_confirm">إعادة الدورة</string>
+    <string name="review_cycle_reset_cancel">إلغاء</string>
     <string name="review_mark_done">أنهيت المراجعة</string>
+    <string name="review_open_in_quran">فتح المقطع في تطبيق قراءة</string>
+    <string name="review_external_quran_dialog_title">فتح المقطع خارج التطبيق</string>
+    <string name="review_external_quran_dialog_body">لم يتم العثور على تطبيق القرآن على هذا الجهاز. يمكنك تثبيته أو فتح المقطع في المتصفح.</string>
+    <string name="review_external_quran_install_action">تثبيت التطبيق</string>
+    <string name="review_external_quran_web_action">فتح في المتصفح</string>
     <string name="review_edit_rating">تعديل التقييم</string>
     <string name="review_rating_dialog_title">قيّم درجة حفظك</string>
     <string name="review_rating_value">%1$d/5</string>

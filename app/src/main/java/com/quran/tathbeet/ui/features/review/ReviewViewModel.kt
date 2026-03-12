@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.quran.tathbeet.R
+import com.quran.tathbeet.app.QuranExternalLauncher
+import com.quran.tathbeet.app.QuranLaunchResult
 import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.domain.model.ReviewAssignment
 import com.quran.tathbeet.domain.model.ReviewDay
@@ -24,6 +26,7 @@ class ReviewViewModel(
     private val profileRepository: ProfileRepository,
     private val reviewRepository: ReviewRepository,
     private val timeProvider: TimeProvider,
+    private val quranExternalLauncher: QuranExternalLauncher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReviewUiState())
@@ -31,8 +34,10 @@ class ReviewViewModel(
 
     private var currentLearnerId: String? = null
     private var timeline: List<ReviewDay> = emptyList()
+    private var showCycleResetWarningDialog: Boolean = false
     private var showCycleResetDialog: Boolean = false
     private var cycleResetDialogDismissed: Boolean = false
+    private var externalQuranDialog: ReviewExternalQuranDialogUiState? = null
 
     init {
         viewModelScope.launch {
@@ -40,8 +45,10 @@ class ReviewViewModel(
                 .filterNotNull()
                 .collectLatest { account ->
                     currentLearnerId = account.id
+                    showCycleResetWarningDialog = false
                     showCycleResetDialog = false
                     cycleResetDialogDismissed = false
+                    externalQuranDialog = null
                     reviewRepository.ensureAssignmentsForDate(
                         learnerId = account.id,
                         assignedForDate = timeProvider.today(),
@@ -74,9 +81,43 @@ class ReviewViewModel(
         }
     }
 
+    fun launchTaskReading(taskId: String) {
+        val task = allAssignments().firstOrNull { it.id == taskId } ?: return
+        val readingTarget = task.readingTarget ?: return
+        when (quranExternalLauncher.openReadingTarget(readingTarget)) {
+            QuranLaunchResult.LaunchedInApp -> {
+                externalQuranDialog = null
+                publishUiState()
+            }
+            QuranLaunchResult.ShowFallbackOptions -> {
+                externalQuranDialog = ReviewExternalQuranDialogUiState(
+                    taskTitle = TextSpec(rawText = task.title),
+                    target = readingTarget,
+                )
+                publishUiState()
+            }
+        }
+    }
+
+    fun dismissExternalQuranDialog() {
+        externalQuranDialog = null
+        publishUiState()
+    }
+
+    fun openQuranAndroidInstall() {
+        quranExternalLauncher.openQuranAndroidInstallPage()
+        dismissExternalQuranDialog()
+    }
+
+    fun openQuranOnWeb() {
+        externalQuranDialog?.target?.let(quranExternalLauncher::openReadingTargetOnWeb)
+        dismissExternalQuranDialog()
+    }
+
     fun restartCycle() {
         val learnerId = currentLearnerId ?: return
         viewModelScope.launch {
+            showCycleResetWarningDialog = false
             showCycleResetDialog = false
             cycleResetDialogDismissed = false
             reviewRepository.restartCycle(
@@ -84,6 +125,16 @@ class ReviewViewModel(
                 restartDate = timeProvider.today(),
             )
         }
+    }
+
+    fun requestCycleReset() {
+        showCycleResetWarningDialog = true
+        publishUiState()
+    }
+
+    fun dismissCycleResetWarning() {
+        showCycleResetWarningDialog = false
+        publishUiState()
     }
 
     fun dismissCycleResetDialog() {
@@ -149,7 +200,9 @@ class ReviewViewModel(
                 progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
             ),
             sections = visibleSections,
+            showCycleResetWarningDialog = showCycleResetWarningDialog,
             showCycleResetDialog = showCycleResetDialog,
+            externalQuranDialog = externalQuranDialog,
         )
     }
 
@@ -159,7 +212,11 @@ class ReviewViewModel(
     ): TextSpec = when (date) {
         today -> TextSpec(R.string.review_section_today_title)
         today.plusDays(1) -> TextSpec(R.string.review_section_next_title)
-        else -> TextSpec(rawText = date.format(DateTimeFormatter.ofPattern("d MMMM", Locale("ar"))))
+        else -> TextSpec(
+            rawText = date.format(
+                DateTimeFormatter.ofPattern("d MMMM", Locale.forLanguageTag("ar")),
+            ),
+        )
     }
 
     private fun sectionStatusFor(assignments: List<ReviewAssignment>): TextSpec =
@@ -180,6 +237,7 @@ class ReviewViewModel(
             rating = rating,
             defaultRating = rating ?: 3,
             weight = weight,
+            readingTarget = readingTarget,
         )
 
     private fun allAssignments(): List<ReviewAssignment> =
@@ -195,6 +253,7 @@ class ReviewViewModelFactory(
     private val profileRepository: ProfileRepository,
     private val reviewRepository: ReviewRepository,
     private val timeProvider: TimeProvider,
+    private val quranExternalLauncher: QuranExternalLauncher,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ReviewViewModel::class.java)) {
@@ -203,6 +262,7 @@ class ReviewViewModelFactory(
                 profileRepository = profileRepository,
                 reviewRepository = reviewRepository,
                 timeProvider = timeProvider,
+                quranExternalLauncher = quranExternalLauncher,
             ) as T
         }
         error("Unknown ViewModel class: ${modelClass.name}")

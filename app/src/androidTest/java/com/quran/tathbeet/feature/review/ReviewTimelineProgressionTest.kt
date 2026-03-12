@@ -3,6 +3,7 @@ package com.quran.tathbeet.feature.review
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -74,12 +75,47 @@ class ReviewTimelineProgressionTest : BaseUiFlowTest() {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.review_section_today_title),
         ).assertIsDisplayed()
-        composeRule.onNodeWithTag("review-sections-list").performScrollToNode(
-            hasText(composeRule.activity.getString(R.string.review_section_next_title)),
-        )
+
+        val restartedToday = awaitTodayReviewDay()
+        val restartedAssignment = restartedToday.assignments.first()
+        scrollReviewListToTag("review-task-${restartedAssignment.id}")
+        composeRule.onNodeWithTag("review-task-${restartedAssignment.id}").assertIsDisplayed()
+        composeRule.onNodeWithTag("review-complete-${restartedAssignment.id}").assertIsDisplayed()
+    }
+
+    @Test
+    fun reset_cycle_from_toolbar_requires_confirmation_and_resets_progress() {
+        completeOnboardingWithJuzOne()
+        assertReviewVisible()
+
+        val initialAssignment = awaitTodayReviewDay().assignments.first()
+        completeReviewTask(initialAssignment.id, rating = 4)
+
+        composeRule.onNodeWithContentDescription(
+            composeRule.activity.getString(R.string.content_reset_cycle),
+        ).performClick()
+
         composeRule.onNodeWithText(
-            composeRule.activity.getString(R.string.review_section_next_title),
+            composeRule.activity.getString(R.string.review_cycle_reset_title),
         ).assertIsDisplayed()
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.review_cycle_reset_cancel),
+        ).performClick()
+
+        composeRule.onNodeWithTag("review-completed-rating-${initialAssignment.id}-4").assertIsDisplayed()
+
+        composeRule.onNodeWithContentDescription(
+            composeRule.activity.getString(R.string.content_reset_cycle),
+        ).performClick()
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.review_cycle_reset_confirm),
+        ).performClick()
+
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(
+                composeRule.activity.getString(R.string.review_cycle_reset_title),
+            ).fetchSemanticsNodes().isEmpty()
+        }
 
         val restartedToday = awaitTodayReviewDay()
         val restartedAssignment = restartedToday.assignments.first()

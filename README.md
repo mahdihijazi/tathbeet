@@ -9,6 +9,7 @@ The core idea is:
 - the app builds a rotating daily review plan
 - the app sends reminders and motivational notifications
 - the app works offline for core review and schedule tracking
+- each review task can jump straight into an external Quran reader
 - the app supports multiple local profiles, such as one user managing multiple learners in a family or class
 
 ## Product Direction
@@ -32,6 +33,7 @@ The MVP supports:
 
 - Android app with Arabic-first RTL UX and English support
 - offline-first core flows for creating schedules, viewing daily tasks, and marking revision progress
+- external Quran launch from each task row, with direct app opening first and browser fallback if needed
 - optional account creation using Google sign-in
 - use without an account
 - local profiles for multiple users on one device
@@ -152,6 +154,7 @@ The current app build is:
 - loads the selector data from the Quran assets under `app/src/main/assets/quran`
 - shows real lists for all four tabs: surahs, juzs, hizbs, and rub al-hizb
 - generates fake review tasks from those real selections so the prototype feels closer to the final product
+- keeps exact task start/end ayah references so review rows can open Quran for Android directly or fall back to `quran.com`
 - reveals future review days inline as the current visible work is completed
 - offers an explicit restart action when the visible cycle is finished
 - keeps strings in Android XML resources instead of hardcoded Kotlin literals

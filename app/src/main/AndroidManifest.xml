@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <queries>
+        <package android:name="com.quran.labs.androidquran" />
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="quran" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/tathbeet_logo"

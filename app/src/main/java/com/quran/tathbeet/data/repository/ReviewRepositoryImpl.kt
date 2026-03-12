@@ -11,6 +11,7 @@ import com.quran.tathbeet.domain.model.ReviewAssignment
 import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.domain.model.RevisionSchedule
 import com.quran.tathbeet.domain.model.PaceMethod
+import com.quran.tathbeet.domain.model.QuranReadingTarget
 import com.quran.tathbeet.domain.repository.QuranCatalogRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
 import com.quran.tathbeet.domain.repository.ScheduleRepository
@@ -234,6 +235,10 @@ class ReviewRepositoryImpl(
                             assignedForDate = dateKey,
                             taskKey = unit.id,
                             rubId = unit.rubId,
+                            startSurahId = unit.start.surahId,
+                            startAyah = unit.start.ayah,
+                            endSurahId = unit.end.surahId,
+                            endAyah = unit.end.ayah,
                             title = unit.title,
                             detail = unit.detail,
                             weight = unit.weight,
@@ -312,6 +317,7 @@ class ReviewRepositoryImpl(
             title = title,
             detail = normalizeDetail(quranCatalog),
             rubId = rubId,
+            readingTarget = readingTarget(),
             weight = weight,
             displayOrder = displayOrder,
             isRollover = isRollover,
@@ -319,6 +325,19 @@ class ReviewRepositoryImpl(
             rating = rating,
             completedAt = completedAt?.let(ZonedDateTime::parse),
         )
+
+    private fun ReviewAssignmentEntity.readingTarget(): QuranReadingTarget? {
+        val resolvedStartSurahId = startSurahId ?: return null
+        val resolvedStartAyah = startAyah ?: return null
+        val resolvedEndSurahId = endSurahId ?: return null
+        val resolvedEndAyah = endAyah ?: return null
+        return QuranReadingTarget(
+            startSurahId = resolvedStartSurahId,
+            startAyah = resolvedStartAyah,
+            endSurahId = resolvedEndSurahId,
+            endAyah = resolvedEndAyah,
+        )
+    }
 
     private fun ReviewAssignmentEntity.normalizeDetail(
         quranCatalog: com.quran.tathbeet.ui.model.QuranCatalog,

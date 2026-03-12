@@ -16,8 +16,13 @@ fun ReviewScreen(
     uiState: ReviewUiState,
     onRequestTaskCompletion: (String) -> Unit,
     onUpdateTaskRating: (String, Int) -> Unit,
+    onLaunchTaskReading: (String) -> Unit,
     onRestartCycle: () -> Unit,
+    onDismissCycleResetWarning: () -> Unit,
     onDismissCycleResetDialog: () -> Unit,
+    onDismissExternalQuranDialog: () -> Unit,
+    onOpenQuranAndroidInstall: () -> Unit,
+    onOpenQuranOnWeb: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -47,6 +52,7 @@ fun ReviewScreen(
                     task = task,
                     onCompleteReview = { onRequestTaskCompletion(task.id) },
                     onUpdateRating = { rating -> onUpdateTaskRating(task.id, rating) },
+                    onLaunchTaskReading = { onLaunchTaskReading(task.id) },
                 )
             }
         }
@@ -56,6 +62,22 @@ fun ReviewScreen(
         ReviewCycleCompleteDialog(
             onRestartCycle = onRestartCycle,
             onDismiss = onDismissCycleResetDialog,
+        )
+    }
+
+    if (uiState.showCycleResetWarningDialog) {
+        ReviewCycleResetWarningDialog(
+            onConfirm = onRestartCycle,
+            onDismiss = onDismissCycleResetWarning,
+        )
+    }
+
+    uiState.externalQuranDialog?.let { dialog ->
+        ReviewExternalQuranDialog(
+            dialog = dialog,
+            onDismiss = onDismissExternalQuranDialog,
+            onInstallQuranAndroid = onOpenQuranAndroidInstall,
+            onOpenOnWeb = onOpenQuranOnWeb,
         )
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,6 +41,7 @@ fun AppShell(
     onNavigate: (AppDestination) -> Unit,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
+    onReviewResetAction: () -> Unit,
     snackbarHost: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -52,6 +54,7 @@ fun AppShell(
                         currentDestination = currentDestination,
                         onBack = onBack,
                         onReviewPlanAction = onReviewPlanAction,
+                        onReviewResetAction = onReviewResetAction,
                     )
                 }
             },
@@ -89,6 +92,7 @@ private fun AppTopBar(
     currentDestination: AppDestination,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
+    onReviewResetAction: () -> Unit,
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -114,6 +118,12 @@ private fun AppTopBar(
         },
         actions = {
             if (currentDestination == AppDestination.Review) {
+                IconButton(onClick = onReviewResetAction) {
+                    Icon(
+                        imageVector = Icons.Outlined.Refresh,
+                        contentDescription = stringResource(R.string.content_reset_cycle),
+                    )
+                }
                 IconButton(onClick = onReviewPlanAction) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,

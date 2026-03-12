@@ -107,6 +107,7 @@ fun ReviewTaskRowCompletedScreenshot() {
             task = ReviewMockFactory.initialState().toUiState().sections[1].tasks[0],
             onCompleteReview = {},
             onUpdateRating = {},
+            onLaunchTaskReading = {},
         )
     }
 }
@@ -126,6 +127,7 @@ fun ReviewTaskRowPendingScreenshot() {
             task = ReviewMockFactory.initialState().toUiState().sections[2].tasks[0],
             onCompleteReview = {},
             onUpdateRating = {},
+            onLaunchTaskReading = {},
         )
     }
 }
@@ -152,6 +154,7 @@ fun ReviewTaskRowCompletedDefaultRatingScreenshot() {
             ),
             onCompleteReview = {},
             onUpdateRating = {},
+            onLaunchTaskReading = {},
         )
     }
 }
@@ -169,6 +172,24 @@ fun ReviewCycleCompleteDialogScreenshot() {
     ReviewScreenshotBox {
         ReviewCycleCompleteDialog(
             onRestartCycle = {},
+            onDismiss = {},
+        )
+    }
+}
+
+@PreviewTest
+@Preview(
+    name = "review_cycle_reset_warning_dialog",
+    locale = "ar",
+    widthDp = ReviewPreviewWidth,
+    heightDp = 320,
+    showBackground = true,
+)
+@Composable
+fun ReviewCycleResetWarningDialogScreenshot() {
+    ReviewScreenshotBox {
+        ReviewCycleResetWarningDialog(
+            onConfirm = {},
             onDismiss = {},
         )
     }

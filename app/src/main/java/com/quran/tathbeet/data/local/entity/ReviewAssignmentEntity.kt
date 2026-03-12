@@ -18,6 +18,14 @@ data class ReviewAssignmentEntity(
     val taskKey: String,
     @ColumnInfo(name = "rub_id")
     val rubId: Int,
+    @ColumnInfo(name = "start_surah_id")
+    val startSurahId: Int?,
+    @ColumnInfo(name = "start_ayah")
+    val startAyah: Int?,
+    @ColumnInfo(name = "end_surah_id")
+    val endSurahId: Int?,
+    @ColumnInfo(name = "end_ayah")
+    val endAyah: Int?,
     val title: String,
     val detail: String,
     val weight: Double,

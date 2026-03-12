@@ -17,6 +17,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -27,7 +28,9 @@ import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -113,6 +116,7 @@ fun ReviewTaskRow(
     task: ReviewTaskUiState,
     onCompleteReview: () -> Unit,
     onUpdateRating: (Int) -> Unit,
+    onLaunchTaskReading: () -> Unit,
 ) {
     val taskTitle = task.title.asString()
 
@@ -149,29 +153,46 @@ fun ReviewTaskRow(
                     )
                 }
             }
-            if (task.isDone) {
-                Icon(
-                    imageVector = Icons.Outlined.CheckCircle,
-                    contentDescription = taskTitle,
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            } else {
-                OutlinedButton(
-                    onClick = onCompleteReview,
-                    modifier = Modifier.testTag("review-complete-${task.id}"),
-                    shape = RoundedCornerShape(TathbeetTokens.radii.pill),
-                    contentPadding = PaddingValues(
-                        horizontal = TathbeetTokens.spacing.x2,
-                        vertical = TathbeetTokens.spacing.x1,
-                    ),
-                    border = ButtonDefaults.outlinedButtonBorder(),
-                ) {
-                    Text(
-                        text = stringResource(R.string.review_mark_done),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                task.readingTarget?.let {
+                    IconButton(
+                        onClick = onLaunchTaskReading,
+                        modifier = Modifier.testTag("review-launch-${task.id}"),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.mipmap.ic_review_open_quran),
+                            contentDescription = stringResource(R.string.review_open_in_quran),
+                            tint = Color.Unspecified,
+                        )
+                    }
+                }
+                if (task.isDone) {
+                    Icon(
+                        imageVector = Icons.Outlined.CheckCircle,
+                        contentDescription = taskTitle,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
+                } else {
+                    OutlinedButton(
+                        onClick = onCompleteReview,
+                        modifier = Modifier.testTag("review-complete-${task.id}"),
+                        shape = RoundedCornerShape(TathbeetTokens.radii.pill),
+                        contentPadding = PaddingValues(
+                            horizontal = TathbeetTokens.spacing.x2,
+                            vertical = TathbeetTokens.spacing.x1,
+                        ),
+                        border = ButtonDefaults.outlinedButtonBorder(),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.review_mark_done),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                 }
             }
         }
@@ -231,22 +252,93 @@ fun ReviewCycleCompleteDialog(
     onRestartCycle: () -> Unit,
     onDismiss: () -> Unit,
 ) {
+    ReviewConfirmationDialog(
+        titleRes = R.string.review_cycle_complete_title,
+        bodyRes = R.string.review_cycle_complete_body,
+        confirmRes = R.string.review_cycle_restart,
+        dismissRes = R.string.review_cycle_dismiss,
+        onConfirm = onRestartCycle,
+        onDismiss = onDismiss,
+    )
+}
+
+@Composable
+fun ReviewCycleResetWarningDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ReviewConfirmationDialog(
+        titleRes = R.string.review_cycle_reset_title,
+        bodyRes = R.string.review_cycle_reset_body,
+        confirmRes = R.string.review_cycle_reset_confirm,
+        dismissRes = R.string.review_cycle_reset_cancel,
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+    )
+}
+
+@Composable
+private fun ReviewConfirmationDialog(
+    titleRes: Int,
+    bodyRes: Int,
+    confirmRes: Int,
+    dismissRes: Int,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = stringResource(R.string.review_cycle_complete_title))
+            Text(text = stringResource(titleRes))
         },
         text = {
-            Text(text = stringResource(R.string.review_cycle_complete_body))
+            Text(text = stringResource(bodyRes))
         },
         confirmButton = {
-            TextButton(onClick = onRestartCycle) {
-                Text(text = stringResource(R.string.review_cycle_restart))
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(confirmRes))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.review_cycle_dismiss))
+                Text(text = stringResource(dismissRes))
+            }
+        },
+    )
+}
+
+@Composable
+fun ReviewExternalQuranDialog(
+    dialog: ReviewExternalQuranDialogUiState,
+    onDismiss: () -> Unit,
+    onInstallQuranAndroid: () -> Unit,
+    onOpenOnWeb: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = stringResource(R.string.review_external_quran_dialog_title))
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+            ) {
+                Text(text = stringResource(R.string.review_external_quran_dialog_body))
+                Text(
+                    text = dialog.taskTitle.asString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onInstallQuranAndroid) {
+                Text(text = stringResource(R.string.review_external_quran_install_action))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onOpenOnWeb) {
+                Text(text = stringResource(R.string.review_external_quran_web_action))
             }
         },
     )

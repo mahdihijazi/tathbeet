@@ -218,4 +218,8 @@ class TestAppContainer(
     database = Room.inMemoryDatabaseBuilder(context, TathbeetDatabase::class.java)
         .allowMainThreadQueries()
         .build(),
-)
+) {
+    val recordingQuranExternalLauncher = RecordingQuranExternalLauncher()
+
+    override val quranExternalLauncher = recordingQuranExternalLauncher
+}

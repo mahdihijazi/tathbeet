@@ -1,6 +1,7 @@
 package com.quran.tathbeet.ui.features.review
 
 import com.quran.tathbeet.R
+import com.quran.tathbeet.domain.model.QuranReadingTarget
 import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.ui.model.TextSpec
 
@@ -12,6 +13,7 @@ data class ReviewTaskUiState(
     val rating: Int? = null,
     val defaultRating: Int = 3,
     val weight: Double = 1.0,
+    val readingTarget: QuranReadingTarget? = null,
 )
 
 data class ReviewSectionUiState(
@@ -32,7 +34,14 @@ data class ReviewUiState(
     val isLoading: Boolean = true,
     val progressCard: ReviewProgressCardUiState? = null,
     val sections: List<ReviewSectionUiState> = emptyList(),
+    val showCycleResetWarningDialog: Boolean = false,
     val showCycleResetDialog: Boolean = false,
+    val externalQuranDialog: ReviewExternalQuranDialogUiState? = null,
+)
+
+data class ReviewExternalQuranDialogUiState(
+    val taskTitle: TextSpec,
+    val target: QuranReadingTarget,
 )
 
 fun ReviewDay.toUiState(
@@ -46,6 +55,7 @@ fun ReviewDay.toUiState(
             rating = assignment.rating,
             defaultRating = assignment.rating ?: 3,
             weight = assignment.weight,
+            readingTarget = assignment.readingTarget,
         )
     }
     val completedWeight = tasks.filter { it.isDone }.sumOf { task -> task.weight }
@@ -74,6 +84,7 @@ fun ReviewDay.toUiState(
         ),
         sections = listOf(section),
         showCycleResetDialog = false,
+        externalQuranDialog = null,
     )
 }
 
@@ -95,11 +106,12 @@ internal data class ReviewMockState(
                     completedText = formatReviewWeight(completedWeight),
                     totalText = formatReviewWeight(totalWeight),
                     remainingText = formatReviewWeight(remainingWeight),
-                    progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
-                ),
-                sections = visibleSections,
-                showCycleResetDialog = showCycleResetDialog,
-            )
+                progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
+            ),
+            sections = visibleSections,
+            showCycleResetDialog = showCycleResetDialog,
+            externalQuranDialog = null,
+        )
         }
 }
 
@@ -246,6 +258,7 @@ internal object ReviewMockFactory {
         rating = rating,
         defaultRating = rating ?: 3,
         weight = 1.0,
+        readingTarget = null,
     )
 }
 

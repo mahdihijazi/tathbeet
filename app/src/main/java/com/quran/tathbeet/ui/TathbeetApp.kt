@@ -1,11 +1,11 @@
 package com.quran.tathbeet.ui
 
-import android.content.Context
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,7 +23,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
-import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.ui.components.AppShell
 import com.quran.tathbeet.ui.features.progress.ProgressScreen
 import com.quran.tathbeet.ui.features.profiles.ProfilesScreen
@@ -36,38 +33,18 @@ import com.quran.tathbeet.ui.features.schedule.PoolSelectorScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleIntroScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModel
-import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModelFactory
 import com.quran.tathbeet.ui.features.settings.SettingsScreen
 import com.quran.tathbeet.ui.features.shared.SharedProfileScreen
-import com.quran.tathbeet.ui.model.AccountMode
 import com.quran.tathbeet.ui.model.AppDestination
-import com.quran.tathbeet.ui.model.AppProfile
 import com.quran.tathbeet.ui.model.AppUiState
-import com.quran.tathbeet.ui.model.Guardian
 import com.quran.tathbeet.ui.model.SyncState
 import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.activeProfile
 import com.quran.tathbeet.ui.model.completionRate
-import com.quran.tathbeet.ui.model.displayLabelRes
 import com.quran.tathbeet.ui.model.loadQuranCatalog
 import com.quran.tathbeet.ui.model.reminderOptions
 import com.quran.tathbeet.ui.model.seedAppState
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
-
-private const val RouteLaunch = "launch"
-private const val RouteScheduleGraph = "schedule_graph"
-private const val RouteScheduleIntro = "schedule_intro"
-private const val RoutePoolSelector = "pool_selector"
-private const val RouteScheduleDose = "schedule_dose"
-private const val RouteReview = "review"
-private const val RouteProfiles = "profiles"
-private const val RouteProgress = "progress"
-private const val RouteSettings = "settings"
-private const val RouteShared = "shared"
 
 @Composable
 fun TathbeetApp(
@@ -81,11 +58,18 @@ fun TathbeetApp(
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination?.route.toAppDestination()
+    var onReviewResetAction by remember { mutableStateOf({}) }
 
     LaunchedEffect(appContainer) {
         appContainer.profileRepository.ensureDefaultAccount(
             name = context.getString(R.string.profile_name_self),
         )
+    }
+
+    LaunchedEffect(currentDestination) {
+        if (currentDestination != AppDestination.Review) {
+            onReviewResetAction = {}
+        }
     }
 
     fun mutateLegacy(message: TextSpec? = null, transform: (AppUiState) -> AppUiState) {
@@ -107,6 +91,7 @@ fun TathbeetApp(
             onReviewPlanAction = {
                 navController.navigate(RoutePoolSelector)
             },
+            onReviewResetAction = onReviewResetAction,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) {
             NavHost(
@@ -204,15 +189,24 @@ fun TathbeetApp(
                             profileRepository = appContainer.profileRepository,
                             reviewRepository = appContainer.reviewRepository,
                             timeProvider = appContainer.timeProvider,
+                            quranExternalLauncher = appContainer.quranExternalLauncher,
                         ),
                     )
                     val uiState by reviewViewModel.uiState.collectAsState()
+                    SideEffect {
+                        onReviewResetAction = reviewViewModel::requestCycleReset
+                    }
                     ReviewScreen(
                         uiState = uiState,
                         onRequestTaskCompletion = reviewViewModel::requestCompleteTask,
                         onUpdateTaskRating = reviewViewModel::updateTaskRating,
+                        onLaunchTaskReading = reviewViewModel::launchTaskReading,
                         onRestartCycle = reviewViewModel::restartCycle,
+                        onDismissCycleResetWarning = reviewViewModel::dismissCycleResetWarning,
                         onDismissCycleResetDialog = reviewViewModel::dismissCycleResetDialog,
+                        onDismissExternalQuranDialog = reviewViewModel::dismissExternalQuranDialog,
+                        onOpenQuranAndroidInstall = reviewViewModel::openQuranAndroidInstall,
+                        onOpenQuranOnWeb = reviewViewModel::openQuranOnWeb,
                     )
                 }
 
@@ -285,16 +279,7 @@ fun TathbeetApp(
                             }
                         },
                         onAccountModeChanged = {
-                            mutateLegacy {
-                                it.copy(
-                                    accountMode = if (it.accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
-                                    syncState = if (it.accountMode == AccountMode.Guest) {
-                                        SyncState.Synced
-                                    } else {
-                                        SyncState.OfflineReady
-                                    },
-                                )
-                            }
+                            mutateLegacy(transform = AppUiState::toggleAccountMode)
                         },
                     )
                 }
@@ -342,106 +327,3 @@ fun TathbeetApp(
         }
     }
 }
-
-@Composable
-private fun LaunchRoute(
-    appContainer: AppContainer,
-    onNavigate: (String) -> Unit,
-) {
-    LaunchedEffect(appContainer) {
-        val settings = appContainer.settingsRepository.observeSettings().first()
-        val account = appContainer.profileRepository.observeActiveAccount().filterNotNull().first()
-        val schedule = appContainer.scheduleRepository.observeActiveSchedule(account.id).first()
-        val route = when {
-            schedule != null -> RouteReview
-            settings.hasSeenScheduleIntro -> RoutePoolSelector
-            else -> RouteScheduleIntro
-        }
-        withContext(Dispatchers.Main.immediate) {
-            onNavigate(route)
-        }
-    }
-}
-
-private fun scheduleWizardViewModelFactory(
-    appContainer: AppContainer,
-) = ScheduleWizardViewModelFactory(
-    profileRepository = appContainer.profileRepository,
-    scheduleRepository = appContainer.scheduleRepository,
-    reviewRepository = appContainer.reviewRepository,
-    settingsRepository = appContainer.settingsRepository,
-    quranCatalogRepository = appContainer.quranCatalogRepository,
-    revisionPlanner = appContainer.revisionPlanner,
-    timeProvider = appContainer.timeProvider,
-)
-
-private fun NavHostController.navigateMain(route: String) {
-    navigate(route) {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
-        launchSingleTop = true
-        restoreState = true
-    }
-}
-
-private fun AppDestination.toRoute(): String = when (this) {
-    AppDestination.Profiles -> RouteProfiles
-    AppDestination.ScheduleIntro -> RouteScheduleIntro
-    AppDestination.PoolSelector -> RoutePoolSelector
-    AppDestination.ScheduleDose -> RouteScheduleDose
-    AppDestination.Review -> RouteReview
-    AppDestination.Progress -> RouteProgress
-    AppDestination.Shared -> RouteShared
-    AppDestination.Settings -> RouteSettings
-}
-
-private fun String?.toAppDestination(): AppDestination = when (this) {
-    RouteProfiles -> AppDestination.Profiles
-    RouteScheduleIntro -> AppDestination.ScheduleIntro
-    RoutePoolSelector -> AppDestination.PoolSelector
-    RouteScheduleDose -> AppDestination.ScheduleDose
-    RouteProgress -> AppDestination.Progress
-    RouteShared -> AppDestination.Shared
-    RouteSettings -> AppDestination.Settings
-    else -> AppDestination.Review
-}
-
-private fun AppUiState.addProfile(): AppUiState {
-    val nextName = listOf(
-        TextSpec(R.string.profile_name_hafsah),
-        TextSpec(R.string.profile_name_ibrahim),
-        TextSpec(R.string.profile_name_zaynab),
-        TextSpec(R.string.profile_name_abdullah),
-    ).getOrElse(extraProfileCount) {
-        TextSpec(R.string.profile_name_child_generic, listOf(extraProfileCount + 1))
-    }
-    val newProfileId = "child-$extraProfileCount"
-    val newProfile = activeProfile.copy(
-        id = newProfileId,
-        name = nextName,
-        isSelfProfile = false,
-        isShared = false,
-        guardians = setOf(Guardian.Mother),
-        notificationsEnabled = true,
-        activityFeed = listOf(
-            TextSpec(R.string.feed_new_child_created, listOf(nextName)),
-            TextSpec(R.string.feed_new_child_next_step),
-        ),
-    )
-    return copy(
-        profiles = profiles + newProfile,
-        activeProfileId = newProfileId,
-        extraProfileCount = extraProfileCount + 1,
-        destination = AppDestination.PoolSelector,
-        scheduleReturnDestination = AppDestination.Profiles,
-    )
-}
-
-private fun TextSpec.resolve(context: Context): String =
-    rawText ?: context.getString(resId!!, *formatArgs.map { arg ->
-        when (arg) {
-            is TextSpec -> arg.resolve(context)
-            else -> arg
-        }
-    }.toTypedArray())

@@ -36,6 +36,7 @@ open class AppContainer(
 
     open val revisionPlanner: RevisionPlanner = DefaultRevisionPlanner()
     open val quranCatalogRepository: QuranCatalogRepository = AssetQuranCatalogRepository(appContext)
+    open val quranExternalLauncher: QuranExternalLauncher = AndroidQuranExternalLauncher(appContext)
     open val profileRepository: ProfileRepository = ProfileRepositoryImpl(database = this.database)
     open val scheduleRepository: ScheduleRepository = ScheduleRepositoryImpl(database = this.database)
     open val settingsRepository: SettingsRepository = SettingsRepositoryImpl(database = this.database)
