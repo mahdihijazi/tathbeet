@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import com.android.tools.screenshot.PreviewTest
+import com.quran.tathbeet.domain.model.QuranReadingTarget
 import com.quran.tathbeet.ui.theme.TathbeetTheme
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
@@ -151,6 +152,12 @@ fun ReviewTaskRowCompletedDefaultRatingScreenshot() {
                 isDone = true,
                 rating = 3,
                 defaultRating = 3,
+                readingTarget = QuranReadingTarget(
+                    startSurahId = 1,
+                    startAyah = 1,
+                    endSurahId = 2,
+                    endAyah = 25,
+                ),
             ),
             onCompleteReview = {},
             onUpdateRating = {},

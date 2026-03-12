@@ -17,7 +17,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -28,9 +27,7 @@ import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -129,7 +126,7 @@ fun ReviewTaskRow(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
         ) {
             Column(
                 modifier = Modifier.weight(1f),
@@ -153,21 +150,15 @@ fun ReviewTaskRow(
                     )
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half),
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                horizontalAlignment = AbsoluteAlignment.Left,
+                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
             ) {
                 task.readingTarget?.let {
-                    IconButton(
+                    ReviewLaunchIconButton(
                         onClick = onLaunchTaskReading,
                         modifier = Modifier.testTag("review-launch-${task.id}"),
-                    ) {
-                        Icon(
-                            painter = painterResource(R.mipmap.ic_review_open_quran),
-                            contentDescription = stringResource(R.string.review_open_in_quran),
-                            tint = Color.Unspecified,
-                        )
-                    }
+                    )
                 }
                 if (task.isDone) {
                     Icon(

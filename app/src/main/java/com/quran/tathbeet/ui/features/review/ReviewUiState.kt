@@ -258,7 +258,12 @@ internal object ReviewMockFactory {
         rating = rating,
         defaultRating = rating ?: 3,
         weight = 1.0,
-        readingTarget = null,
+        readingTarget = QuranReadingTarget(
+            startSurahId = 79,
+            startAyah = 1,
+            endSurahId = 79,
+            endAyah = 46,
+        ),
     )
 }
 
