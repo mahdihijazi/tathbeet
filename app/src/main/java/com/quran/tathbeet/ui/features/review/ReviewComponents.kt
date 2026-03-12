@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -28,10 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.AppCardTone
 import com.quran.tathbeet.ui.components.TitledCardSection
@@ -132,10 +138,9 @@ fun ReviewTaskRow(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half),
             ) {
-                Text(
-                    text = taskTitle,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
+                CompletedTaskTitle(
+                    title = taskTitle,
+                    isDone = task.isDone,
                 )
                 Text(
                     text = task.detail.asString(),
@@ -160,13 +165,7 @@ fun ReviewTaskRow(
                         modifier = Modifier.testTag("review-launch-${task.id}"),
                     )
                 }
-                if (task.isDone) {
-                    Icon(
-                        imageVector = Icons.Outlined.CheckCircle,
-                        contentDescription = taskTitle,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                } else {
+                if (!task.isDone) {
                     OutlinedButton(
                         onClick = onCompleteReview,
                         modifier = Modifier.testTag("review-complete-${task.id}"),
@@ -192,6 +191,55 @@ fun ReviewTaskRow(
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f),
         )
     }
+}
+
+@Composable
+private fun CompletedTaskTitle(
+    title: String,
+    isDone: Boolean,
+) {
+    val titleStyle = MaterialTheme.typography.titleLarge
+    val completedTitle = stringResource(
+        R.string.review_completed_title_format,
+        title,
+        stringResource(R.string.review_completed_pill),
+    )
+
+    if (!isDone) {
+        Text(
+            text = title,
+            style = titleStyle,
+            fontWeight = FontWeight.SemiBold,
+        )
+        return
+    }
+
+    val inlineIconId = "completed-inline-icon"
+    Text(
+        text = buildAnnotatedString {
+            append(completedTitle)
+            append(' ')
+            appendInlineContent(inlineIconId)
+        },
+        style = titleStyle,
+        fontWeight = FontWeight.SemiBold,
+        inlineContent = mapOf(
+            inlineIconId to InlineTextContent(
+                Placeholder(
+                    width = 20.sp,
+                    height = 20.sp,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                ),
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+        ),
+    )
 }
 
 @Composable

@@ -155,6 +155,7 @@ The current app build is:
 - shows real lists for all four tabs: surahs, juzs, hizbs, and rub al-hizb
 - generates fake review tasks from those real selections so the prototype feels closer to the final product
 - keeps exact task start/end ayah references so review rows can open Quran for Android directly or fall back to `quran.com`
+- appends completed review status directly into the task title text flow for finished rows, with an inline completed icon immediately after the text
 - reveals future review days inline as the current visible work is completed
 - offers an explicit restart action when the visible cycle is finished
 - keeps strings in Android XML resources instead of hardcoded Kotlin literals

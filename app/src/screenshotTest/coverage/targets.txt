@@ -12,8 +12,9 @@ review:review_section_header_done
 review:review_section_header_available
 review:review_task_row_completed
 review:review_task_row_pending
-review:review_rating_dialog_default
+review:review_task_row_completed_default_rating
 review:review_cycle_complete_dialog
+review:review_cycle_reset_warning_dialog
 
 # Schedule
 schedule:onboarding_message_card_default

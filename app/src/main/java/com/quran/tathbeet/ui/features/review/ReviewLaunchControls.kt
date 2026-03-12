@@ -22,7 +22,7 @@ fun ReviewLaunchIconButton(
         modifier = modifier.size(56.dp),
     ) {
         Image(
-            painter = painterResource(R.mipmap.ic_review_open_quran_launcher),
+            painter = painterResource(R.mipmap.quran),
             contentDescription = stringResource(R.string.review_open_in_quran),
             modifier = Modifier.size(48.dp),
         )

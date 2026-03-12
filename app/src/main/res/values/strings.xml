@@ -203,6 +203,8 @@
     <string name="review_cycle_reset_confirm">إعادة الدورة</string>
     <string name="review_cycle_reset_cancel">إلغاء</string>
     <string name="review_mark_done">أنهيت المراجعة</string>
+    <string name="review_completed_pill">تمت المراجعة</string>
+    <string name="review_completed_title_format">%1$s - %2$s</string>
     <string name="review_open_in_quran">فتح المقطع في تطبيق قراءة</string>
     <string name="review_external_quran_dialog_title">فتح المقطع خارج التطبيق</string>
     <string name="review_external_quran_dialog_body">لم يتم العثور على تطبيق القرآن على هذا الجهاز. يمكنك تثبيته أو فتح المقطع في المتصفح.</string>

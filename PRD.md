@@ -329,6 +329,7 @@ Completing a task in MVP should also capture a simple retention rating:
 - rating uses a 1 to 5 star scale shown inline in the completed task row rather than in a dialog
 - first-time completion should default to 3 stars
 - if the same task was rated before in a previous cycle, the app should reuse the previous rating as the default/current value
+- completed task rows should render completion status inline as part of the title text flow itself, in the form `عنوان المهمة - تمت المراجعة` with a small inline completed icon immediately after the text, instead of a detached check icon or a separate status bubble
 - completed tasks should always show the saved rating inline
 - users should be able to edit the rating later by tapping the inline stars directly
 
