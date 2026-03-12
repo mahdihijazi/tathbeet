@@ -7,6 +7,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
+import com.quran.tathbeet.ui.features.profiles.ProfilesViewModelFactory
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModelFactory
 import com.quran.tathbeet.ui.model.AccountMode
 import com.quran.tathbeet.ui.model.AppDestination
@@ -60,6 +61,16 @@ internal fun scheduleWizardViewModelFactory(
     settingsRepository = appContainer.settingsRepository,
     quranCatalogRepository = appContainer.quranCatalogRepository,
     revisionPlanner = appContainer.revisionPlanner,
+    timeProvider = appContainer.timeProvider,
+)
+
+internal fun profilesViewModelFactory(
+    appContainer: AppContainer,
+) = ProfilesViewModelFactory(
+    profileRepository = appContainer.profileRepository,
+    scheduleRepository = appContainer.scheduleRepository,
+    reviewRepository = appContainer.reviewRepository,
+    settingsRepository = appContainer.settingsRepository,
     timeProvider = appContainer.timeProvider,
 )
 

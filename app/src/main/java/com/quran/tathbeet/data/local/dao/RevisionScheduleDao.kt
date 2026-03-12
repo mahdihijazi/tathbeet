@@ -23,4 +23,7 @@ interface RevisionScheduleDao {
 
     @Query("UPDATE revision_schedule SET is_active = 0 WHERE learner_id = :learnerId")
     suspend fun clearActiveSchedule(learnerId: String)
+
+    @Query("DELETE FROM revision_schedule WHERE learner_id = :learnerId")
+    suspend fun deleteForLearner(learnerId: String)
 }

@@ -26,6 +26,7 @@ import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.ui.components.AppShell
 import com.quran.tathbeet.ui.features.progress.ProgressScreen
 import com.quran.tathbeet.ui.features.profiles.ProfilesScreen
+import com.quran.tathbeet.ui.features.profiles.ProfilesViewModel
 import com.quran.tathbeet.ui.features.review.ReviewScreen
 import com.quran.tathbeet.ui.features.review.ReviewViewModel
 import com.quran.tathbeet.ui.features.review.ReviewViewModelFactory
@@ -217,31 +218,35 @@ fun TathbeetApp(
                 }
 
                 composable(RouteProfiles) {
+                    val profilesViewModel: ProfilesViewModel = viewModel(
+                        factory = profilesViewModelFactory(appContainer),
+                    )
+                    val uiState by profilesViewModel.uiState.collectAsState()
                     ProfilesScreen(
-                        uiState = legacyUiState,
-                        onProfileSelected = { profileId ->
-                            mutateLegacy { it.copy(activeProfileId = profileId) }
-                        },
-                        onProfileNotificationsToggled = { profileId ->
-                            mutateLegacy {
-                                it.copy(
-                                    profiles = it.profiles.map { profile ->
-                                        if (profile.id == profileId) {
-                                            profile.copy(notificationsEnabled = !profile.notificationsEnabled)
+                        uiState = uiState,
+                        onProfileSelected = profilesViewModel::selectProfile,
+                        onProfileNotificationsToggled = profilesViewModel::toggleProfileNotifications,
+                        onAddProfileRequested = profilesViewModel::showCreateDialog,
+                        onEditActiveProfileRequested = profilesViewModel::showEditActiveProfileDialog,
+                        onProfileNameChanged = profilesViewModel::updateEditorName,
+                        onSaveProfile = {
+                            profilesViewModel.saveEditor(
+                                onCreated = {
+                                    navController.navigate(
+                                        if (uiState.hasSeenScheduleIntro) {
+                                            RoutePoolSelector
                                         } else {
-                                            profile
-                                        }
-                                    },
-                                )
-                            }
+                                            RouteScheduleIntro
+                                        },
+                                    )
+                                },
+                            )
                         },
-                        onAddChildProfile = {
-                            mutateLegacy(TextSpec(R.string.snackbar_child_profile_created)) { state ->
-                                state.addProfile()
-                            }
-                        },
+                        onDismissProfileDialog = profilesViewModel::dismissEditor,
+                        onRequestDeleteProfile = profilesViewModel::requestDeleteFromEditor,
+                        onDismissDeleteProfile = profilesViewModel::dismissDeleteConfirmation,
+                        onConfirmDeleteProfile = profilesViewModel::confirmDelete,
                         onOpenSchedule = { navController.navigate(RoutePoolSelector) },
-                        onOpenSharedProfile = { navController.navigate(RouteShared) },
                     )
                 }
 

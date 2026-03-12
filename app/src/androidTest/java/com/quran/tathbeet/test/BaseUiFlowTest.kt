@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performScrollToNode
@@ -91,6 +92,50 @@ abstract class BaseUiFlowTest {
         ).performClick()
     }
 
+    protected fun openProfilesTab() {
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.destination_profiles),
+        ).performClick()
+    }
+
+    protected fun openAddProfileDialog() {
+        composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
+            hasTestTag("profiles-add-button"),
+        )
+        composeRule.onNodeWithTag("profiles-add-button").performClick()
+    }
+
+    protected fun openEditActiveProfileDialog() {
+        composeRule.onNodeWithTag("profiles-edit-active").performClick()
+    }
+
+    protected fun enterProfileEditorName(name: String) {
+        composeRule.onNodeWithTag("profiles-editor-name-input").performTextClearance()
+        composeRule.onNodeWithTag("profiles-editor-name-input").performTextInput(name)
+    }
+
+    protected fun saveProfileDialog() {
+        composeRule.onNodeWithTag("profiles-editor-save").performClick()
+    }
+
+    protected fun deleteProfileFromDialog() {
+        composeRule.onNodeWithTag("profiles-editor-delete").performClick()
+    }
+
+    protected fun confirmProfileDeletion() {
+        composeRule.onNodeWithTag("profiles-delete-confirm").performClick()
+    }
+
+    protected fun toggleProfileNotifications(profileId: String) {
+        composeRule.onNodeWithTag("profiles-notifications-$profileId").performClick()
+    }
+
+    protected fun navigateBack() {
+        composeRule.onNodeWithContentDescription(
+            composeRule.activity.getString(R.string.content_back),
+        ).performClick()
+    }
+
     protected fun openJuzTab() {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.selection_category_juz),
@@ -159,6 +204,12 @@ abstract class BaseUiFlowTest {
     protected fun assertIntroVisible() {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.schedule_intro_body),
+        ).assertIsDisplayed()
+    }
+
+    protected fun assertProfilesVisible() {
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.profile_screen_subtitle),
         ).assertIsDisplayed()
     }
 

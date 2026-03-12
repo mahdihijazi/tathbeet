@@ -5,6 +5,7 @@ import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.data.local.entity.LearnerAccountEntity
 import com.quran.tathbeet.domain.model.LearnerAccount
 import com.quran.tathbeet.domain.repository.ProfileRepository
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -39,6 +40,22 @@ class ProfileRepositoryImpl(
         )
     }
 
+    override suspend fun createProfile(name: String): LearnerAccount {
+        val entity = LearnerAccountEntity(
+            id = UUID.randomUUID().toString(),
+            name = name,
+            isSelfProfile = false,
+            isShared = false,
+            notificationsEnabled = true,
+            isActive = true,
+        )
+        database.withTransaction {
+            database.learnerAccountDao().clearActiveAccount()
+            database.learnerAccountDao().upsert(entity)
+        }
+        return entity.toDomainModel()
+    }
+
     override suspend fun updateAccountName(
         accountId: String,
         name: String,
@@ -47,6 +64,38 @@ class ProfileRepositoryImpl(
             accountId = accountId,
             name = name,
         )
+    }
+
+    override suspend fun updateNotificationsEnabled(
+        accountId: String,
+        enabled: Boolean,
+    ) {
+        database.learnerAccountDao().updateNotificationsEnabled(
+            accountId = accountId,
+            enabled = enabled,
+        )
+    }
+
+    override suspend fun deleteProfile(accountId: String) {
+        database.withTransaction {
+            val account = database.learnerAccountDao().getAccount(accountId) ?: return@withTransaction
+            if (account.isSelfProfile) {
+                return@withTransaction
+            }
+
+            database.reviewAssignmentDao().deleteForLearner(accountId)
+            database.reviewDayDao().deleteForLearner(accountId)
+            database.scheduleSelectionDao().deleteForSchedule("active-$accountId")
+            database.revisionScheduleDao().deleteForLearner(accountId)
+            database.learnerAccountDao().deleteAccount(accountId)
+
+            if (account.isActive) {
+                database.learnerAccountDao().clearActiveAccount()
+                database.learnerAccountDao().getPreferredAccount()?.let { fallback ->
+                    database.learnerAccountDao().setActiveAccount(fallback.id)
+                }
+            }
+        }
     }
 
     override suspend fun setActiveAccount(accountId: String) {

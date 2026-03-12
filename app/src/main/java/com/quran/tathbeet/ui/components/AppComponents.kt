@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import com.quran.tathbeet.R
@@ -30,6 +31,7 @@ fun ScreenLayout(
     content: LazyListScope.() -> Unit,
 ) {
     LazyColumn(
+        modifier = Modifier.testTag("screen-layout-list"),
         contentPadding = PaddingValues(
             horizontal = TathbeetTokens.spacing.x2Half,
             vertical = TathbeetTokens.spacing.x2Half,
