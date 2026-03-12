@@ -2,6 +2,7 @@ package com.quran.tathbeet.data.repository
 
 import android.content.Context
 import androidx.room.withTransaction
+import com.quran.tathbeet.core.text.formatAyahCount
 import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.data.local.entity.ReviewAssignmentEntity
@@ -12,10 +13,11 @@ import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.domain.repository.QuranCatalogRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
 import com.quran.tathbeet.domain.repository.ScheduleRepository
+import com.quran.tathbeet.ui.model.ReviewUnitTemplate
+import com.quran.tathbeet.ui.model.buildReviewUnits
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import kotlin.math.min
+import kotlin.math.max
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -29,16 +31,20 @@ class ReviewRepositoryImpl(
     private val timeProvider: TimeProvider,
 ) : ReviewRepository {
 
-    private val preservedRatingsByLearner = mutableMapOf<String, Map<Int, Int>>()
+    private val preservedRatingsByLearner = mutableMapOf<String, Map<String, Int>>()
 
     override fun observeReviewTimeline(learnerId: String): Flow<List<ReviewDay>> =
         combine(
             database.reviewDayDao().observeReviewDays(learnerId),
             database.reviewAssignmentDao().observeAssignmentsForLearner(learnerId),
         ) { dayEntities, assignmentEntities ->
+            val quranCatalog = quranCatalogRepository.getCatalog()
             val assignmentsByDate = assignmentEntities.groupBy { it.assignedForDate }
             dayEntities.map { dayEntity ->
-                dayEntity.toDomainModel(assignmentsByDate[dayEntity.assignedForDate].orEmpty())
+                dayEntity.toDomainModel(
+                    assignments = assignmentsByDate[dayEntity.assignedForDate].orEmpty(),
+                    quranCatalog = quranCatalog,
+                )
             }
         }
 
@@ -51,7 +57,10 @@ class ReviewRepositoryImpl(
             database.reviewDayDao().observeReviewDay(learnerId, dateKey),
             database.reviewAssignmentDao().observeAssignments(learnerId, dateKey),
         ) { reviewDayEntity, assignmentEntities ->
-            reviewDayEntity?.toDomainModel(assignmentEntities)
+            reviewDayEntity?.toDomainModel(
+                assignments = assignmentEntities,
+                quranCatalog = quranCatalogRepository.getCatalog(),
+            )
         }
     }
 
@@ -76,40 +85,40 @@ class ReviewRepositoryImpl(
         if (allUnits.isEmpty()) {
             return false
         }
-        val maxAssignments = when (schedule.paceMethod) {
-            PaceMethod.CycleTarget -> schedule.manualPace.dailySegments
-            PaceMethod.Manual -> schedule.manualPace.dailySegments
+        val dailyCapacity = when (schedule.paceMethod) {
+            PaceMethod.CycleTarget -> schedule.manualPace.dailySegments.toDouble()
+            PaceMethod.Manual -> schedule.manualPace.dailySegments.toDouble()
         }
-        val cycleStartDate = database.reviewDayDao().getFirstReviewDay(learnerId)
-            ?.assignedForDate
-            ?.let(LocalDate::parse)
-            ?: assignedForDate
-        val dayOffset = ChronoUnit.DAYS.between(cycleStartDate, assignedForDate).toInt()
-        if (dayOffset < 0) {
-            return false
-        }
-        val startIndex = dayOffset * maxAssignments
+        val startIndex = database.reviewAssignmentDao().countAssignmentsBeforeDate(
+            learnerId = learnerId,
+            assignedForDate = dateKey,
+        )
         if (startIndex >= allUnits.size) {
             return false
         }
-        val endExclusive = min(startIndex + maxAssignments, allUnits.size)
+        val endExclusive = determineEndExclusive(
+            units = allUnits,
+            startIndex = startIndex,
+            dailyCapacity = dailyCapacity,
+        )
         val preservedRatings = preservedRatingsByLearner[learnerId].orEmpty()
         val assignments = allUnits
             .subList(startIndex, endExclusive)
             .mapIndexed { index, unit ->
-                val rubId = unit.id.removePrefix("review-unit-").toIntOrNull() ?: index + 1
                 ReviewAssignmentEntity(
                     id = "$dateKey-${unit.id}",
                     reviewDayId = "$learnerId-$dateKey",
                     learnerId = learnerId,
                     assignedForDate = dateKey,
-                    rubId = rubId,
+                    taskKey = unit.id,
+                    rubId = unit.rubId,
                     title = unit.title,
                     detail = unit.detail,
+                    weight = unit.weight,
                     displayOrder = index,
                     isRollover = false,
                     isDone = false,
-                    rating = preservedRatings[rubId],
+                    rating = preservedRatings[unit.id],
                     completedAt = null,
                 )
             }
@@ -156,9 +165,9 @@ class ReviewRepositoryImpl(
     ) {
         preservedRatingsByLearner[learnerId] = database.reviewAssignmentDao()
             .getRatedAssignments(learnerId)
-            .fold(linkedMapOf<Int, Int>()) { acc, assignment ->
-                if (assignment.rating != null && !acc.containsKey(assignment.rubId)) {
-                    acc[assignment.rubId] = assignment.rating
+            .fold(linkedMapOf<String, Int>()) { acc, assignment ->
+                if (assignment.rating != null && !acc.containsKey(assignment.taskKey)) {
+                    acc[assignment.taskKey] = assignment.rating
                 }
                 acc
             }
@@ -172,8 +181,19 @@ class ReviewRepositoryImpl(
         )
     }
 
+    override suspend fun refreshForScheduleChange(
+        learnerId: String,
+        restartDate: LocalDate,
+    ) {
+        restartCycle(
+            learnerId = learnerId,
+            restartDate = restartDate,
+        )
+    }
+
     private fun ReviewDayEntity.toDomainModel(
         assignments: List<ReviewAssignmentEntity>,
+        quranCatalog: com.quran.tathbeet.ui.model.QuranCatalog,
     ): ReviewDay {
         val completed = assignments.count { it.isDone }
         val completionRate = if (assignments.isEmpty()) 0 else (completed * 100) / assignments.size
@@ -181,22 +201,63 @@ class ReviewRepositoryImpl(
             learnerId = learnerId,
             assignedForDate = LocalDate.parse(assignedForDate),
             completionRate = completionRate,
-            assignments = assignments.map { assignment -> assignment.toDomainModel() },
+            assignments = assignments.map { assignment -> assignment.toDomainModel(quranCatalog) },
         )
     }
 
-    private fun ReviewAssignmentEntity.toDomainModel(): ReviewAssignment =
+    private fun ReviewAssignmentEntity.toDomainModel(
+        quranCatalog: com.quran.tathbeet.ui.model.QuranCatalog,
+    ): ReviewAssignment =
         ReviewAssignment(
             id = id,
             learnerId = learnerId,
             assignedForDate = LocalDate.parse(assignedForDate),
+            taskKey = taskKey,
             title = title,
-            detail = detail,
+            detail = normalizeDetail(quranCatalog),
             rubId = rubId,
+            weight = weight,
             displayOrder = displayOrder,
             isRollover = isRollover,
             isDone = isDone,
             rating = rating,
             completedAt = completedAt?.let(ZonedDateTime::parse),
         )
+
+    private fun ReviewAssignmentEntity.normalizeDetail(
+        quranCatalog: com.quran.tathbeet.ui.model.QuranCatalog,
+    ): String {
+        val surahId = taskKey.removePrefix("surah-").toIntOrNull() ?: return detail
+        return quranCatalog.surahAyahCounts[surahId]
+            ?.let { ayahCount -> formatAyahCount(appContext, ayahCount) }
+            ?: detail
+    }
+
+    private fun determineEndExclusive(
+        units: List<ReviewUnitTemplate>,
+        startIndex: Int,
+        dailyCapacity: Double,
+    ): Int {
+        var currentIndex = startIndex
+        var consumedWeight = 0.0
+
+        while (currentIndex < units.size) {
+            val nextWeight = units[currentIndex].weight
+            val wouldExceedCapacity = consumedWeight + nextWeight > dailyCapacity + EPSILON
+            if (currentIndex > startIndex && wouldExceedCapacity) {
+                break
+            }
+            consumedWeight += nextWeight
+            currentIndex += 1
+            if (consumedWeight >= dailyCapacity - EPSILON) {
+                break
+            }
+        }
+
+        return max(startIndex + 1, currentIndex)
+    }
+
+    private companion object {
+        private const val EPSILON = 0.0001
+    }
 }

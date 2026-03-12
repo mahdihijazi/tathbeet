@@ -9,8 +9,10 @@ import com.quran.tathbeet.domain.planner.CoverageSelection
 import com.quran.tathbeet.domain.planner.RevisionPlanner
 import com.quran.tathbeet.domain.repository.ProfileRepository
 import com.quran.tathbeet.domain.repository.QuranCatalogRepository
+import com.quran.tathbeet.domain.repository.ReviewRepository
 import com.quran.tathbeet.domain.repository.ScheduleRepository
 import com.quran.tathbeet.domain.repository.SettingsRepository
+import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.ui.model.CycleTarget as UiCycleTarget
 import com.quran.tathbeet.ui.model.PaceMethod as UiPaceMethod
 import com.quran.tathbeet.ui.model.PaceOption as UiPaceOption
@@ -29,9 +31,11 @@ import kotlinx.coroutines.launch
 class ScheduleWizardViewModel(
     private val profileRepository: ProfileRepository,
     private val scheduleRepository: ScheduleRepository,
+    private val reviewRepository: ReviewRepository,
     private val settingsRepository: SettingsRepository,
     private val quranCatalogRepository: QuranCatalogRepository,
     private val revisionPlanner: RevisionPlanner,
+    private val timeProvider: TimeProvider,
 ) : ViewModel() {
 
     private val quranCatalog = quranCatalogRepository.getCatalog()
@@ -163,6 +167,10 @@ class ScheduleWizardViewModel(
                     selections = selections,
                 ),
             )
+            reviewRepository.refreshForScheduleChange(
+                learnerId = activeAccount.id,
+                restartDate = timeProvider.today(),
+            )
             onSaved()
         }
     }
@@ -213,9 +221,11 @@ class ScheduleWizardViewModel(
 class ScheduleWizardViewModelFactory(
     private val profileRepository: ProfileRepository,
     private val scheduleRepository: ScheduleRepository,
+    private val reviewRepository: ReviewRepository,
     private val settingsRepository: SettingsRepository,
     private val quranCatalogRepository: QuranCatalogRepository,
     private val revisionPlanner: RevisionPlanner,
+    private val timeProvider: TimeProvider,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ScheduleWizardViewModel::class.java)) {
@@ -223,9 +233,11 @@ class ScheduleWizardViewModelFactory(
             return ScheduleWizardViewModel(
                 profileRepository = profileRepository,
                 scheduleRepository = scheduleRepository,
+                reviewRepository = reviewRepository,
                 settingsRepository = settingsRepository,
                 quranCatalogRepository = quranCatalogRepository,
                 revisionPlanner = revisionPlanner,
+                timeProvider = timeProvider,
             ) as T
         }
         error("Unknown ViewModel class: ${modelClass.name}")

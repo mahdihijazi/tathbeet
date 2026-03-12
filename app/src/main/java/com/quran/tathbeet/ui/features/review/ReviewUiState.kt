@@ -11,6 +11,7 @@ data class ReviewTaskUiState(
     val isDone: Boolean,
     val rating: Int? = null,
     val defaultRating: Int = 3,
+    val weight: Double = 1.0,
 )
 
 data class ReviewSectionUiState(
@@ -21,9 +22,9 @@ data class ReviewSectionUiState(
 )
 
 data class ReviewProgressCardUiState(
-    val completedCount: Int,
-    val totalCount: Int,
-    val remainingCount: Int,
+    val completedText: String,
+    val totalText: String,
+    val remainingText: String,
     val progress: Float,
 )
 
@@ -44,11 +45,12 @@ fun ReviewDay.toUiState(
             isDone = assignment.isDone,
             rating = assignment.rating,
             defaultRating = assignment.rating ?: 3,
+            weight = assignment.weight,
         )
     }
-    val completedCount = tasks.count { it.isDone }
-    val totalCount = tasks.size
-    val remainingCount = totalCount - completedCount
+    val completedWeight = tasks.filter { it.isDone }.sumOf { task -> task.weight }
+    val totalWeight = tasks.sumOf { task -> task.weight }
+    val remainingWeight = totalWeight - completedWeight
     val section = ReviewSectionUiState(
         id = assignedForDate.toString(),
         title = TextSpec(R.string.review_section_today_title),
@@ -65,10 +67,10 @@ fun ReviewDay.toUiState(
     return ReviewUiState(
         isLoading = false,
         progressCard = ReviewProgressCardUiState(
-            completedCount = completedCount,
-            totalCount = totalCount,
-            remainingCount = remainingCount,
-            progress = if (totalCount == 0) 0f else completedCount.toFloat() / totalCount.toFloat(),
+            completedText = formatReviewWeight(completedWeight),
+            totalText = formatReviewWeight(totalWeight),
+            remainingText = formatReviewWeight(remainingWeight),
+            progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
         ),
         sections = listOf(section),
         showCycleResetDialog = false,
@@ -83,17 +85,17 @@ internal data class ReviewMockState(
     fun toUiState(): ReviewUiState =
         allSections.take(visibleSectionCount).let { visibleSections ->
             val visibleTasks = visibleSections.flatMap { it.tasks }
-            val completedCount = visibleTasks.count { it.isDone }
-            val totalCount = visibleTasks.size
-            val remainingCount = totalCount - completedCount
+            val completedWeight = visibleTasks.filter { it.isDone }.sumOf { task -> task.weight }
+            val totalWeight = visibleTasks.sumOf { task -> task.weight }
+            val remainingWeight = totalWeight - completedWeight
 
             ReviewUiState(
                 isLoading = false,
                 progressCard = ReviewProgressCardUiState(
-                    completedCount = completedCount,
-                    totalCount = totalCount,
-                    remainingCount = remainingCount,
-                    progress = if (totalCount == 0) 0f else completedCount.toFloat() / totalCount.toFloat(),
+                    completedText = formatReviewWeight(completedWeight),
+                    totalText = formatReviewWeight(totalWeight),
+                    remainingText = formatReviewWeight(remainingWeight),
+                    progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
                 ),
                 sections = visibleSections,
                 showCycleResetDialog = showCycleResetDialog,
@@ -243,5 +245,16 @@ internal object ReviewMockFactory {
         isDone = isDone,
         rating = rating,
         defaultRating = rating ?: 3,
+        weight = 1.0,
     )
+}
+
+internal fun formatReviewWeight(weight: Double): String {
+    val normalized = if (weight < 0.0) 0.0 else weight
+    val rounded = kotlin.math.round(normalized * 10.0) / 10.0
+    return if (rounded % 1.0 == 0.0) {
+        rounded.toInt().toString()
+    } else {
+        rounded.toString()
+    }
 }

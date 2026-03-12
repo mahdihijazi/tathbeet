@@ -166,8 +166,8 @@ class ReviewViewModel(
             .firstOrNull { it.assignedForDate == today }
             ?.assignments
             .orEmpty())
-        val completedCount = progressAssignments.count { it.isDone }
-        val totalCount = progressAssignments.size
+        val completedWeight = progressAssignments.filter { it.isDone }.sumOf { assignment -> assignment.weight }
+        val totalWeight = progressAssignments.sumOf { assignment -> assignment.weight }
         val allCycleAssignments = overdueAssignments + currentAndFutureDays.flatMap { it.assignments }
         val allDone = allCycleAssignments.isNotEmpty() && allCycleAssignments.all { it.isDone }
         if (!allDone) {
@@ -178,10 +178,10 @@ class ReviewViewModel(
         _uiState.value = ReviewUiState(
             isLoading = false,
             progressCard = ReviewProgressCardUiState(
-                completedCount = completedCount,
-                totalCount = totalCount,
-                remainingCount = totalCount - completedCount,
-                progress = if (totalCount == 0) 0f else completedCount.toFloat() / totalCount.toFloat(),
+                completedText = formatReviewWeight(completedWeight),
+                totalText = formatReviewWeight(totalWeight),
+                remainingText = formatReviewWeight(totalWeight - completedWeight),
+                progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
             ),
             sections = visibleSections,
             showCycleResetDialog = showCycleResetDialog,
@@ -214,6 +214,7 @@ class ReviewViewModel(
             isDone = isDone,
             rating = rating,
             defaultRating = rating ?: 3,
+            weight = weight,
         )
 
     private fun allAssignments(): List<ReviewAssignment> =

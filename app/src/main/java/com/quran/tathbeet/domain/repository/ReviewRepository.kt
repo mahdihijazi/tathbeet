@@ -27,6 +27,11 @@ interface ReviewRepository {
         rating: Int,
     )
 
+    suspend fun refreshForScheduleChange(
+        learnerId: String,
+        restartDate: LocalDate,
+    )
+
     suspend fun restartCycle(
         learnerId: String,
         restartDate: LocalDate,

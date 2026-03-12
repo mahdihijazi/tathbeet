@@ -2,6 +2,7 @@ package com.quran.tathbeet.ui.model
 
 import android.content.Context
 import com.quran.tathbeet.R
+import com.quran.tathbeet.core.text.formatAyahCount
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.max
@@ -19,9 +20,9 @@ data class QuranSelectionItem(
 )
 
 class QuranCatalog internal constructor(
-    private val itemsByCategory: Map<SelectionCategory, List<QuranSelectionItem>>,
-    private val rubsById: Map<Int, RubItem>,
-    private val surahAyahCounts: Map<Int, Int>,
+    internal val itemsByCategory: Map<SelectionCategory, List<QuranSelectionItem>>,
+    internal val rubsById: Map<Int, RubItem>,
+    internal val surahAyahCounts: Map<Int, Int>,
 ) {
     private val itemsByKey: Map<String, QuranSelectionItem> = itemsByCategory
         .values
@@ -38,82 +39,17 @@ class QuranCatalog internal constructor(
         itemsByKey[selectionKey(category, itemId)]
             ?: error("Missing Quran selection for ${category.name}:$itemId")
 
-    fun buildReviewUnits(
-        context: Context,
-        keys: Set<String>,
-    ): List<ReviewUnitTemplate> {
-        val coverageByRubId = linkedMapOf<Int, CoverageSegment>()
-
-        resolveSelections(keys).forEach { item ->
-            buildCoverageSegments(item).forEach { segment ->
-                coverageByRubId[segment.rubId] = coverageByRubId[segment.rubId]
-                    ?.mergeWith(segment)
-                    ?: segment
-            }
-        }
-
-        return coverageByRubId.values
-            .sortedBy { it.rubId }
-            .map { segment ->
-                ReviewUnitTemplate(
-                    id = "review-unit-${segment.rubId}",
-                    title = buildReviewUnitTitle(context, segment),
-                    detail = context.getString(
-                        R.string.review_unit_detail,
-                        rubsById.getValue(segment.rubId).title,
-                        buildRangeSummary(context, segment.start, segment.end),
-                    ),
-                    isPartial = !segment.isWholeRub(rubsById.getValue(segment.rubId)),
-                )
-            }
-    }
-
-    private fun buildCoverageSegments(item: QuranSelectionItem): List<CoverageSegment> =
-        (item.firstRubId..item.lastRubId).map { rubId ->
-            val rub = rubsById.getValue(rubId)
-            val clippedStart = when (item.category) {
-                SelectionCategory.Surahs -> {
-                    if (rub.start.surahId < item.itemId) {
-                        Boundary(
-                            surahId = item.itemId,
-                            surahNameArabic = rub.end.surahNameArabic.takeIf { rub.end.surahId == item.itemId }
-                                ?: rub.start.surahNameArabic,
-                            ayah = 1,
-                        )
-                    } else {
-                        rub.start
-                    }
-                }
-                else -> rub.start
-            }
-            val clippedEnd = when (item.category) {
-                SelectionCategory.Surahs -> {
-                    if (rub.end.surahId > item.itemId) {
-                        Boundary(
-                            surahId = item.itemId,
-                            surahNameArabic = rub.start.surahNameArabic.takeIf { rub.start.surahId == item.itemId }
-                                ?: rub.end.surahNameArabic,
-                            ayah = surahAyahCounts.getValue(item.itemId),
-                        )
-                    } else {
-                        rub.end
-                    }
-                }
-                else -> rub.end
-            }
-            CoverageSegment(
-                rubId = rubId,
-                start = clippedStart,
-                end = clippedEnd,
-            )
-        }
 }
 
-data class ReviewUnitTemplate(
+internal data class ReviewUnitTemplate(
     val id: String,
+    val rubId: Int,
     val title: String,
     val detail: String,
+    val weight: Double,
     val isPartial: Boolean,
+    val start: Boundary,
+    val end: Boundary,
 )
 
 private val selectionComparator =
@@ -201,7 +137,7 @@ private fun parseSurahItems(
             title = context.getString(R.string.quran_surah_title, surahName),
             subtitle = context.getString(
                 R.string.quran_surah_detail,
-                ayahCount,
+                formatAyahCount(context, ayahCount),
                 segmentCount,
             ),
             segments = segmentCount,
@@ -295,7 +231,7 @@ private fun RubItem.toSelectionItem(context: Context): QuranSelectionItem =
         lastRubId = id,
     )
 
-private fun buildReviewUnitTitle(
+internal fun buildReviewUnitTitle(
     context: Context,
     segment: CoverageSegment,
 ): String =
@@ -309,7 +245,7 @@ private fun buildReviewUnitTitle(
         )
     }
 
-private fun buildRangeSummary(
+internal fun buildRangeSummary(
     context: Context,
     start: Boundary,
     end: Boundary,

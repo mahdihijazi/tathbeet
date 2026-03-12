@@ -51,6 +51,17 @@ interface ReviewAssignmentDao {
     )
     suspend fun getRatedAssignments(learnerId: String): List<ReviewAssignmentEntity>
 
+    @Query(
+        """
+        SELECT COUNT(*) FROM review_assignment
+        WHERE learner_id = :learnerId AND assigned_for_date < :assignedForDate
+        """,
+    )
+    suspend fun countAssignmentsBeforeDate(
+        learnerId: String,
+        assignedForDate: String,
+    ): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entities: List<ReviewAssignmentEntity>)
 

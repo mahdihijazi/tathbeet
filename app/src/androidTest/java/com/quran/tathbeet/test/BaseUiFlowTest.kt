@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -87,19 +88,33 @@ abstract class BaseUiFlowTest {
         ).performClick()
     }
 
+    protected fun openSurahTab() {
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.selection_category_surahs),
+        ).performClick()
+    }
+
+    protected fun openRubTab() {
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.selection_category_rub),
+        ).performClick()
+    }
+
     protected fun selectVisibleJuz(juzNumber: Int) {
         val title = composeRule.activity.getString(R.string.quran_juz_title, juzNumber)
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText(title).fetchSemanticsNodes().isNotEmpty()
-        }
+        composeRule.onNodeWithTag("pool-selector-options-list-Juz").performScrollToNode(hasText(title))
         composeRule.onNodeWithText(title).performClick()
     }
 
     protected fun selectVisibleSurah(surahNameArabic: String) {
         val title = composeRule.activity.getString(R.string.quran_surah_title, surahNameArabic)
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText(title).fetchSemanticsNodes().isNotEmpty()
-        }
+        composeRule.onNodeWithTag("pool-selector-options-list-Surahs").performScrollToNode(hasText(title))
+        composeRule.onNodeWithText(title).performClick()
+    }
+
+    protected fun selectVisibleRub(rubNumber: Int) {
+        val title = composeRule.activity.getString(R.string.quran_rub_title, rubNumber)
+        composeRule.onNodeWithTag("pool-selector-options-list-Rub").performScrollToNode(hasText(title))
         composeRule.onNodeWithText(title).performClick()
     }
 

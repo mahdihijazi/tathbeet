@@ -449,7 +449,15 @@ The data model should support shared ownership and conflict-safe synchronization
 - the top summary should not represent the whole cycle
 - that top summary should focus on completed count, remaining count, and clear progress through today’s work scope
 - review items should be execution units, not raw pool labels like `الجزء 30`
-- if a task spans multiple short surahs, the main task label should read like `من النبأ إلى المرسلات`
+- if the user explicitly selected a surah and that surah is small enough to fit within the size of one `rub al-hizb`, it should appear as its own separate task in the review list
+- if a selected surah is larger than one `rub al-hizb`, it should be split into rub-based tasks
+- if the user selected a `juz` or `hizb`, the engine should split into surah tasks only when a surah is fully contained inside that selected scope and small enough to fit within the size of one `rub al-hizb`
+- explicit `rub al-hizb` selections should remain rub-based tasks
+- when several short surahs qualify, each surah should appear as its own separate task
+- if a short surah crosses two consecutive non-explicit `rub al-hizb` boundaries, it should still appear as one surah task rather than two partial rub tasks
+- completion granularity should follow the displayed task granularity
+- progress in the top summary should be weighted by real review size rather than by raw task count, so short-surah tasks do not count the same as a full rub-based task
+- if a task spans multiple short surahs, the main task label should read like `من النبإ إلى المرسلات`
 - if a task stays inside one long surah, the labeling should use Quran range detail with ayah numbering
 - user completes individual items from the task list
 - app can determine when the day is complete
@@ -460,6 +468,7 @@ The data model should support shared ownership and conflict-safe synchronization
   - future dated assignments already visible inline through the end of the current cycle
 - the review screen should stay structurally simple: compact top summary and a unified task list separated by section headers
 - editing the revision plan should be available from the review screen top app bar rather than from the review body
+- saving an edited revision plan should rebuild the active visible review cycle from the updated pool so the review list reflects the latest selections immediately
 
 ### 13.4 Offline Behavior
 

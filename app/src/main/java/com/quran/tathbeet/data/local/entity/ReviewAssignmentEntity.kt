@@ -14,10 +14,13 @@ data class ReviewAssignmentEntity(
     val learnerId: String,
     @ColumnInfo(name = "assigned_for_date")
     val assignedForDate: String,
+    @ColumnInfo(name = "task_key")
+    val taskKey: String,
     @ColumnInfo(name = "rub_id")
     val rubId: Int,
     val title: String,
     val detail: String,
+    val weight: Double,
     @ColumnInfo(name = "display_order")
     val displayOrder: Int,
     @ColumnInfo(name = "is_rollover")

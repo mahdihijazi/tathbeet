@@ -50,8 +50,8 @@ fun ReviewProgressCard(
         Text(
             text = stringResource(
                 R.string.review_progress_ratio,
-                progress.completedCount,
-                progress.totalCount,
+                progress.completedText,
+                progress.totalText,
             ),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
@@ -68,7 +68,7 @@ fun ReviewProgressCard(
                 .padding(top = TathbeetTokens.spacing.x1Half),
         )
         Text(
-            text = stringResource(R.string.review_progress_remaining, progress.remainingCount),
+            text = stringResource(R.string.review_progress_remaining, progress.remainingText),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

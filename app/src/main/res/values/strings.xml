@@ -48,7 +48,7 @@
     <string name="selection_summary_separator">، </string>
     <string name="selection_summary_more"> + %1$d أخرى</string>
     <string name="quran_surah_title">سورة %1$s</string>
-    <string name="quran_surah_detail">%1$d آية · %2$d مقطع مراجعة</string>
+    <string name="quran_surah_detail">%1$s · %2$d مقطع مراجعة</string>
     <string name="quran_juz_title">الجزء %1$d</string>
     <string name="quran_juz_detail">%1$s</string>
     <string name="quran_hizb_title">الحزب %1$d</string>
@@ -190,9 +190,9 @@
     <string name="review_section_day_after_next_title">ورد بعد الغد</string>
     <string name="review_section_cycle_last_title">آخر ورد في الدورة</string>
     <string name="review_progress_title">إنجاز مهام اليوم</string>
-    <string name="review_progress_ratio">%1$d من %2$d</string>
-    <string name="review_progress_completed_label">مهام مكتملة</string>
-    <string name="review_progress_remaining">المتبقي الآن: %1$d</string>
+    <string name="review_progress_ratio">%1$s من %2$s</string>
+    <string name="review_progress_completed_label">وحدات مكتملة</string>
+    <string name="review_progress_remaining">المتبقي الآن: %1$s</string>
     <string name="review_cycle_complete_title">اكتملت الدورة الحالية</string>
     <string name="review_cycle_complete_body">أنهيت جميع مهام هذه الدورة. يمكنك بدء دورة جديدة من البداية.</string>
     <string name="review_cycle_restart">ابدأ دورة جديدة</string>
@@ -202,6 +202,10 @@
     <string name="review_rating_dialog_title">قيّم درجة حفظك</string>
     <string name="review_rating_value">%1$d/5</string>
     <string name="review_toggle_task">تحديد %1$s</string>
+    <string name="ayah_count_one">آية واحدة</string>
+    <string name="ayah_count_two">آيتان</string>
+    <string name="ayah_count_few">%1$d آيات</string>
+    <string name="ayah_count_many">%1$d آية</string>
     <string name="sample_range_rub_13">من البقرة 203 إلى 252</string>
     <string name="sample_range_rub_14">من البقرة 253 إلى آل عمران 25</string>
     <string name="sample_range_rub_15">من آل عمران 26 إلى 49</string>

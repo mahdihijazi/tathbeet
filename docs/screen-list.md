@@ -52,7 +52,7 @@
 
 - shows today’s assigned execution units
 - uses friendly Quran-range labels instead of raw pool labels like `الجزء 30`
-- shows ranges like `من النبأ إلى المرسلات` for multi-surah tasks
+- shows ranges like `من النبإ إلى المرسلات` for multi-surah tasks
 - shows rollover items first when previous work was missed
 - appends future dated work inline once the currently visible day is finished
 - offers an explicit restart action when the current cycle is fully completed

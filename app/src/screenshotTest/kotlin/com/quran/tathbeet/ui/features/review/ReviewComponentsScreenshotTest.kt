@@ -49,9 +49,9 @@ fun ReviewProgressCardCompleteScreenshot() {
     ReviewScreenshotBox {
         ReviewProgressCard(
             progress = ReviewProgressCardUiState(
-                completedCount = 5,
-                totalCount = 5,
-                remainingCount = 0,
+                completedText = "1",
+                totalText = "1",
+                remainingText = "0",
                 progress = 1f,
             ),
         )

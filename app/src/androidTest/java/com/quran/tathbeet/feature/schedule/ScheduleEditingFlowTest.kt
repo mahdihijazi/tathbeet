@@ -6,6 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.quran.tathbeet.R
 import com.quran.tathbeet.test.BaseUiFlowTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlinx.coroutines.flow.filterNotNull
@@ -56,5 +58,41 @@ class ScheduleEditingFlowTest : BaseUiFlowTest() {
                 composeRule.activity.getString(R.string.wizard_step_counter, 2, 3),
             ).fetchSemanticsNodes().isEmpty()
         }
+    }
+
+    @Test
+    fun editing_plan_rebuilds_review_timeline_from_new_pool() {
+        tapNext()
+        assertPoolSelectorVisible()
+        openJuzTab()
+        selectVisibleJuz(30)
+        tapNext()
+        saveSchedule()
+        assertReviewVisible()
+
+        composeRule.onNodeWithContentDescription(
+            composeRule.activity.getString(R.string.content_edit_plan),
+        ).performClick()
+
+        assertPoolSelectorVisible()
+        openJuzTab()
+        selectVisibleJuz(29)
+        openRubTab()
+        selectVisibleRub(1)
+        openSurahTab()
+        selectVisibleSurah("الصف")
+        selectVisibleSurah("الجمعة")
+        selectVisibleSurah("المنافقون")
+        tapNext()
+        saveSchedule()
+        assertReviewVisible()
+
+        val timeline = awaitReviewTimeline()
+        val allAssignments = timeline.flatMap { it.assignments }
+
+        assertEquals(1, timeline.first().assignments.first().rubId)
+        assertTrue(allAssignments.any { it.taskKey == "rub-1" })
+        assertTrue(allAssignments.any { it.taskKey == "surah-61" })
+        assertTrue(allAssignments.any { it.rubId in 229..236 })
     }
 }

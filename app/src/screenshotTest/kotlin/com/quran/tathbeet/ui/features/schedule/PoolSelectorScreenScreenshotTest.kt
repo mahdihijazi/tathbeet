@@ -200,7 +200,7 @@ private fun sampleSurahItem(
 @Composable
 private fun sampleJuzItem(
     itemId: Int,
-    rangeSummary: String = "من النبأ إلى الناس",
+    rangeSummary: String = "من النبإ إلى الناس",
 ): QuranSelectionItem = QuranSelectionItem(
     key = selectionKey(SelectionCategory.Juz, itemId),
     category = SelectionCategory.Juz,

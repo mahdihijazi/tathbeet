@@ -368,9 +368,11 @@ private fun scheduleWizardViewModelFactory(
 ) = ScheduleWizardViewModelFactory(
     profileRepository = appContainer.profileRepository,
     scheduleRepository = appContainer.scheduleRepository,
+    reviewRepository = appContainer.reviewRepository,
     settingsRepository = appContainer.settingsRepository,
     quranCatalogRepository = appContainer.quranCatalogRepository,
     revisionPlanner = appContainer.revisionPlanner,
+    timeProvider = appContainer.timeProvider,
 )
 
 private fun NavHostController.navigateMain(route: String) {
