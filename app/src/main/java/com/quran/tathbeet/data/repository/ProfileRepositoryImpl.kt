@@ -39,6 +39,16 @@ class ProfileRepositoryImpl(
         )
     }
 
+    override suspend fun updateAccountName(
+        accountId: String,
+        name: String,
+    ) {
+        database.learnerAccountDao().updateName(
+            accountId = accountId,
+            name = name,
+        )
+    }
+
     override suspend fun setActiveAccount(accountId: String) {
         database.withTransaction {
             database.learnerAccountDao().clearActiveAccount()

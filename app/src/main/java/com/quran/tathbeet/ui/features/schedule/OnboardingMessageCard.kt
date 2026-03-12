@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.quran.tathbeet.ui.components.AppCardTone
-import com.quran.tathbeet.ui.components.AppPrimaryButton
 import com.quran.tathbeet.ui.components.CardSection
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
@@ -19,8 +18,6 @@ import com.quran.tathbeet.ui.theme.TathbeetTokens
 fun OnboardingMessageCard(
     title: String,
     body: String,
-    actionLabel: String,
-    onActionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CardSection(
@@ -44,10 +41,6 @@ fun OnboardingMessageCard(
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-            )
-            AppPrimaryButton(
-                text = actionLabel,
-                onClick = onActionClick,
             )
         }
     }

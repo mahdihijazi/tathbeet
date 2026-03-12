@@ -10,5 +10,7 @@ interface ProfileRepository {
 
     suspend fun ensureDefaultAccount(name: String)
 
+    suspend fun updateAccountName(accountId: String, name: String)
+
     suspend fun setActiveAccount(accountId: String)
 }

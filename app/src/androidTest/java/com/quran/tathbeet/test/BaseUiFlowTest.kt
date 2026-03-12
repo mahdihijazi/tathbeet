@@ -13,6 +13,8 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performScrollToNode
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -76,6 +78,11 @@ abstract class BaseUiFlowTest {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.action_next),
         ).performClick()
+    }
+
+    protected fun enterProfileName(name: String) {
+        composeRule.onNodeWithTag("schedule-profile-name-input").performTextClearance()
+        composeRule.onNodeWithTag("schedule-profile-name-input").performTextInput(name)
     }
 
     protected fun saveSchedule() {

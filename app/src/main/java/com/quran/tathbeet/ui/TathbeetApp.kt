@@ -121,12 +121,18 @@ fun TathbeetApp(
                             viewModelStoreOwner = scheduleGraphEntry,
                             factory = scheduleWizardViewModelFactory(appContainer),
                         )
-                        ScheduleIntroScreen(
-                            onNext = {
-                                wizardViewModel.markIntroSeen()
-                                navController.navigate(RoutePoolSelector)
-                            },
-                        )
+                        val uiState by wizardViewModel.uiState.collectAsState()
+                        if (!uiState.isLoading) {
+                            ScheduleIntroScreen(
+                                profileName = uiState.profileName,
+                                onProfileNameChanged = wizardViewModel::updateProfileName,
+                                onNext = {
+                                    wizardViewModel.continueFromIntro {
+                                        navController.navigate(RoutePoolSelector)
+                                    }
+                                },
+                            )
+                        }
                     }
                     composable(RoutePoolSelector) { backStackEntry ->
                         val scheduleGraphEntry = remember(backStackEntry) {

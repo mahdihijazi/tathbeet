@@ -10,18 +10,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.Image
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.testTag
 import com.quran.tathbeet.R
+import com.quran.tathbeet.ui.components.AppPrimaryButton
+import com.quran.tathbeet.ui.components.CardSection
 import com.quran.tathbeet.ui.components.WizardHeader
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
 fun ScheduleIntroScreen(
+    profileName: String,
+    onProfileNameChanged: (String) -> Unit,
     onNext: () -> Unit,
 ) {
     Box(
@@ -79,8 +86,24 @@ fun ScheduleIntroScreen(
                 OnboardingMessageCard(
                     title = stringResource(R.string.schedule_intro_body),
                     body = stringResource(R.string.schedule_intro_supporting),
-                    actionLabel = stringResource(R.string.action_next),
-                    onActionClick = onNext,
+                )
+                CardSection {
+                    OutlinedTextField(
+                        value = profileName,
+                        onValueChange = onProfileNameChanged,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("schedule-profile-name-input"),
+                        label = {
+                            Text(text = stringResource(R.string.schedule_profile_name_label))
+                        },
+                        singleLine = true,
+                    )
+                }
+                AppPrimaryButton(
+                    text = stringResource(R.string.action_next),
+                    onClick = onNext,
+                    enabled = profileName.isNotBlank(),
                 )
             }
         }

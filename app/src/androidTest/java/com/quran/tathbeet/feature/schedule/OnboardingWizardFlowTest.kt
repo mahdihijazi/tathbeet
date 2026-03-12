@@ -38,4 +38,19 @@ class OnboardingWizardFlowTest : BaseUiFlowTest() {
             assert(schedule.selections.any { it.itemId == 1 })
         }
     }
+
+    @Test
+    fun onboarding_flow_saves_entered_profile_name() {
+        enterProfileName("محمد")
+        completeOnboardingWithJuzOne()
+        assertReviewVisible()
+
+        runBlocking {
+            val account = appContainer.profileRepository.observeActiveAccount()
+                .filterNotNull()
+                .first()
+
+            assert(account.name == "محمد")
+        }
+    }
 }

@@ -144,6 +144,7 @@ The current app build is:
 - intentionally fake for sync, Firebase, database, and backend behavior
 - uses a 3-step schedule wizard
 - shows a one-time intro on first app open
+- asks for the active profile name on the intro step with a lightweight single input before memorized-pool selection
 - reopens the wizard from محفوظ selection after onboarding
 - sends users with an existing schedule straight to review on launch
 - keeps sign-in and account-mode changes as a later Settings action in the prototype

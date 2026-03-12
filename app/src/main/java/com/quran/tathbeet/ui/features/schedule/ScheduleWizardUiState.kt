@@ -8,6 +8,7 @@ import com.quran.tathbeet.ui.model.SelectionCategory
 
 data class ScheduleWizardUiState(
     val isLoading: Boolean = true,
+    val profileName: String = "",
     val hasSeenScheduleIntro: Boolean = false,
     val isOnboarding: Boolean = true,
     val selectedCategory: SelectionCategory = SelectionCategory.Surahs,

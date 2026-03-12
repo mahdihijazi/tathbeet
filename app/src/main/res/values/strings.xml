@@ -101,6 +101,7 @@
 
     <string name="review_starter_title">ابدأ باختيار المحفوظ</string>
     <string name="review_starter_detail">بعد ذلك احفظ الخطة لفتح ورد اليوم</string>
+    <string name="schedule_profile_name_label">اسم الملف الشخصي</string>
 
     <string name="profile_name_father">الأب</string>
     <string name="profile_name_self">حسابي</string>

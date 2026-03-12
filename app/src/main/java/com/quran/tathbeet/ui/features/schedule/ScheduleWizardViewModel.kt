@@ -54,9 +54,11 @@ class ScheduleWizardViewModel(
                         settingsRepository.observeSettings(),
                         scheduleRepository.observeActiveSchedule(account.id),
                     ) { settings, schedule ->
-                        Triple(account.id, settings.hasSeenScheduleIntro, schedule)
-                    }.collect { (accountId, hasSeenIntro, schedule) ->
-                        if (loadedAccountId != accountId) {
+                        Triple(account, settings.hasSeenScheduleIntro, schedule)
+                    }.collect { (account, hasSeenIntro, schedule) ->
+                        val accountId = account.id
+                        val isNewAccount = loadedAccountId != accountId
+                        if (isNewAccount) {
                             loadedAccountId = accountId
                             selectedKeys = schedule?.selections
                                 ?.sortedBy { it.displayOrder }
@@ -70,6 +72,11 @@ class ScheduleWizardViewModel(
                                 .orEmpty()
                         }
 
+                        val profileName = if (isNewAccount) {
+                            account.name
+                        } else {
+                            _uiState.value.profileName.ifBlank { account.name }
+                        }
                         val uiPaceMethod = schedule?.paceMethod?.toUiPaceMethod() ?: UiPaceMethod.CycleTarget
                         val uiCycleTarget = schedule?.cycleTarget?.toUiCycleTarget() ?: UiCycleTarget.OneMonth
                         val uiSelectedPace = if (schedule == null) {
@@ -81,6 +88,7 @@ class ScheduleWizardViewModel(
 
                         _uiState.value = ScheduleWizardUiState(
                             isLoading = false,
+                            profileName = profileName,
                             hasSeenScheduleIntro = hasSeenIntro,
                             isOnboarding = schedule == null,
                             selectedCategory = _uiState.value.selectedCategory,
@@ -101,11 +109,29 @@ class ScheduleWizardViewModel(
         }
     }
 
-    fun markIntroSeen() {
-        viewModelScope.launch {
-            settingsRepository.markScheduleIntroSeen()
+    fun updateProfileName(name: String) {
+        _uiState.value = _uiState.value.copy(profileName = name)
+    }
+
+    fun continueFromIntro(onDone: () -> Unit) {
+        val trimmedName = _uiState.value.profileName.trim()
+        if (trimmedName.isBlank()) {
+            return
         }
-        _uiState.value = _uiState.value.copy(hasSeenScheduleIntro = true)
+
+        viewModelScope.launch {
+            val activeAccount = profileRepository.observeActiveAccount().filterNotNull().first()
+            profileRepository.updateAccountName(
+                accountId = activeAccount.id,
+                name = trimmedName,
+            )
+            settingsRepository.markScheduleIntroSeen()
+            _uiState.value = _uiState.value.copy(
+                profileName = trimmedName,
+                hasSeenScheduleIntro = true,
+            )
+            onDone()
+        }
     }
 
     fun selectCategory(category: UiSelectionCategory) {

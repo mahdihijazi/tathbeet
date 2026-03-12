@@ -21,6 +21,9 @@ interface LearnerAccountDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(entity: LearnerAccountEntity)
 
+    @Query("UPDATE learner_account SET name = :name WHERE id = :accountId")
+    suspend fun updateName(accountId: String, name: String)
+
     @Query("UPDATE learner_account SET is_active = 0")
     suspend fun clearActiveAccount()
 

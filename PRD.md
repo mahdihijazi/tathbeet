@@ -426,6 +426,7 @@ The data model should support shared ownership and conflict-safe synchronization
 - user can create one active schedule per profile
 - schedule setup should use a wizard flow rather than a single crowded screen
 - the wizard should show a one-time intro screen on first app open
+- the intro step should ask for the active profile name with a lightweight single input before the user moves into memorized-content selection
 - user can choose memorized content using surah, juz, hizb, or rub al-hizb
 - memorized-content selection should use a dedicated selection screen rather than a compact inline control
 - the memorized-content screen should keep the top summary and navigation area fixed while only the item list scrolls
