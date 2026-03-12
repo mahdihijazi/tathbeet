@@ -55,6 +55,33 @@ interface ReviewDayDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(entity: ReviewDayEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(entities: List<ReviewDayEntity>)
+
+    @Query(
+        """
+        DELETE FROM review_day
+        WHERE learner_id = :learnerId AND assigned_for_date >= :assignedForDate
+        """,
+    )
+    suspend fun deleteOnOrAfter(
+        learnerId: String,
+        assignedForDate: String,
+    )
+
+    @Query(
+        """
+        DELETE FROM review_day
+        WHERE learner_id = :learnerId
+          AND id NOT IN (
+              SELECT DISTINCT review_day_id
+              FROM review_assignment
+              WHERE learner_id = :learnerId
+          )
+        """,
+    )
+    suspend fun deleteEmptyDays(learnerId: String)
+
     @Query("DELETE FROM review_day WHERE learner_id = :learnerId")
     suspend fun deleteForLearner(learnerId: String)
 }

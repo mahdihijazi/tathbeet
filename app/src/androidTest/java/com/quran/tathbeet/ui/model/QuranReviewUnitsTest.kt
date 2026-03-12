@@ -66,4 +66,53 @@ class QuranReviewUnitsTest {
             },
         )
     }
+
+    @Test
+    fun mixed_pool_keeps_short_surahs_friendly_and_includes_new_selections() {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val catalog = loadQuranCatalog(context)
+
+        val reviewUnits = catalog.buildReviewUnits(
+            context = context,
+            keys = setOf(
+                selectionKey(SelectionCategory.Juz, 30),
+                selectionKey(SelectionCategory.Juz, 29),
+                selectionKey(SelectionCategory.Rub, 1),
+                selectionKey(SelectionCategory.Surahs, 61),
+                selectionKey(SelectionCategory.Surahs, 62),
+                selectionKey(SelectionCategory.Surahs, 63),
+            ),
+        )
+
+        assertTrue(reviewUnits.any { unit -> unit.id == "rub-1" })
+        assertTrue(reviewUnits.any { unit -> unit.id == "surah-61" })
+        assertTrue(reviewUnits.any { unit -> unit.id == "surah-62" })
+        assertTrue(reviewUnits.any { unit -> unit.id == "surah-63" })
+        assertTrue(reviewUnits.any { unit -> unit.rubId in 225..232 })
+        assertTrue(
+            reviewUnits.any { unit ->
+                unit.title == context.getString(R.string.quran_surah_title, "العاديات")
+            },
+        )
+        assertFalse(
+            reviewUnits.any { unit ->
+                unit.title == context.getString(
+                    R.string.quran_range_single_surah,
+                    "العاديات",
+                    1,
+                    8,
+                )
+            },
+        )
+        assertFalse(
+            reviewUnits.any { unit ->
+                unit.title == context.getString(
+                    R.string.quran_range_single_surah,
+                    "العاديات",
+                    9,
+                    11,
+                )
+            },
+        )
+    }
 }

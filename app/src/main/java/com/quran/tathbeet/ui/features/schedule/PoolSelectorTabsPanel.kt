@@ -92,7 +92,10 @@ fun PoolSelectorTabsPanel(
             ) {
                 items(pageOptions, key = { it.key }) { option ->
                     val isSelected = selectedPool.any { item -> item.key == option.key }
-                    Card(onClick = { onToggleSelection(option) }) {
+                    Card(
+                        onClick = { onToggleSelection(option) },
+                        modifier = Modifier.testTag("pool-selector-option-${option.key}"),
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -116,6 +119,7 @@ fun PoolSelectorTabsPanel(
                                 )
                             }
                             Checkbox(
+                                modifier = Modifier.testTag("pool-selector-checkbox-${option.key}"),
                                 checked = isSelected,
                                 onCheckedChange = { onToggleSelection(option) },
                             )

@@ -49,9 +49,6 @@ class ReviewViewModel(
                     reviewRepository.observeReviewTimeline(account.id)
                         .collect { reviewDays ->
                             timeline = reviewDays.sortedBy { it.assignedForDate }
-                            if (populateFullCycleAssignments()) {
-                                return@collect
-                            }
                             publishUiState()
                         }
                 }
@@ -93,38 +90,6 @@ class ReviewViewModel(
         showCycleResetDialog = false
         cycleResetDialogDismissed = true
         publishUiState()
-    }
-
-    private suspend fun populateFullCycleAssignments(): Boolean {
-        val learnerId = currentLearnerId ?: return false
-        val today = timeProvider.today()
-        var cursorDate = timeline
-            .lastOrNull { !it.assignedForDate.isBefore(today) }
-            ?.assignedForDate
-            ?: today
-        var addedAssignments = false
-
-        while (true) {
-            val nextDate = if (addedAssignments || timeline.any { !it.assignedForDate.isBefore(today) }) {
-                cursorDate.plusDays(1)
-            } else {
-                cursorDate
-            }
-            val created = reviewRepository.ensureAssignmentsForDate(
-                learnerId = learnerId,
-                assignedForDate = nextDate,
-            )
-            if (!created) {
-                break
-            }
-            if (timeline.any { it.assignedForDate == nextDate }) {
-                cursorDate = nextDate
-                continue
-            }
-            addedAssignments = true
-            cursorDate = nextDate
-        }
-        return addedAssignments
     }
 
     private fun publishUiState() {

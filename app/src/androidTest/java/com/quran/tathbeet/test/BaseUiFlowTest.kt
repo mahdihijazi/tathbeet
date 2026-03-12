@@ -23,6 +23,7 @@ import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.domain.model.ReviewAssignment
 import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.ui.TathbeetApp
+import com.quran.tathbeet.ui.model.SelectionCategory
 import com.quran.tathbeet.ui.theme.TathbeetTheme
 import java.time.LocalDate
 import java.time.ZoneId
@@ -101,21 +102,21 @@ abstract class BaseUiFlowTest {
     }
 
     protected fun selectVisibleJuz(juzNumber: Int) {
-        val title = composeRule.activity.getString(R.string.quran_juz_title, juzNumber)
-        composeRule.onNodeWithTag("pool-selector-options-list-Juz").performScrollToNode(hasText(title))
-        composeRule.onNodeWithText(title).performClick()
+        val optionTag = "pool-selector-option-juz-$juzNumber"
+        composeRule.onNodeWithTag("pool-selector-options-list-Juz").performScrollToNode(hasTestTag(optionTag))
+        composeRule.onNodeWithTag(optionTag).performClick()
     }
 
     protected fun selectVisibleSurah(surahNameArabic: String) {
-        val title = composeRule.activity.getString(R.string.quran_surah_title, surahNameArabic)
-        composeRule.onNodeWithTag("pool-selector-options-list-Surahs").performScrollToNode(hasText(title))
-        composeRule.onNodeWithText(title).performClick()
+        val optionTag = "pool-selector-option-surahs-${surahIdForName(surahNameArabic)}"
+        composeRule.onNodeWithTag("pool-selector-options-list-Surahs").performScrollToNode(hasTestTag(optionTag))
+        composeRule.onNodeWithTag(optionTag).performClick()
     }
 
     protected fun selectVisibleRub(rubNumber: Int) {
-        val title = composeRule.activity.getString(R.string.quran_rub_title, rubNumber)
-        composeRule.onNodeWithTag("pool-selector-options-list-Rub").performScrollToNode(hasText(title))
-        composeRule.onNodeWithText(title).performClick()
+        val optionTag = "pool-selector-option-rub-$rubNumber"
+        composeRule.onNodeWithTag("pool-selector-options-list-Rub").performScrollToNode(hasTestTag(optionTag))
+        composeRule.onNodeWithTag(optionTag).performClick()
     }
 
     protected fun assertReviewVisible() {
@@ -180,14 +181,26 @@ abstract class BaseUiFlowTest {
     protected fun awaitTodayReviewDay(): ReviewDay = awaitReviewDay(todayDate())
 
     protected fun awaitReviewTimeline(): List<ReviewDay> = runBlocking {
-        val account = appContainer.profileRepository.observeActiveAccount()
-            .filterNotNull()
-            .first()
-        appContainer.reviewRepository.observeReviewTimeline(account.id).first()
+        appContainer.reviewRepository.observeReviewTimeline(activeAccountId()).first()
     }
 
     protected fun firstTodayAssignment(): ReviewAssignment =
         awaitTodayReviewDay().assignments.first()
+
+    protected fun activeAccountId(): String = runBlocking {
+        appContainer.profileRepository.observeActiveAccount()
+            .filterNotNull()
+            .first()
+            .id
+    }
+
+    private fun surahIdForName(surahNameArabic: String): Int =
+        appContainer.quranCatalogRepository.getCatalog()
+            .itemsFor(SelectionCategory.Surahs)
+            .first { surah ->
+                surah.title == composeRule.activity.getString(R.string.quran_surah_title, surahNameArabic)
+            }
+            .itemId
 }
 
 class TestAppContainer(

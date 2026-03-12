@@ -45,6 +45,15 @@ interface ReviewAssignmentDao {
     @Query(
         """
         SELECT * FROM review_assignment
+        WHERE learner_id = :learnerId
+        ORDER BY assigned_for_date, display_order
+        """,
+    )
+    suspend fun getAssignmentsForLearner(learnerId: String): List<ReviewAssignmentEntity>
+
+    @Query(
+        """
+        SELECT * FROM review_assignment
         WHERE learner_id = :learnerId AND rating IS NOT NULL
         ORDER BY completed_at DESC, assigned_for_date DESC, display_order DESC
         """,
@@ -84,6 +93,19 @@ interface ReviewAssignmentDao {
     suspend fun updateRating(
         assignmentId: String,
         rating: Int,
+    )
+
+    @Query(
+        """
+        DELETE FROM review_assignment
+        WHERE learner_id = :learnerId
+          AND is_done = 0
+          AND assigned_for_date >= :assignedForDate
+        """,
+    )
+    suspend fun deletePendingAssignmentsOnOrAfter(
+        learnerId: String,
+        assignedForDate: String,
     )
 
     @Query("SELECT COUNT(*) FROM review_assignment WHERE review_day_id = :reviewDayId")
