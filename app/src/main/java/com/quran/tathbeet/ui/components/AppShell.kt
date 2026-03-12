@@ -38,6 +38,7 @@ import com.quran.tathbeet.ui.model.AppDestination
 @Composable
 fun AppShell(
     currentDestination: AppDestination,
+    reviewTitle: String?,
     onNavigate: (AppDestination) -> Unit,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
@@ -52,6 +53,7 @@ fun AppShell(
                 if (currentDestination != AppDestination.ScheduleIntro) {
                     AppTopBar(
                         currentDestination = currentDestination,
+                        reviewTitle = reviewTitle,
                         onBack = onBack,
                         onReviewPlanAction = onReviewPlanAction,
                         onReviewResetAction = onReviewResetAction,
@@ -90,6 +92,7 @@ private val mainDestinations = listOf(
 @Composable
 private fun AppTopBar(
     currentDestination: AppDestination,
+    reviewTitle: String?,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
     onReviewResetAction: () -> Unit,
@@ -102,7 +105,9 @@ private fun AppTopBar(
         title = {
             if (currentDestination != AppDestination.ScheduleIntro) {
                 Text(
-                    text = stringResource(currentDestination.titleRes),
+                    text = reviewTitle
+                        ?.takeIf { currentDestination == AppDestination.Review }
+                        ?: stringResource(currentDestination.titleRes),
                 )
             }
         },

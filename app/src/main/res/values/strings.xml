@@ -192,6 +192,7 @@
     <string name="pool_selector_done">تم</string>
 
     <string name="review_title">ورد اليوم</string>
+    <string name="review_title_for_profile">الورد لـ %1$s</string>
     <string name="review_subtitle">أكمل المقاطع المطلوبة لليوم</string>
     <string name="review_rollover_chip">مؤجل</string>
     <string name="review_state_done">مكتمل</string>

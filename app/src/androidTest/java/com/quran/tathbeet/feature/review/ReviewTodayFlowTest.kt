@@ -12,6 +12,17 @@ import org.junit.Test
 class ReviewTodayFlowTest : BaseUiFlowTest() {
 
     @Test
+    fun review_screen_shows_active_profile_name() {
+        enterProfileName("محمد")
+        completeOnboardingWithJuzOne()
+        assertReviewVisible()
+
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.review_title_for_profile, "محمد"),
+        ).assertIsDisplayed()
+    }
+
+    @Test
     fun fresh_saved_plan_shows_real_cycle_tasks_without_fake_rollover() {
         completeOnboardingWithJuzOne()
         assertReviewVisible()

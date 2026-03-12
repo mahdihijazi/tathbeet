@@ -59,6 +59,7 @@ fun TathbeetApp(
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination?.route.toAppDestination()
+    val activeAccount by appContainer.profileRepository.observeActiveAccount().collectAsState(initial = null)
     var onReviewResetAction by remember { mutableStateOf({}) }
 
     LaunchedEffect(appContainer) {
@@ -85,6 +86,9 @@ fun TathbeetApp(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         AppShell(
             currentDestination = currentDestination,
+            reviewTitle = activeAccount?.name
+                ?.takeIf { currentDestination == AppDestination.Review }
+                ?.let { profileName -> context.getString(R.string.review_title_for_profile, profileName) },
             onNavigate = { destination ->
                 navController.navigateMain(destination.toRoute())
             },

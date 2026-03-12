@@ -451,6 +451,7 @@ The data model should support shared ownership and conflict-safe synchronization
 - the review screen top app bar should also allow the user to reset the current cycle at any time
 - resetting the current cycle is destructive and must show a warning confirmation before removing current-cycle progress
 - the review screen should show a compact top progress summary card for today’s work scope
+- the review screen top bar should clearly show which local profile is currently active so the visible plan is not ambiguous on shared devices
 - that top summary should count:
   - carried-over overdue work
   - today’s assigned work
