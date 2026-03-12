@@ -140,7 +140,6 @@
     <string name="profile_button_edit_profile">تعديل الحساب</string>
     <string name="profile_button_manage_sharing">إدارة المشاركة</string>
     <string name="profile_section_title">الحسابات</string>
-    <string name="profile_section_subtitle">كل ضغطة تحدث الحالة فوراً</string>
     <string name="profile_add_child">إضافة حساب</string>
     <string name="profile_type_self">حساب شخصي</string>
     <string name="profile_type_child">حساب إضافي</string>
@@ -152,8 +151,8 @@
     <string name="percentage_value">%1$d%%</string>
     <string name="profile_today_tasks_done">تم %1$d من %2$d لمهام اليوم</string>
     <string name="profile_today_tasks_empty">افتح الخطة لإعداد أول ورد</string>
+    <string name="profile_notifications_toggle">تفعيل الإشعارات</string>
     <string name="profile_shared_with">مشترك مع %1$s</string>
-    <string name="profile_local_only">حساب محلي حالياً</string>
     <string name="profile_dialog_add_title">إضافة حساب محلي</string>
     <string name="profile_dialog_edit_title">تعديل بيانات الحساب</string>
     <string name="profile_dialog_delete_title">حذف الحساب</string>

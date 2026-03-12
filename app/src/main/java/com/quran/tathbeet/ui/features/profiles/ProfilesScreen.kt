@@ -78,7 +78,6 @@ fun ProfilesScreen(
         item {
             SectionHeader(
                 title = stringResource(R.string.profile_section_title),
-                subtitle = stringResource(R.string.profile_section_subtitle),
             )
         }
 
@@ -192,17 +191,22 @@ private fun ProfileCard(
                     },
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                Switch(
-                    checked = profile.notificationsEnabled,
-                    onCheckedChange = { onToggleNotifications() },
-                    modifier = Modifier.testTag("profiles-notifications-${profile.id}"),
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.profile_notifications_toggle),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Switch(
+                        checked = profile.notificationsEnabled,
+                        onCheckedChange = { onToggleNotifications() },
+                        modifier = Modifier.testTag("profiles-notifications-${profile.id}"),
+                    )
+                }
             }
-            Text(
-                text = stringResource(R.string.profile_local_only),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }

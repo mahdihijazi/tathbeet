@@ -96,6 +96,7 @@ abstract class BaseUiFlowTest {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.destination_profiles),
         ).performClick()
+        assertProfilesVisible()
     }
 
     protected fun openAddProfileDialog() {
@@ -208,9 +209,11 @@ abstract class BaseUiFlowTest {
     }
 
     protected fun assertProfilesVisible() {
-        composeRule.onNodeWithText(
-            composeRule.activity.getString(R.string.profile_screen_subtitle),
-        ).assertIsDisplayed()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(
+                composeRule.activity.getString(R.string.profile_screen_subtitle),
+            ).fetchSemanticsNodes().isNotEmpty()
+        }
     }
 
     protected fun completeReviewTask(
