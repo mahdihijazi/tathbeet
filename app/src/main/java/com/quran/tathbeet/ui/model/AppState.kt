@@ -18,6 +18,7 @@ enum class AppDestination(
     Progress(R.string.destination_progress, R.string.destination_progress),
     Shared(R.string.destination_shared, R.string.destination_shared),
     Settings(R.string.destination_settings, R.string.destination_settings),
+    Debug(R.string.debug_tools_title, R.string.debug_tools_title),
 }
 
 enum class AccountMode {

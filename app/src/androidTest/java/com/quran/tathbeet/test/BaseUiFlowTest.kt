@@ -2,7 +2,6 @@ package com.quran.tathbeet.test
 
 import android.content.Context
 import androidx.activity.ComponentActivity
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasTestTag
@@ -15,16 +14,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.performScrollToNode
-import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.quran.tathbeet.R
-import com.quran.tathbeet.app.AppContainer
-import com.quran.tathbeet.app.LocalReminderScheduler
-import com.quran.tathbeet.core.time.TimeProvider
-import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.domain.model.ReviewAssignment
 import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.ui.TathbeetApp
@@ -32,8 +27,6 @@ import com.quran.tathbeet.ui.model.CycleTarget
 import com.quran.tathbeet.ui.model.SelectionCategory
 import com.quran.tathbeet.ui.theme.TathbeetTheme
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -324,58 +317,4 @@ abstract class BaseUiFlowTest {
                 surah.title == composeRule.activity.getString(R.string.quran_surah_title, surahNameArabic)
             }
             .itemId
-}
-
-class TestAppContainer(
-    context: Context,
-) : AppContainer(
-    context = context,
-    timeProvider = object : TimeProvider {
-        override fun today(): LocalDate = LocalDate.of(2026, 3, 10)
-
-        override fun now(): ZonedDateTime =
-            ZonedDateTime.of(2026, 3, 10, 8, 0, 0, 0, ZoneId.of("UTC"))
-
-        override fun zoneId(): ZoneId = ZoneId.of("UTC")
-    },
-    database = Room.inMemoryDatabaseBuilder(context, TathbeetDatabase::class.java)
-        .allowMainThreadQueries()
-        .build(),
-) {
-    val recordingQuranExternalLauncher = RecordingQuranExternalLauncher()
-    val recordingReminderScheduler = RecordingLocalReminderScheduler(
-        enabledProfilesProvider = {
-            val settings = settingsRepository.observeSettings().first()
-            if (!settings.globalNotificationsEnabled) {
-                emptyList()
-            } else {
-                profileRepository.observeAccounts().first()
-                    .filter { account ->
-                        account.notificationsEnabled &&
-                            scheduleRepository.observeActiveSchedule(account.id).first() != null
-                    }
-                    .map { account -> account.id }
-            }
-        },
-    )
-
-    override val quranExternalLauncher = recordingQuranExternalLauncher
-    override val localReminderScheduler: LocalReminderScheduler = recordingReminderScheduler
-}
-
-class RecordingLocalReminderScheduler(
-    private val enabledProfilesProvider: suspend () -> List<String>,
-) : LocalReminderScheduler {
-    val scheduledProfiles = mutableListOf<List<String>>()
-    val cancelledProfiles = mutableListOf<String>()
-
-    override suspend fun syncSchedules() {
-        scheduledProfiles += enabledProfilesProvider()
-    }
-
-    override suspend fun cancelProfile(profileId: String) {
-        cancelledProfiles += profileId
-    }
-
-    override suspend fun handleReminder(profileId: String) = Unit
 }

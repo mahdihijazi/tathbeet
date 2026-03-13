@@ -30,11 +30,14 @@ class AndroidLocalReminderScheduler(
     private val scheduleRepository: ScheduleRepository,
     private val settingsRepository: SettingsRepository,
     private val reviewRepository: ReviewRepository,
-) : LocalReminderScheduler {
+) : LocalReminderScheduler, DebugNotificationController {
 
     private val appContext = context.applicationContext
     private val alarmManager = appContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     private val notificationManager = NotificationManagerCompat.from(appContext)
+
+    override val reminderScenarios: List<ReminderNotificationDebugScenario> =
+        ReminderNotificationDebugScenario.entries
 
     override suspend fun syncSchedules() {
         createNotificationChannel()
@@ -108,42 +111,47 @@ class AndroidLocalReminderScheduler(
         )
     }
 
+    override suspend fun triggerReminderNotification(scenario: ReminderNotificationDebugScenario) {
+        createNotificationChannel()
+        if (!canPostNotifications()) {
+            return
+        }
+
+        val account = profileRepository.observeAccounts().first().firstOrNull() ?: return
+        postReminderNotification(
+            notificationId = debugNotificationId(scenario),
+            requestCode = debugNotificationId(scenario),
+            profileId = account.id,
+            title = reminderNotificationTitle(
+                accountName = account.name,
+                includeProfileName = scenario.includeProfileName,
+            ),
+            body = reminderNotificationBody(
+                baseBodyResId = scenario.baseBodyResId,
+                hadithEntry = scenario.hadithEntry,
+            ),
+        )
+    }
+
     private suspend fun showReminderNotification(
         account: LearnerAccount,
         motivationalMessagesEnabled: Boolean,
     ) {
-        val title = if (shouldIncludeProfileName(account)) {
-            appContext.getString(R.string.reminder_notification_title_for_profile, account.name)
-        } else {
-            appContext.getString(R.string.reminder_notification_title)
-        }
+        val title = reminderNotificationTitle(
+            accountName = account.name,
+            includeProfileName = shouldIncludeProfileName(account),
+        )
         val body = buildReminderBody(
             learnerId = account.id,
             motivationalMessagesEnabled = motivationalMessagesEnabled,
         )
-        val openIntent = Intent(appContext, MainActivity::class.java).apply {
-            action = ReminderNotificationAction
-            putExtra(ReminderProfileIdExtra, account.id)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        val contentIntent = PendingIntent.getActivity(
-            appContext,
-            notificationRequestCode(account.id),
-            openIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        postReminderNotification(
+            notificationId = notificationRequestCode(account.id),
+            requestCode = notificationRequestCode(account.id),
+            profileId = account.id,
+            title = title,
+            body = body,
         )
-
-        val notification = NotificationCompat.Builder(appContext, ReminderChannelId)
-            .setSmallIcon(R.drawable.tathbeet_logo)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(true)
-            .setContentIntent(contentIntent)
-            .build()
-
-        notificationManager.notify(notificationRequestCode(account.id), notification)
     }
 
     private suspend fun buildReminderBody(
@@ -162,16 +170,13 @@ class AndroidLocalReminderScheduler(
                 R.string.reminder_notification_body_today
             },
         )
-        if (!motivationalMessagesEnabled) {
-            return baseBody
-        }
-
-        val hadith = ReminderHadithCatalog.notificationEntryFor(timeProvider.today().dayOfYear)
-        return appContext.getString(
-            R.string.reminder_notification_body_with_motivation,
-            baseBody,
-            appContext.getString(hadith.textResId),
-            appContext.getString(hadith.sourceResId),
+        return reminderNotificationBody(
+            baseBody = baseBody,
+            hadithEntry = if (motivationalMessagesEnabled) {
+                ReminderHadithCatalog.notificationEntryFor(timeProvider.today().dayOfYear)
+            } else {
+                null
+            },
         )
     }
 
@@ -220,6 +225,9 @@ class AndroidLocalReminderScheduler(
     private fun notificationRequestCode(profileId: String): Int =
         profileId.hashCode() + 31_000
 
+    private fun debugNotificationId(scenario: ReminderNotificationDebugScenario): Int =
+        61_000 + scenario.ordinal
+
     private fun canPostNotifications(): Boolean =
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             notificationManager.areNotificationsEnabled()
@@ -246,6 +254,71 @@ class AndroidLocalReminderScheduler(
         )
     }
 
+    private fun reminderNotificationTitle(
+        accountName: String,
+        includeProfileName: Boolean,
+    ): String =
+        if (includeProfileName) {
+            appContext.getString(R.string.reminder_notification_title_for_profile, accountName)
+        } else {
+            appContext.getString(R.string.reminder_notification_title)
+        }
+
+    private fun reminderNotificationBody(
+        baseBody: String,
+        hadithEntry: ReminderHadithEntry?,
+    ): String =
+        if (hadithEntry == null) {
+            baseBody
+        } else {
+            appContext.getString(
+                R.string.reminder_notification_body_with_motivation,
+                baseBody,
+                appContext.getString(hadithEntry.textResId),
+                appContext.getString(hadithEntry.sourceResId),
+            )
+        }
+
+    private fun reminderNotificationBody(
+        baseBodyResId: Int,
+        hadithEntry: ReminderHadithEntry?,
+    ): String = reminderNotificationBody(
+        baseBody = appContext.getString(baseBodyResId),
+        hadithEntry = hadithEntry,
+    )
+
+    private fun postReminderNotification(
+        notificationId: Int,
+        requestCode: Int,
+        profileId: String,
+        title: String,
+        body: String,
+    ) {
+        val openIntent = Intent(appContext, MainActivity::class.java).apply {
+            action = ReminderNotificationAction
+            putExtra(ReminderProfileIdExtra, profileId)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val contentIntent = PendingIntent.getActivity(
+            appContext,
+            requestCode,
+            openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        val notification = NotificationCompat.Builder(appContext, ReminderChannelId)
+            .setSmallIcon(R.drawable.tathbeet_logo)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(contentIntent)
+            .build()
+
+        notificationManager.notify(notificationId, notification)
+    }
+
     companion object {
         const val ReminderChannelId = "daily_reminders"
         const val ReminderAlarmAction = "com.quran.tathbeet.REMINDER_ALARM"
@@ -253,3 +326,17 @@ class AndroidLocalReminderScheduler(
         const val ReminderProfileIdExtra = "reminder_profile_id"
     }
 }
+
+private val ReminderNotificationDebugScenario.baseBodyResId: Int
+    get() = if (hasRollover) {
+        R.string.reminder_notification_body_rollover
+    } else {
+        R.string.reminder_notification_body_today
+    }
+
+private val ReminderNotificationDebugScenario.hadithEntry: ReminderHadithEntry?
+    get() = if (includesMotivation) {
+        ReminderHadithCatalog.notificationEntries[motivationalEntryIndex]
+    } else {
+        null
+    }

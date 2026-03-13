@@ -32,6 +32,7 @@ internal const val RouteReview = "review"
 internal const val RouteProfiles = "profiles"
 internal const val RouteProgress = "progress"
 internal const val RouteSettings = "settings"
+internal const val RouteDebug = "debug"
 internal const val RouteShared = "shared"
 
 @Composable
@@ -114,6 +115,7 @@ internal fun AppDestination.toRoute(): String = when (this) {
     AppDestination.Progress -> RouteProgress
     AppDestination.Shared -> RouteShared
     AppDestination.Settings -> RouteSettings
+    AppDestination.Debug -> RouteDebug
 }
 
 internal fun String?.toAppDestination(): AppDestination = when (this) {
@@ -124,6 +126,7 @@ internal fun String?.toAppDestination(): AppDestination = when (this) {
     RouteProgress -> AppDestination.Progress
     RouteShared -> AppDestination.Shared
     RouteSettings -> AppDestination.Settings
+    RouteDebug -> AppDestination.Debug
     else -> AppDestination.Review
 }
 

@@ -55,4 +55,6 @@ open class AppContainer(
         settingsRepository = settingsRepository,
         reviewRepository = reviewRepository,
     )
+    open val debugNotificationController: DebugNotificationController =
+        (localReminderScheduler as? DebugNotificationController) ?: NoOpDebugNotificationController
 }
