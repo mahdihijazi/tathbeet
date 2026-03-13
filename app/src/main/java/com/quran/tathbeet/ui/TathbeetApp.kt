@@ -52,7 +52,10 @@ import com.quran.tathbeet.ui.model.activeProfile
 import com.quran.tathbeet.ui.model.completionRate
 import com.quran.tathbeet.ui.model.loadQuranCatalog
 import com.quran.tathbeet.ui.model.seedAppState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun TathbeetApp(
@@ -84,16 +87,26 @@ fun TathbeetApp(
         }
     }
 
-    LaunchedEffect(notificationTargetProfileId) {
-        if (notificationTargetProfileId.isNullOrBlank()) {
+    suspend fun navigateToNotificationTarget(profileId: String) {
+        appContainer.profileRepository.setActiveAccount(profileId)
+        withContext(Dispatchers.Main.immediate) {
+            navController.navigate(RouteReview) {
+                popUpTo(RouteLaunch) { inclusive = true }
+                launchSingleTop = true
+            }
+            onNotificationTargetHandled()
+        }
+    }
+
+    LaunchedEffect(notificationTargetProfileId, currentBackStackEntry) {
+        if (
+            notificationTargetProfileId.isNullOrBlank() ||
+            currentBackStackEntry == null ||
+            currentBackStackEntry?.destination?.route == RouteLaunch
+        ) {
             return@LaunchedEffect
         }
-        appContainer.profileRepository.setActiveAccount(notificationTargetProfileId)
-        navController.navigate(RouteReview) {
-            popUpTo(RouteLaunch) { inclusive = true }
-            launchSingleTop = true
-        }
-        onNotificationTargetHandled()
+        navigateToNotificationTarget(notificationTargetProfileId)
     }
 
     fun mutateLegacy(message: TextSpec? = null, transform: (AppUiState) -> AppUiState) {
@@ -135,6 +148,10 @@ fun TathbeetApp(
                                 }
                             },
                         )
+                    } else {
+                        LaunchedEffect(notificationTargetProfileId) {
+                            navigateToNotificationTarget(notificationTargetProfileId)
+                        }
                     }
                 }
 

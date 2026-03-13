@@ -36,8 +36,10 @@ abstract class BaseMainActivityUiTest {
         clearDatabase()
     }
 
-    protected fun launchMainActivity(): ActivityScenario<MainActivity> =
-        ActivityScenario.launch(Intent(targetContext, MainActivity::class.java))
+    protected fun launchMainActivity(
+        intent: Intent = Intent(targetContext, MainActivity::class.java),
+    ): ActivityScenario<MainActivity> =
+        ActivityScenario.launch(intent)
 
     protected fun tapNext() {
         composeRule.onNodeWithText(

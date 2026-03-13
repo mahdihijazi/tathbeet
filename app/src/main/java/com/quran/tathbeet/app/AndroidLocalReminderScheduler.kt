@@ -41,14 +41,19 @@ class AndroidLocalReminderScheduler(
 
         val settings = settingsRepository.observeSettings().first()
         val accounts = profileRepository.observeAccounts().first()
-
-        if (!settings.globalNotificationsEnabled || !canPostNotifications()) {
-            accounts.forEach { account -> cancelProfile(account.id) }
-            return
-        }
+        val scheduledProfileIds = accounts
+            .filter { account -> hasSchedule(account.id) }
+            .map { account -> account.id }
+            .toSet()
+        val eligibleProfileIds = ReminderSchedulePlanner.eligibleProfileIds(
+            globalNotificationsEnabled = settings.globalNotificationsEnabled,
+            canPostNotifications = canPostNotifications(),
+            accounts = accounts,
+            scheduledProfileIds = scheduledProfileIds,
+        )
 
         accounts.forEach { account ->
-            if (account.notificationsEnabled && hasSchedule(account.id)) {
+            if (account.id in eligibleProfileIds) {
                 scheduleReminder(
                     profileId = account.id,
                     hour = settings.reminderHour,
@@ -70,8 +75,17 @@ class AndroidLocalReminderScheduler(
         val account = profileRepository.observeAccounts().first()
             .firstOrNull { profile -> profile.id == profileId }
             ?: return
+        val canPostNotifications = canPostNotifications()
+        val hasSchedule = hasSchedule(profileId)
 
-        if (!settings.globalNotificationsEnabled || !account.notificationsEnabled || !hasSchedule(profileId)) {
+        if (
+            !ReminderSchedulePlanner.shouldHandleReminder(
+                globalNotificationsEnabled = settings.globalNotificationsEnabled,
+                canPostNotifications = canPostNotifications,
+                accountNotificationsEnabled = account.notificationsEnabled,
+                hasSchedule = hasSchedule,
+            )
+        ) {
             cancelProfile(profileId)
             return
         }
@@ -81,12 +95,10 @@ class AndroidLocalReminderScheduler(
             assignedForDate = timeProvider.today(),
         )
 
-        if (canPostNotifications()) {
-            showReminderNotification(
-                account = account,
-                motivationalMessagesEnabled = settings.motivationalMessagesEnabled,
-            )
-        }
+        showReminderNotification(
+            account = account,
+            motivationalMessagesEnabled = settings.motivationalMessagesEnabled,
+        )
 
         scheduleReminder(
             profileId = profileId,
@@ -179,7 +191,7 @@ class AndroidLocalReminderScheduler(
         minute: Int,
         referenceTime: ZonedDateTime,
     ) {
-        val triggerAt = nextTriggerAt(
+        val triggerAt = ReminderSchedulePlanner.nextTriggerAt(
             referenceTime = referenceTime,
             hour = hour,
             minute = minute,
@@ -189,23 +201,6 @@ class AndroidLocalReminderScheduler(
             triggerAt.toInstant().toEpochMilli(),
             reminderPendingIntent(profileId),
         )
-    }
-
-    private fun nextTriggerAt(
-        referenceTime: ZonedDateTime,
-        hour: Int,
-        minute: Int,
-    ): ZonedDateTime {
-        val targetToday = referenceTime
-            .withHour(hour)
-            .withMinute(minute)
-            .withSecond(0)
-            .withNano(0)
-        return if (targetToday.isAfter(referenceTime)) {
-            targetToday
-        } else {
-            targetToday.plusDays(1)
-        }
     }
 
     private fun reminderPendingIntent(profileId: String): PendingIntent =
