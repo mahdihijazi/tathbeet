@@ -360,19 +360,15 @@ fun ReviewExternalQuranDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = stringResource(R.string.review_external_quran_dialog_title))
+            Text(
+                text = stringResource(
+                    R.string.review_external_quran_dialog_title,
+                    dialog.taskTitle.asString(),
+                ),
+            )
         },
         text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
-            ) {
-                Text(text = stringResource(R.string.review_external_quran_dialog_body))
-                Text(
-                    text = dialog.taskTitle.asString(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
+            Text(text = stringResource(R.string.review_external_quran_dialog_body))
         },
         confirmButton = {
             TextButton(onClick = onInstallQuranAndroid) {

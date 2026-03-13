@@ -218,7 +218,7 @@
     <string name="review_completed_pill">تمت المراجعة</string>
     <string name="review_completed_title_format">%1$s - %2$s</string>
     <string name="review_open_in_quran">فتح المقطع في تطبيق قراءة</string>
-    <string name="review_external_quran_dialog_title">فتح المقطع خارج التطبيق</string>
+    <string name="review_external_quran_dialog_title">فتح %1$s خارج التطبيق</string>
     <string name="review_external_quran_dialog_body">لم يتم العثور على تطبيق القرآن على هذا الجهاز. يمكنك تثبيته أو فتح المقطع في المتصفح.</string>
     <string name="review_external_quran_install_action">تثبيت التطبيق</string>
     <string name="review_external_quran_web_action">فتح في المتصفح</string>
