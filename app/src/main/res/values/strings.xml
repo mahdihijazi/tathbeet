@@ -276,7 +276,6 @@
     <string name="account_mode_account">حساب</string>
 
     <string name="settings_title">الإعدادات</string>
-    <string name="settings_subtitle">إدارة التذكيرات ووقت التنبيه</string>
     <string name="settings_permission_title">السماح بإشعارات الجهاز</string>
     <string name="settings_permission_body">لن تصل التذكيرات اليومية إلا بعد السماح للإشعارات من إعدادات أندرويد أو من الزر التالي.</string>
     <string name="settings_permission_action">تفعيل الإشعارات</string>

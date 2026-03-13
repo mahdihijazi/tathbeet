@@ -61,7 +61,7 @@ fun SettingsScreen(
 
     ScreenLayout(
         title = stringResource(R.string.settings_title),
-        subtitle = stringResource(R.string.settings_subtitle),
+        subtitle = "",
     ) {
         if (!hasNotificationPermission) {
             item {
