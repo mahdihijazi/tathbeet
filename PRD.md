@@ -412,6 +412,27 @@ The MVP should track:
 
 - completion rate
 
+The MVP Progress screen should stay intentionally simple and answer only:
+
+- where the learner stands today
+- whether this week is moving in a healthy direction
+- what encourages them to continue
+
+The Progress screen should therefore use this structure:
+
+- `ملخص اليوم`
+  - show completed count, total count, and remaining count for today's visible work scope
+  - include a direct action back to the review screen
+  - mention carried-over work when today's list includes overdue tasks
+- `هذا الأسبوع`
+  - show one clear weekly completion rate
+  - show one clear completed-days summary for the last 7 days
+  - show a lightweight 7-day rhythm view rather than a heavy analytics dashboard
+- `رسالة تشجيع`
+  - show one larger hadith-based encouragement card
+  - always show the hadith reference
+  - rotate from locally bundled content in MVP
+
 The MVP will not include:
 
 - streak systems unless added later

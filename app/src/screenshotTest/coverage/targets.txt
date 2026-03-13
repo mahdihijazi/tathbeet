@@ -16,6 +16,11 @@ review:review_task_row_completed_default_rating
 review:review_cycle_complete_dialog
 review:review_cycle_reset_warning_dialog
 
+# Progress
+progress:progress_screen_empty
+progress:progress_screen_partial
+progress:progress_screen_complete
+
 # Schedule
 schedule:onboarding_message_card_default
 schedule:pool_selector_surahs_tab

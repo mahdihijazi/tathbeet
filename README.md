@@ -46,7 +46,7 @@ The MVP supports:
 - daily revision targets based on juz-per-day pacing
 - daily reminders
 - motivational notifications
-- completion-rate tracking
+- a simple Progress screen with today's summary, a weekly rhythm view, and one motivational card
 - profile-level notification settings
 - cloud sync for signed-in users
 - shared learner profiles so more than one manager can update schedule and completion state

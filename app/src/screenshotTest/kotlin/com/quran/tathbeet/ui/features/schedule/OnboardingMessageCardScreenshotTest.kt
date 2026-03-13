@@ -38,8 +38,6 @@ fun OnboardingMessageCardScreenshot() {
                 OnboardingMessageCard(
                     title = stringResource(R.string.schedule_intro_body),
                     body = stringResource(R.string.schedule_intro_supporting),
-                    actionLabel = stringResource(R.string.action_next),
-                    onActionClick = {},
                 )
             }
         }

@@ -47,4 +47,9 @@ object ReminderHadithCatalog {
         val index = Math.floorMod(dayOfYear - 1, notificationEntries.size)
         return notificationEntries[index]
     }
+
+    fun cardEntryFor(seed: Int): ReminderHadithEntry {
+        val index = Math.floorMod(seed, cardEntries.size)
+        return cardEntries[index]
+    }
 }
