@@ -7,6 +7,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
+import com.quran.tathbeet.ui.features.progress.ProgressViewModelFactory
 import com.quran.tathbeet.ui.features.profiles.ProfilesViewModelFactory
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModelFactory
 import com.quran.tathbeet.ui.features.settings.SettingsViewModelFactory
@@ -94,6 +95,14 @@ internal fun settingsViewModelFactory(
     profileRepository = appContainer.profileRepository,
     scheduleRepository = appContainer.scheduleRepository,
     localReminderScheduler = appContainer.localReminderScheduler,
+)
+
+internal fun progressViewModelFactory(
+    appContainer: AppContainer,
+) = ProgressViewModelFactory(
+    profileRepository = appContainer.profileRepository,
+    reviewRepository = appContainer.reviewRepository,
+    timeProvider = appContainer.timeProvider,
 )
 
 internal fun AppDestination.toRoute(): String = when (this) {

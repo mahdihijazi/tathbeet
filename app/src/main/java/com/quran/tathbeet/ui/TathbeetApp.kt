@@ -32,6 +32,7 @@ import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.ui.components.AppShell
 import com.quran.tathbeet.ui.features.progress.ProgressScreen
+import com.quran.tathbeet.ui.features.progress.ProgressViewModel
 import com.quran.tathbeet.ui.features.profiles.ProfilesScreen
 import com.quran.tathbeet.ui.features.profiles.ProfilesViewModel
 import com.quran.tathbeet.ui.features.review.ReviewScreen
@@ -49,7 +50,6 @@ import com.quran.tathbeet.ui.model.AppUiState
 import com.quran.tathbeet.ui.model.SyncState
 import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.activeProfile
-import com.quran.tathbeet.ui.model.completionRate
 import com.quran.tathbeet.ui.model.loadQuranCatalog
 import com.quran.tathbeet.ui.model.seedAppState
 import kotlinx.coroutines.Dispatchers
@@ -296,10 +296,12 @@ fun TathbeetApp(
                 }
 
                 composable(RouteProgress) {
-                    val activeProfile = legacyUiState.activeProfile
+                    val progressViewModel: ProgressViewModel = viewModel(
+                        factory = progressViewModelFactory(appContainer),
+                    )
+                    val uiState by progressViewModel.uiState.collectAsState()
                     ProgressScreen(
-                        profile = activeProfile,
-                        completionRate = activeProfile.completionRate,
+                        uiState = uiState,
                         onOpenReview = { navController.navigate(RouteReview) },
                     )
                 }

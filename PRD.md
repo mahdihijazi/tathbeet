@@ -424,11 +424,12 @@ The Progress screen should therefore use this structure:
   - show completed count, total count, and remaining count for today's visible work scope
   - include a direct action back to the review screen
   - mention carried-over work when today's list includes overdue tasks
-- `هذا الأسبوع`
+- the screen title should stand on its own without extra intro copy below it
+- `ملخص الأسبوع`
   - show one clear weekly completion rate
   - show one clear completed-days summary for the last 7 days
-  - show a lightweight 7-day rhythm view rather than a heavy analytics dashboard
-- `رسالة تشجيع`
+  - show a lightweight 7-day view labeled `نسبة الإنجاز اليومية` rather than a heavy analytics dashboard
+- `في فضل القرآن`
   - show one larger hadith-based encouragement card
   - always show the hadith reference
   - rotate from locally bundled content in MVP

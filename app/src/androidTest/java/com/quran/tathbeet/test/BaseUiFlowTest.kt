@@ -266,7 +266,7 @@ abstract class BaseUiFlowTest {
     protected fun assertSettingsVisible() {
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodesWithText(
-                composeRule.activity.getString(R.string.settings_subtitle),
+                composeRule.activity.getString(R.string.settings_notifications_title),
             ).fetchSemanticsNodes().isNotEmpty()
         }
     }
