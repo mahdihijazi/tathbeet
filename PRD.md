@@ -537,6 +537,11 @@ The data model should support shared ownership and conflict-safe synchronization
   - motivational reminder enable/disable
   - one preferred reminder time for the whole app
   - per-profile reminder toggles
+- the screen hierarchy should stay simple:
+  - one muted intro line under the page title
+  - one reminders section for app-level toggles and reminder time
+  - one accounts section for per-profile toggles
+- the settings screen should not use a second hero title that competes with the main section headings
 - the per-profile list should show profiles directly when the list is short
 - if the profile list grows beyond five entries, the extra entries may be collapsed behind an expandable section
 - the active profile, self profile, and profiles with reminders already enabled should remain visible before collapsed overflow when practical

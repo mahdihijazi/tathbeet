@@ -276,15 +276,12 @@
     <string name="account_mode_account">حساب</string>
 
     <string name="settings_title">الإعدادات</string>
-    <string name="settings_subtitle">إدارة التذكيرات المحلية ووقت التنبيه</string>
-    <string name="settings_eyebrow">التذكيرات</string>
-    <string name="settings_body_title">ورد يومي هادئ وواضح</string>
-    <string name="settings_body">اختر وقتاً واحداً للتذكير اليومي، ثم فعّل الحسابات التي تريد أن يصلها التنبيه على هذا الجهاز.</string>
+    <string name="settings_subtitle">إدارة التذكيرات ووقت التنبيه</string>
     <string name="settings_permission_title">السماح بإشعارات الجهاز</string>
     <string name="settings_permission_body">لن تصل التذكيرات اليومية إلا بعد السماح للإشعارات من إعدادات أندرويد أو من الزر التالي.</string>
     <string name="settings_permission_action">تفعيل الإشعارات</string>
     <string name="settings_notifications_title">التذكيرات اليومية</string>
-    <string name="settings_notifications_subtitle">تحكم عام ثم تخصيص لكل حساب</string>
+    <string name="settings_notifications_subtitle">تحكم عام ووقت موحّد لكل الحسابات</string>
     <string name="settings_global_notifications">الإشعارات العامة</string>
     <string name="settings_global_notifications_supporting">عند إيقافها تتوقف كل التذكيرات المحلية لهذا الجهاز.</string>
     <string name="settings_motivational_messages">الرسائل التحفيزية</string>
@@ -297,7 +294,7 @@
     <string name="settings_reminder_dialog_title">اختر وقت التذكير اليومي</string>
     <string name="settings_reminder_selected">الحالي</string>
     <string name="settings_profiles_title">الحسابات</string>
-    <string name="settings_profiles_subtitle">الحساب الرئيسي يظهر أولاً، والحسابات الإضافية تبدأ بإشعارات متوقفة افتراضياً.</string>
+    <string name="settings_profiles_subtitle">فعّل التذكير للحسابات التي تريد تنبيهها.</string>
     <string name="settings_profiles_show_more">عرض %1$d حسابات أخرى</string>
     <string name="settings_profiles_show_less">إخفاء الحسابات الإضافية (%1$d)</string>
     <string name="settings_profile_status_active">الحساب الحالي</string>

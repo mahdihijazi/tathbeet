@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -29,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.AppPrimaryButton
 import com.quran.tathbeet.ui.components.AppSecondaryButton
-import com.quran.tathbeet.ui.components.HeroCard
 import com.quran.tathbeet.ui.components.InfoActionCard
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
@@ -63,14 +63,6 @@ fun SettingsScreen(
         title = stringResource(R.string.settings_title),
         subtitle = stringResource(R.string.settings_subtitle),
     ) {
-        item {
-            HeroCard(
-                eyebrow = stringResource(R.string.settings_eyebrow),
-                title = stringResource(R.string.settings_body_title),
-                body = stringResource(R.string.settings_body),
-            )
-        }
-
         if (!hasNotificationPermission) {
             item {
                 InfoActionCard(
@@ -94,46 +86,12 @@ fun SettingsScreen(
         }
 
         item {
-            SettingCard(
-                label = stringResource(R.string.settings_global_notifications),
-                supporting = stringResource(R.string.settings_global_notifications_supporting),
-                enabled = uiState.globalNotificationsEnabled,
-                onToggle = onGlobalNotificationsChanged,
-                switchTag = "settings-global-toggle",
+            ReminderSettingsCard(
+                uiState = uiState,
+                onGlobalNotificationsChanged = onGlobalNotificationsChanged,
+                onMotivationalMessagesChanged = onMotivationalMessagesChanged,
+                onOpenReminderTime = { showReminderDialog = true },
             )
-        }
-
-        item {
-            SettingCard(
-                label = stringResource(R.string.settings_motivational_messages),
-                supporting = stringResource(R.string.settings_motivational_messages_supporting),
-                enabled = uiState.motivationalMessagesEnabled,
-                onToggle = onMotivationalMessagesChanged,
-                switchTag = "settings-motivational-toggle",
-            )
-        }
-
-        item {
-            InfoActionCard(
-                title = stringResource(R.string.settings_reminder_title),
-            ) {
-                Text(
-                    text = stringResource(
-                        R.string.settings_reminder_current,
-                        formatReminderTime(uiState.reminderHour, uiState.reminderMinute),
-                    ),
-                )
-                Text(
-                    text = stringResource(R.string.settings_reminder_supporting),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                AppSecondaryButton(
-                    text = stringResource(R.string.settings_reminder_change),
-                    onClick = { showReminderDialog = true },
-                    modifier = Modifier.testTag("settings-reminder-open"),
-                )
-            }
         }
 
         item {
@@ -199,8 +157,8 @@ private fun ProfileReminderCard(
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = profile.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
                     )
                     Text(
                         text = when {
@@ -229,6 +187,47 @@ private fun ProfileReminderCard(
             )
         }
     }
+}
+
+@Composable
+private fun ReminderSettingsCard(
+    uiState: SettingsUiState,
+    onGlobalNotificationsChanged: () -> Unit,
+    onMotivationalMessagesChanged: () -> Unit,
+    onOpenReminderTime: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            SettingToggleRow(
+                label = stringResource(R.string.settings_global_notifications),
+                supporting = stringResource(R.string.settings_global_notifications_supporting),
+                enabled = uiState.globalNotificationsEnabled,
+                onToggle = onGlobalNotificationsChanged,
+                switchTag = "settings-global-toggle",
+            )
+            SettingsRowDivider()
+            SettingToggleRow(
+                label = stringResource(R.string.settings_motivational_messages),
+                supporting = stringResource(R.string.settings_motivational_messages_supporting),
+                enabled = uiState.motivationalMessagesEnabled,
+                onToggle = onMotivationalMessagesChanged,
+                switchTag = "settings-motivational-toggle",
+            )
+            SettingsRowDivider()
+            ReminderTimeRow(
+                hour = uiState.reminderHour,
+                minute = uiState.reminderMinute,
+                onOpenReminderTime = onOpenReminderTime,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsRowDivider() {
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+    )
 }
 
 @Composable
@@ -273,43 +272,78 @@ private fun ReminderTimeDialog(
 }
 
 @Composable
-private fun SettingCard(
+private fun SettingToggleRow(
     label: String,
     supporting: String,
     enabled: Boolean,
     onToggle: () -> Unit,
     switchTag: String,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                Text(
-                    text = supporting,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Switch(
-                checked = enabled,
-                onCheckedChange = { onToggle() },
-                modifier = Modifier.testTag(switchTag),
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = supporting,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        Switch(
+            checked = enabled,
+            onCheckedChange = { onToggle() },
+            modifier = Modifier.testTag(switchTag),
+        )
+    }
+}
+
+@Composable
+private fun ReminderTimeRow(
+    hour: Int,
+    minute: Int,
+    onOpenReminderTime: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.settings_reminder_title),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = stringResource(
+                R.string.settings_reminder_current,
+                formatReminderTime(hour, minute),
+            ),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = stringResource(R.string.settings_reminder_supporting),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        AppSecondaryButton(
+            text = stringResource(R.string.settings_reminder_change),
+            onClick = onOpenReminderTime,
+            modifier = Modifier.testTag("settings-reminder-open"),
+        )
     }
 }
 
