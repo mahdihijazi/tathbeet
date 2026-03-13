@@ -1,11 +1,5 @@
 package com.quran.tathbeet.ui
 
-import android.Manifest
-import android.content.Context
-import android.os.Build
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -21,13 +15,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.quran.tathbeet.BuildConfig
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.ui.components.AppShell
@@ -38,12 +32,11 @@ import com.quran.tathbeet.ui.features.profiles.ProfilesViewModel
 import com.quran.tathbeet.ui.features.review.ReviewScreen
 import com.quran.tathbeet.ui.features.review.ReviewViewModel
 import com.quran.tathbeet.ui.features.review.ReviewViewModelFactory
+import com.quran.tathbeet.ui.features.review.reviewSortActionState
 import com.quran.tathbeet.ui.features.schedule.PoolSelectorScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleIntroScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModel
-import com.quran.tathbeet.ui.features.settings.SettingsScreen
-import com.quran.tathbeet.ui.features.settings.SettingsViewModel
 import com.quran.tathbeet.ui.features.shared.SharedProfileScreen
 import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.model.AppUiState
@@ -73,6 +66,7 @@ fun TathbeetApp(
     val currentDestination = currentBackStackEntry?.destination?.route.toAppDestination()
     val activeAccount by appContainer.profileRepository.observeActiveAccount().collectAsState(initial = null)
     var onReviewResetAction by remember { mutableStateOf({}) }
+    var reviewSortActionState by remember { mutableStateOf<com.quran.tathbeet.ui.features.review.ReviewSortActionState?>(null) }
 
     LaunchedEffect(appContainer) {
         appContainer.profileRepository.ensureDefaultAccount(
@@ -84,6 +78,7 @@ fun TathbeetApp(
     LaunchedEffect(currentDestination) {
         if (currentDestination != AppDestination.Review) {
             onReviewResetAction = {}
+            reviewSortActionState = null
         }
     }
 
@@ -124,6 +119,7 @@ fun TathbeetApp(
             reviewTitle = activeAccount?.name
                 ?.takeIf { currentDestination == AppDestination.Review }
                 ?.let { profileName -> context.getString(R.string.review_title_for_profile, profileName) },
+            reviewSortActionState = reviewSortActionState,
             onNavigate = { destination ->
                 navController.navigateMain(destination.toRoute())
             },
@@ -132,6 +128,15 @@ fun TathbeetApp(
                 navController.navigate(RoutePoolSelector)
             },
             onReviewResetAction = onReviewResetAction,
+            onSettingsDebugAction = if (BuildConfig.DEBUG) {
+                {
+                    navController.navigate(RouteDebug) {
+                        launchSingleTop = true
+                    }
+                }
+            } else {
+                null
+            },
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) {
             NavHost(
@@ -247,11 +252,16 @@ fun TathbeetApp(
                     val uiState by reviewViewModel.uiState.collectAsState()
                     SideEffect {
                         onReviewResetAction = reviewViewModel::requestCycleReset
+                        reviewSortActionState = uiState.reviewSortActionState(
+                            reviewViewModel::selectFullPlanSortMode,
+                        )
                     }
                     ReviewScreen(
                         uiState = uiState,
+                        onTabSelected = reviewViewModel::selectTab,
                         onRequestTaskCompletion = reviewViewModel::requestCompleteTask,
                         onUpdateTaskRating = reviewViewModel::updateTaskRating,
+                        onRateTaskFromFullPlan = reviewViewModel::rateTaskFromFullPlan,
                         onLaunchTaskReading = reviewViewModel::launchTaskReading,
                         onRestartCycle = reviewViewModel::restartCycle,
                         onDismissCycleResetWarning = reviewViewModel::dismissCycleResetWarning,
@@ -307,35 +317,13 @@ fun TathbeetApp(
                 }
 
                 composable(RouteSettings) {
-                    val settingsViewModel: SettingsViewModel = viewModel(
-                        factory = settingsViewModelFactory(appContainer),
-                    )
-                    val uiState by settingsViewModel.uiState.collectAsState()
-                    var permissionRefreshToken by remember { mutableStateOf(0) }
-                    val notificationPermissionLauncher = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.RequestPermission(),
-                    ) {
-                        permissionRefreshToken++
-                        scope.launch {
-                            appContainer.localReminderScheduler.syncSchedules()
-                        }
+                    SettingsRoute(appContainer = appContainer)
+                }
+
+                if (BuildConfig.DEBUG) {
+                    composable(RouteDebug) {
+                        DebugToolsRoute(appContainer = appContainer)
                     }
-                    val hasNotificationPermission = remember(context, permissionRefreshToken) {
-                        context.hasNotificationPermission()
-                    }
-                    SettingsScreen(
-                        uiState = uiState,
-                        hasNotificationPermission = hasNotificationPermission,
-                        onGlobalNotificationsChanged = settingsViewModel::toggleGlobalNotifications,
-                        onMotivationalMessagesChanged = settingsViewModel::toggleMotivationalMessages,
-                        onProfileNotificationsChanged = settingsViewModel::toggleProfileNotifications,
-                        onReminderTimeSelected = settingsViewModel::selectReminderTime,
-                        onRequestNotificationPermission = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                        },
-                    )
                 }
 
                 composable(RouteShared) {
@@ -381,13 +369,3 @@ fun TathbeetApp(
         }
     }
 }
-
-private fun Context.hasNotificationPermission(): Boolean =
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        true
-    } else {
-        ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS,
-        ) == PackageManager.PERMISSION_GRANTED
-    }

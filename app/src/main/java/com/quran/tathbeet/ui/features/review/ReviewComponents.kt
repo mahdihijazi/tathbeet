@@ -124,11 +124,15 @@ fun ReviewTaskRow(
     onCompleteReview: () -> Unit,
     onUpdateRating: (Int) -> Unit,
     onLaunchTaskReading: () -> Unit,
+    modifier: Modifier = Modifier,
+    showRatingAlways: Boolean = false,
+    allowRatingWithoutCompletion: Boolean = false,
 ) {
     val taskTitle = task.title.asString()
+    val visibleRating = task.rating ?: task.defaultRating
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .testTag("review-task-${task.id}")
             .padding(vertical = TathbeetTokens.spacing.x1),
@@ -151,10 +155,11 @@ fun ReviewTaskRow(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (task.isDone && task.rating != null) {
+                if (task.isDone || showRatingAlways) {
                     CompletedTaskMeta(
                         taskId = task.id,
-                        rating = task.rating,
+                        rating = visibleRating,
+                        isEditable = task.isDone || allowRatingWithoutCompletion,
                         onUpdateRating = onUpdateRating,
                     )
                 }
@@ -250,6 +255,7 @@ private fun CompletedTaskTitle(
 private fun CompletedTaskMeta(
     taskId: String,
     rating: Int,
+    isEditable: Boolean,
     onUpdateRating: (Int) -> Unit,
 ) {
     Row(
@@ -266,28 +272,50 @@ private fun CompletedTaskMeta(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             repeat(5) { index ->
-                OutlinedButton(
-                    onClick = { onUpdateRating(index + 1) },
-                    modifier = Modifier.testTag("review-inline-rating-$taskId-${index + 1}"),
-                    contentPadding = PaddingValues(all = TathbeetTokens.spacing.half),
-                    shape = RoundedCornerShape(TathbeetTokens.radii.sm),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(
-                        brush = ButtonDefaults.outlinedButtonBorder().brush,
-                    ),
-                ) {
-                    Icon(
-                    imageVector = if (index < rating) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                    contentDescription = null,
-                    tint = if (index < rating) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.outline
-                    },
-                    )
+                if (isEditable) {
+                    OutlinedButton(
+                        onClick = { onUpdateRating(index + 1) },
+                        modifier = Modifier.testTag("review-inline-rating-$taskId-${index + 1}"),
+                        contentPadding = PaddingValues(all = TathbeetTokens.spacing.half),
+                        shape = RoundedCornerShape(TathbeetTokens.radii.sm),
+                        border = ButtonDefaults.outlinedButtonBorder(enabled = true),
+                    ) {
+                        RatingStarIcon(
+                            index = index,
+                            rating = rating,
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .testTag("review-inline-rating-$taskId-${index + 1}")
+                            .padding(all = TathbeetTokens.spacing.half),
+                    ) {
+                        RatingStarIcon(
+                            index = index,
+                            rating = rating,
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun RatingStarIcon(
+    index: Int,
+    rating: Int,
+) {
+    Icon(
+        imageVector = if (index < rating) Icons.Filled.Star else Icons.Outlined.StarBorder,
+        contentDescription = null,
+        tint = if (index < rating) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.outline
+        },
+    )
 }
 
 @Composable

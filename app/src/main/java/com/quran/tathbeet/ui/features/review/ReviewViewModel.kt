@@ -15,6 +15,7 @@ import com.quran.tathbeet.ui.model.TextSpec
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,6 +39,10 @@ class ReviewViewModel(
     private var showCycleResetDialog: Boolean = false
     private var cycleResetDialogDismissed: Boolean = false
     private var externalQuranDialog: ReviewExternalQuranDialogUiState? = null
+    private var selectedTab: ReviewTab = ReviewTab.Daily
+    private var fullPlanSortMode: ReviewFullPlanSortMode = ReviewFullPlanSortMode.Rating
+    private var fullPlanScrollToTopNonce: Int = 0
+    private var lastPublishedFullPlanOrder: List<String> = emptyList()
 
     init {
         viewModelScope.launch {
@@ -79,6 +84,25 @@ class ReviewViewModel(
                 reviewRepository.completeAssignment(task.id, rating)
             }
         }
+    }
+
+    fun rateTaskFromFullPlan(taskId: String, rating: Int) {
+        val task = allAssignments().firstOrNull { it.id == taskId } ?: return
+        viewModelScope.launch {
+            reviewRepository.updateAssignmentRating(task.id, rating)
+        }
+    }
+
+    fun selectTab(tab: ReviewTab) {
+        if (selectedTab == tab) return
+        selectedTab = tab
+        publishUiState()
+    }
+
+    fun selectFullPlanSortMode(sortMode: ReviewFullPlanSortMode) {
+        if (fullPlanSortMode == sortMode) return
+        fullPlanSortMode = sortMode
+        publishUiState()
     }
 
     fun launchTaskReading(taskId: String) {
@@ -191,8 +215,19 @@ class ReviewViewModel(
         }
         showCycleResetDialog = allDone && !cycleResetDialogDismissed
 
+        val fullPlanTasks = allAssignments()
+            .sortedWith(fullPlanComparator(fullPlanSortMode))
+            .map { assignment -> assignment.toTaskUiState() }
+        val fullPlanOrder = fullPlanTasks.map { task -> task.id }
+        if (lastPublishedFullPlanOrder.isNotEmpty() && fullPlanOrder != lastPublishedFullPlanOrder) {
+            fullPlanScrollToTopNonce += 1
+        }
+        lastPublishedFullPlanOrder = fullPlanOrder
+
         _uiState.value = ReviewUiState(
             isLoading = false,
+            selectedTab = selectedTab,
+            fullPlanSortMode = fullPlanSortMode,
             progressCard = ReviewProgressCardUiState(
                 completedText = formatReviewWeight(completedWeight),
                 totalText = formatReviewWeight(totalWeight),
@@ -200,6 +235,8 @@ class ReviewViewModel(
                 progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
             ),
             sections = visibleSections,
+            fullPlanTasks = fullPlanTasks,
+            fullPlanScrollToTopNonce = fullPlanScrollToTopNonce,
             showCycleResetWarningDialog = showCycleResetWarningDialog,
             showCycleResetDialog = showCycleResetDialog,
             externalQuranDialog = externalQuranDialog,
@@ -242,6 +279,31 @@ class ReviewViewModel(
 
     private fun allAssignments(): List<ReviewAssignment> =
         timeline.flatMap { it.assignments }
+
+    private fun fullPlanComparator(
+        sortMode: ReviewFullPlanSortMode,
+    ): Comparator<ReviewAssignment> = when (sortMode) {
+        ReviewFullPlanSortMode.Rating -> compareBy<ReviewAssignment>(
+            { it.rating ?: 3 },
+            { it.completedAt == null },
+        ).then(quranOrderComparator())
+        ReviewFullPlanSortMode.LastMemorized -> compareBy<ReviewAssignment>(
+            { it.completedAt != null },
+            { it.completedAt },
+        ).then(quranOrderComparator())
+        ReviewFullPlanSortMode.QuranOrder -> quranOrderComparator()
+    }
+
+    private fun quranOrderComparator(): Comparator<ReviewAssignment> =
+        compareBy<ReviewAssignment>(
+            { it.rubId },
+            { it.readingTarget?.startSurahId ?: Int.MAX_VALUE },
+            { it.readingTarget?.startAyah ?: Int.MAX_VALUE },
+            { it.readingTarget?.endSurahId ?: Int.MAX_VALUE },
+            { it.readingTarget?.endAyah ?: Int.MAX_VALUE },
+            { it.assignedForDate },
+            { it.displayOrder },
+        )
 
     private fun List<ReviewAssignment>.thenByDisplayOrder(): List<ReviewTaskUiState> =
         sortedWith(

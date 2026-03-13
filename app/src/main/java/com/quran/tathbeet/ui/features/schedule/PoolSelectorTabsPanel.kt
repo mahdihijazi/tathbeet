@@ -20,7 +20,7 @@ import androidx.compose.foundation.background
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabIndicatorScope
 import androidx.compose.material3.TabPosition
@@ -87,8 +87,9 @@ fun PoolSelectorTabsPanel(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        PrimaryTabRow(
+        PrimaryScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
+            edgePadding = 0.dp,
             modifier = Modifier.fillMaxWidth(),
             indicator = { PoolSelectorTabIndicator(pagerState = pagerState) },
         ) {

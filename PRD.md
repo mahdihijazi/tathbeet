@@ -335,18 +335,27 @@ Completing a task in MVP should also capture a simple retention rating:
 
 The review experience should also support early completion beyond today:
 
-- the review screen should show the current cycle in one continuous list from the start
-- that list should include:
+- the review screen should use a two-tab pager
+- the right tab should keep the current dated review timeline in one continuous list
+- that dated timeline should include:
   - carried-over work from previous days
   - today’s work
   - tomorrow’s work
   - all later dates until the end of the current revision cycle
-- future dated ward should appear inline in the same list rather than through tabs or a date picker in MVP
+- the left tab should be labeled `كامل المحفوظ`
+- the `كامل المحفوظ` tab should show the same cycle tasks as one flat list without date section headers
+- the `كامل المحفوظ` tab should include a top app bar sort action with these modes:
+  - by memorization rating, worst first
+  - by last memorization date, furthest away first
+  - by Quran order
+- memorization rating sort should be the default mode in the `كامل المحفوظ` tab
+- future dated ward should remain inline inside the dated `ورد اليوم` tab rather than being split into separate date tabs or a date picker in MVP
 - tomorrow should use the relative label `ورد الغد`
 - dates after tomorrow should use explicit calendar dates
 - if the user completes tomorrow's ward today, tomorrow should appear already complete on its actual date
 - early completion should still count as work done on the day the user actually performed it
 - progress and history should distinguish scheduled-day completion from actual completion date
+- completing or rating a task from either tab should update the same underlying task state immediately
 - once the user finishes the whole current cycle, the app should offer a clear way to start the cycle again
 - restarting the cycle may use a confirmation dialog in MVP, as long as the action is explicit and intentional
 
@@ -489,8 +498,18 @@ The data model should support shared ownership and conflict-safe synchronization
 
 ### 13.3 Daily Review
 
-- app shows the full current revision cycle in one unified list
-- the list begins with carried-over overdue work, then today’s work, then future dated work until the end of the current cycle
+- app shows the daily review screen as a two-tab pager
+- the right tab keeps the dated current-cycle list used today
+- that dated list begins with carried-over overdue work, then today’s work, then future dated work until the end of the current cycle
+- the left tab is labeled `كامل المحفوظ`
+- the `كامل المحفوظ` tab shows all current-cycle tasks in one flat list without section headers
+- the `كامل المحفوظ` tab uses the same task-row UI and completion/rating actions as the dated list
+- completing or rating a task from either tab updates the same task in the other tab immediately
+- the review screen top app bar should show a sort action only while the `كامل المحفوظ` tab is active
+- the `كامل المحفوظ` sort action should support:
+  - memorization rating with the weakest tasks first by default
+  - last memorization date with the most distant tasks first
+  - Quran order
 - tomorrow should be labeled `ورد الغد`
 - days after tomorrow should use explicit date labels
 - once the full current cycle is complete, the user should be offered an explicit action to restart the cycle and begin again from the start
@@ -521,7 +540,7 @@ The data model should support shared ownership and conflict-safe synchronization
   - carried-over work from previous days
   - current day assignments
 - future dated assignments already visible inline through the end of the current cycle
-- the review screen should stay structurally simple: compact top summary and a unified task list separated by section headers
+- the review screen should stay structurally simple: dated tab with compact top summary and sectioned task list, plus a flat `كامل المحفوظ` tab using the same rows
 - each task row should include a secondary action to open that exact Quran range in an external reader
 - if Quran for Android is installed, tapping that action should open the task directly with a `quran://surah/ayah` deep link
 - if Quran for Android is not installed, the app should show a dialog offering:

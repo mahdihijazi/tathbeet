@@ -30,10 +30,25 @@ data class ReviewProgressCardUiState(
     val progress: Float,
 )
 
+enum class ReviewTab {
+    Daily,
+    FullPlan,
+}
+
+enum class ReviewFullPlanSortMode {
+    Rating,
+    LastMemorized,
+    QuranOrder,
+}
+
 data class ReviewUiState(
     val isLoading: Boolean = true,
+    val selectedTab: ReviewTab = ReviewTab.Daily,
+    val fullPlanSortMode: ReviewFullPlanSortMode = ReviewFullPlanSortMode.Rating,
     val progressCard: ReviewProgressCardUiState? = null,
     val sections: List<ReviewSectionUiState> = emptyList(),
+    val fullPlanTasks: List<ReviewTaskUiState> = emptyList(),
+    val fullPlanScrollToTopNonce: Int = 0,
     val showCycleResetWarningDialog: Boolean = false,
     val showCycleResetDialog: Boolean = false,
     val externalQuranDialog: ReviewExternalQuranDialogUiState? = null,
@@ -76,6 +91,8 @@ fun ReviewDay.toUiState(
 
     return ReviewUiState(
         isLoading = false,
+        selectedTab = ReviewTab.Daily,
+        fullPlanSortMode = ReviewFullPlanSortMode.Rating,
         progressCard = ReviewProgressCardUiState(
             completedText = formatReviewWeight(completedWeight),
             totalText = formatReviewWeight(totalWeight),
@@ -83,6 +100,8 @@ fun ReviewDay.toUiState(
             progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
         ),
         sections = listOf(section),
+        fullPlanTasks = tasks,
+        fullPlanScrollToTopNonce = 0,
         showCycleResetDialog = false,
         externalQuranDialog = null,
     )
@@ -102,6 +121,8 @@ internal data class ReviewMockState(
 
             ReviewUiState(
                 isLoading = false,
+                selectedTab = ReviewTab.Daily,
+                fullPlanSortMode = ReviewFullPlanSortMode.Rating,
                 progressCard = ReviewProgressCardUiState(
                     completedText = formatReviewWeight(completedWeight),
                     totalText = formatReviewWeight(totalWeight),
@@ -109,6 +130,8 @@ internal data class ReviewMockState(
                 progress = if (totalWeight == 0.0) 0f else (completedWeight / totalWeight).toFloat(),
             ),
             sections = visibleSections,
+            fullPlanTasks = allSections.flatMap { section -> section.tasks },
+            fullPlanScrollToTopNonce = 0,
             showCycleResetDialog = showCycleResetDialog,
             externalQuranDialog = null,
         )

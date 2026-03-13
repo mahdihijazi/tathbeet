@@ -16,6 +16,8 @@
     <string name="content_account_active">الحساب مفعّل</string>
     <string name="content_edit_plan">تعديل الخطة</string>
     <string name="content_reset_cycle">إعادة الدورة من البداية</string>
+    <string name="content_sort_full_plan">فرز كامل المحفوظ</string>
+    <string name="content_open_debug_tools">فتح أدوات التجربة</string>
     <string name="action_next">التالي</string>
     <string name="action_create">إنشاء</string>
     <string name="action_save">حفظ</string>
@@ -194,6 +196,8 @@
     <string name="review_title">ورد اليوم</string>
     <string name="review_title_for_profile">الورد لـ %1$s</string>
     <string name="review_subtitle">أكمل المقاطع المطلوبة لليوم</string>
+    <string name="review_tab_today">ورد اليوم</string>
+    <string name="review_tab_full_plan">كامل المحفوظ</string>
     <string name="review_rollover_chip">مؤجل</string>
     <string name="review_state_done">مكتمل</string>
     <string name="review_state_available_now">متاح الآن</string>
@@ -225,6 +229,9 @@
     <string name="review_edit_rating">تعديل التقييم</string>
     <string name="review_rating_dialog_title">قيّم درجة حفظك</string>
     <string name="review_rating_value">%1$d/5</string>
+    <string name="review_sort_rating">بحسب التقييم</string>
+    <string name="review_sort_last_memorized">بحسب آخر مراجعة</string>
+    <string name="review_sort_quran_order">بحسب ترتيب المصحف</string>
     <string name="review_toggle_task">تحديد %1$s</string>
     <string name="ayah_count_one">آية واحدة</string>
     <string name="ayah_count_two">آيتان</string>
@@ -311,6 +318,20 @@
     <string name="settings_profile_schedule_missing">لن يظهر تذكير لهذا الحساب حتى تُحفظ له خطة مراجعة، لكن تفضيله سيبقى محفوظاً.</string>
     <string name="settings_account_title">الحساب</string>
     <string name="settings_toggle_account_mode">تبديل وضع الحساب</string>
+
+    <string name="debug_tools_title">أدوات التجربة</string>
+    <string name="debug_tools_subtitle">هذه الشاشة متاحة في نسخة التصحيح فقط لتجربة الإشعارات فوراً داخل التطبيق.</string>
+    <string name="debug_notifications_title">معاينة إشعارات التذكير</string>
+    <string name="debug_notifications_subtitle">كل بطاقة تمثل شكلاً فعلياً يمكن أن يرسله التطبيق. اضغط الزر لإظهار الإشعار مباشرة.</string>
+    <string name="debug_notifications_trigger">إرسال الإشعار الآن</string>
+    <string name="debug_notification_today_general">عنوان عام مع ورد اليوم</string>
+    <string name="debug_notification_today_general_motivation">عنوان عام مع ورد اليوم ورسالة تحفيزية</string>
+    <string name="debug_notification_rollover_general">عنوان عام مع ورد مؤجل</string>
+    <string name="debug_notification_rollover_general_motivation">عنوان عام مع ورد مؤجل ورسالة تحفيزية</string>
+    <string name="debug_notification_today_named_profile">عنوان باسم الحساب مع ورد اليوم</string>
+    <string name="debug_notification_today_named_profile_motivation">عنوان باسم الحساب مع ورد اليوم ورسالة تحفيزية</string>
+    <string name="debug_notification_rollover_named_profile">عنوان باسم الحساب مع ورد مؤجل</string>
+    <string name="debug_notification_rollover_named_profile_motivation">عنوان باسم الحساب مع ورد مؤجل ورسالة تحفيزية</string>
 
     <string name="reminder_channel_name">تذكيرات الورد اليومي</string>
     <string name="reminder_channel_description">إشعارات محلية لتذكيرك بورد اليوم والحسابات المفعّلة على هذا الجهاز.</string>

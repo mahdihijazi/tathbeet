@@ -11,12 +11,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,15 +44,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.model.AppDestination
+import com.quran.tathbeet.ui.features.review.ReviewFullPlanSortMode
+import com.quran.tathbeet.ui.features.review.ReviewSortActionState
 
 @Composable
 fun AppShell(
     currentDestination: AppDestination,
     reviewTitle: String?,
+    reviewSortActionState: ReviewSortActionState?,
     onNavigate: (AppDestination) -> Unit,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
     onReviewResetAction: () -> Unit,
+    onSettingsDebugAction: (() -> Unit)?,
     snackbarHost: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -54,9 +68,11 @@ fun AppShell(
                     AppTopBar(
                         currentDestination = currentDestination,
                         reviewTitle = reviewTitle,
+                        reviewSortActionState = reviewSortActionState,
                         onBack = onBack,
                         onReviewPlanAction = onReviewPlanAction,
                         onReviewResetAction = onReviewResetAction,
+                        onSettingsDebugAction = onSettingsDebugAction,
                     )
                 }
             },
@@ -93,10 +109,14 @@ private val mainDestinations = listOf(
 private fun AppTopBar(
     currentDestination: AppDestination,
     reviewTitle: String?,
+    reviewSortActionState: ReviewSortActionState?,
     onBack: () -> Unit,
     onReviewPlanAction: () -> Unit,
     onReviewResetAction: () -> Unit,
+    onSettingsDebugAction: (() -> Unit)?,
 ) {
+    var showSortMenu by remember(reviewSortActionState) { mutableStateOf(false) }
+
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.18f),
@@ -123,6 +143,49 @@ private fun AppTopBar(
         },
         actions = {
             if (currentDestination == AppDestination.Review) {
+                reviewSortActionState?.let { sortAction ->
+                    IconButton(
+                        onClick = { showSortMenu = true },
+                        modifier = Modifier,
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.Sort,
+                            contentDescription = stringResource(R.string.content_sort_full_plan),
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showSortMenu,
+                        onDismissRequest = { showSortMenu = false },
+                    ) {
+                        ReviewFullPlanSortMode.entries.forEach { mode ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = stringResource(
+                                            when (mode) {
+                                                ReviewFullPlanSortMode.Rating -> R.string.review_sort_rating
+                                                ReviewFullPlanSortMode.LastMemorized -> R.string.review_sort_last_memorized
+                                                ReviewFullPlanSortMode.QuranOrder -> R.string.review_sort_quran_order
+                                            },
+                                        ),
+                                    )
+                                },
+                                leadingIcon = {
+                                    if (mode == sortAction.selectedMode) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Check,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    showSortMenu = false
+                                    sortAction.onModeSelected(mode)
+                                },
+                            )
+                        }
+                    }
+                }
                 IconButton(onClick = onReviewResetAction) {
                     Icon(
                         imageVector = Icons.Outlined.Refresh,
@@ -133,6 +196,17 @@ private fun AppTopBar(
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription = stringResource(R.string.content_edit_plan),
+                    )
+                }
+            }
+            if (currentDestination == AppDestination.Settings && onSettingsDebugAction != null) {
+                IconButton(
+                    onClick = onSettingsDebugAction,
+                    modifier = Modifier.testTag("settings-open-debug-tools"),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.BugReport,
+                        contentDescription = stringResource(R.string.content_open_debug_tools),
                     )
                 }
             }

@@ -98,8 +98,9 @@ Missed work rolls over to the next day rather than being dropped.
 2. Select memorized portions of the Quran.
 3. Choose a revision pace.
 4. Receive a daily task list made of smaller execution units, not raw pool labels.
-5. Mark items or sub-items as done.
-6. Track completion rate over time.
+5. Use the daily review tabs to switch between the dated ward view and `كامل المحفوظ`.
+6. Mark items or sub-items as done.
+7. Track completion rate over time.
 
 ### Multi-Learner Management
 
@@ -162,6 +163,9 @@ The current app build is:
 - generates fake review tasks from those real selections so the prototype feels closer to the final product
 - keeps exact task start/end ayah references so review rows can open Quran for Android directly or fall back to `quran.com`
 - appends the active profile name into the review top bar title so the current learner is always clear on shared devices
+- shows the review screen as a two-tab pager with the current dated ward on the right and `كامل المحفوظ` on the left
+- keeps the `كامل المحفوظ` tab on the same underlying task state so completion and rating changes reflect in the dated ward immediately
+- adds a review top bar sort action for `كامل المحفوظ` with rating, last-memorized, and Quran-order sorting
 - appends completed review status directly into the task title text flow for finished rows, with an inline completed icon immediately after the text
 - reveals future review days inline as the current visible work is completed
 - offers an explicit restart action when the visible cycle is finished
