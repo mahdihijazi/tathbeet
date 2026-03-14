@@ -31,6 +31,7 @@ open class AppContainer(
             TathbeetDatabase::class.java,
             "tathbeet.db",
         )
+            .addMigrations(TathbeetDatabase.Migration5To6)
             .fallbackToDestructiveMigration()
             .build()
 

@@ -1,9 +1,10 @@
 package com.quran.tathbeet.domain.model
 
 data class AppSettings(
-    val hasSeenScheduleIntro: Boolean,
-    val globalNotificationsEnabled: Boolean,
-    val motivationalMessagesEnabled: Boolean,
-    val reminderHour: Int,
-    val reminderMinute: Int,
+    val hasSeenScheduleIntro: Boolean = false,
+    val globalNotificationsEnabled: Boolean = true,
+    val motivationalMessagesEnabled: Boolean = true,
+    val reminderHour: Int = 19,
+    val reminderMinute: Int = 0,
+    val forceDarkTheme: Boolean = false,
 )

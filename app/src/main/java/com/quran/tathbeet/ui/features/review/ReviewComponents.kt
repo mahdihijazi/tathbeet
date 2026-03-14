@@ -313,7 +313,7 @@ private fun RatingStarIcon(
         tint = if (index < rating) {
             MaterialTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.outline
+            MaterialTheme.colorScheme.onSurfaceVariant
         },
     )
 }

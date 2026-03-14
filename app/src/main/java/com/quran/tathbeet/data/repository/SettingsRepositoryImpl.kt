@@ -21,6 +21,7 @@ class SettingsRepositoryImpl(
                     motivationalMessagesEnabled = entity?.motivationalMessagesEnabled ?: true,
                     reminderHour = entity?.reminderHour ?: DEFAULT_REMINDER_HOUR,
                     reminderMinute = entity?.reminderMinute ?: DEFAULT_REMINDER_MINUTE,
+                    forceDarkTheme = entity?.forceDarkTheme ?: false,
                 )
             }
 
@@ -48,6 +49,10 @@ class SettingsRepositoryImpl(
         }
     }
 
+    override suspend fun setForceDarkTheme(enabled: Boolean) {
+        updateSettings { entity -> entity.copy(forceDarkTheme = enabled) }
+    }
+
     private suspend fun updateSettings(
         transform: (AppSettingsEntity) -> AppSettingsEntity,
     ) {
@@ -61,6 +66,7 @@ class SettingsRepositoryImpl(
         motivationalMessagesEnabled = true,
         reminderHour = DEFAULT_REMINDER_HOUR,
         reminderMinute = DEFAULT_REMINDER_MINUTE,
+        forceDarkTheme = false,
     )
 
     companion object {

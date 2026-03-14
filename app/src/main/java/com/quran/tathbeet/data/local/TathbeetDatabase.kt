@@ -2,6 +2,8 @@ package com.quran.tathbeet.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.quran.tathbeet.data.local.dao.AppSettingsDao
 import com.quran.tathbeet.data.local.dao.LearnerAccountDao
 import com.quran.tathbeet.data.local.dao.ReviewAssignmentDao
@@ -24,7 +26,7 @@ import com.quran.tathbeet.data.local.entity.ScheduleSelectionEntity
         ReviewDayEntity::class,
         ReviewAssignmentEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 abstract class TathbeetDatabase : RoomDatabase() {
@@ -39,4 +41,18 @@ abstract class TathbeetDatabase : RoomDatabase() {
     abstract fun reviewDayDao(): ReviewDayDao
 
     abstract fun reviewAssignmentDao(): ReviewAssignmentDao
+
+    companion object {
+        val Migration5To6 =
+            object : Migration(5, 6) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        """
+                        ALTER TABLE app_settings
+                        ADD COLUMN forceDarkTheme INTEGER NOT NULL DEFAULT 0
+                        """.trimIndent(),
+                    )
+                }
+            }
+    }
 }

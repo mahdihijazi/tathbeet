@@ -1,5 +1,7 @@
 package com.quran.tathbeet.feature.settings
 
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.onNodeWithTag
 import com.quran.tathbeet.test.BaseUiFlowTest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -9,6 +11,24 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SettingsFlowTest : BaseUiFlowTest() {
+
+    @Test
+    fun dark_theme_override_persists_from_settings() {
+        completeOnboardingWithJuzOne()
+        openSettingsTab()
+
+        toggleDarkTheme()
+
+        runBlocking {
+            val settings = appContainer.settingsRepository.observeSettings().first()
+            assertTrue(settings.forceDarkTheme)
+        }
+
+        openProfilesTab()
+        openSettingsTab()
+
+        composeRule.onNodeWithTag("settings-dark-theme-toggle").assertIsOn()
+    }
 
     @Test
     fun settings_changes_persist_and_reschedule_local_reminders() {

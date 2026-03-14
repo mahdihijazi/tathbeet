@@ -97,6 +97,7 @@ Coverage notes:
 Use Compose Preview Screenshot Testing for visual regression coverage of important screens and UI states. The standard screenshot workflow is:
 
 - aim for 100% screenshot coverage of screen components
+- every screenshot-covered component or state must include both light-theme and dark-theme previews unless there is a documented reason it is theme-invariant
 - do not capture the whole screen by default
 - break each screen into smaller UI elements that form one meaningful component with one clear purpose, then create screenshot tests for those components
 - if a component has multiple variants or changes its UI based on state, capture one screenshot per state or variant

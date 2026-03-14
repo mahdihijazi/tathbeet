@@ -48,6 +48,7 @@ internal fun SettingsRoute(
     SettingsScreen(
         uiState = uiState,
         hasNotificationPermission = hasNotificationPermission,
+        onForceDarkThemeChanged = settingsViewModel::toggleForceDarkTheme,
         onGlobalNotificationsChanged = settingsViewModel::toggleGlobalNotifications,
         onMotivationalMessagesChanged = settingsViewModel::toggleMotivationalMessages,
         onProfileNotificationsChanged = settingsViewModel::toggleProfileNotifications,
@@ -100,11 +101,6 @@ internal fun LocalNotificationsDebugRoute(
 
 @Composable
 internal fun UiCatalogDebugRoute(
-    darkThemeEnabled: Boolean,
-    onDarkThemeChanged: (Boolean) -> Unit,
 ) {
-    UiCatalogDebugScreen(
-        darkThemeEnabled = darkThemeEnabled,
-        onDarkThemeChanged = onDarkThemeChanged,
-    )
+    UiCatalogDebugScreen()
 }

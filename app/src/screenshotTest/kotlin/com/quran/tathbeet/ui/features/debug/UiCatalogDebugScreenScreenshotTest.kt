@@ -1,15 +1,9 @@
 package com.quran.tathbeet.ui.features.debug
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import com.android.tools.screenshot.PreviewTest
-import com.quran.tathbeet.ui.theme.TathbeetTheme
+import com.quran.tathbeet.ui.screenshot.ThemedScreenshotFrame
 
 private const val CatalogPreviewWidth = 411
 private const val CatalogPreviewHeight = 2300
@@ -24,11 +18,8 @@ private const val CatalogPreviewHeight = 2300
 )
 @Composable
 fun UiCatalogLightScreenshot() {
-    UiCatalogScreenshotFrame(darkTheme = false) {
-        UiCatalogDebugScreen(
-            darkThemeEnabled = false,
-            onDarkThemeChanged = {},
-        )
+    ThemedScreenshotFrame(darkTheme = false, padded = false) {
+        UiCatalogDebugScreen()
     }
 }
 
@@ -42,24 +33,7 @@ fun UiCatalogLightScreenshot() {
 )
 @Composable
 fun UiCatalogDarkScreenshot() {
-    UiCatalogScreenshotFrame(darkTheme = true) {
-        UiCatalogDebugScreen(
-            darkThemeEnabled = true,
-            onDarkThemeChanged = {},
-        )
-    }
-}
-
-@Composable
-private fun UiCatalogScreenshotFrame(
-    darkTheme: Boolean,
-    content: @Composable () -> Unit,
-) {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        TathbeetTheme(darkTheme = darkTheme) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                content()
-            }
-        }
+    ThemedScreenshotFrame(darkTheme = true, padded = false) {
+        UiCatalogDebugScreen()
     }
 }

@@ -1,20 +1,14 @@
 package com.quran.tathbeet.ui.features.schedule
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import com.android.tools.screenshot.PreviewTest
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.model.QuranSelectionItem
 import com.quran.tathbeet.ui.model.SelectionCategory
 import com.quran.tathbeet.ui.model.selectionKey
-import com.quran.tathbeet.ui.theme.TathbeetTheme
+import com.quran.tathbeet.ui.screenshot.ThemedScreenshotFrame
 
 private const val SelectorPreviewWidth = 411
 private const val SelectorPreviewHeight = 760
@@ -28,18 +22,26 @@ private const val SelectorPreviewHeight = 760
     showBackground = true,
 )
 @Composable
-fun PoolSelectorSurahsTabScreenshot() {
-    PoolSelectorScreenshotFrame {
-        val optionsByCategory = sampleOptionsByCategory()
-        PoolSelectorTabsPanel(
-            selectedCategory = SelectionCategory.Surahs,
-            optionsForCategory = { category -> optionsByCategory.getValue(category) },
-            selectedPool = emptyList(),
-            onCategorySelected = {},
-            onToggleSelection = {},
-        )
-    }
-}
+fun PoolSelectorSurahsTabScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Surahs,
+        darkTheme = false,
+    )
+
+@PreviewTest
+@Preview(
+    name = "pool_selector_surahs_tab_dark",
+    locale = "ar",
+    widthDp = SelectorPreviewWidth,
+    heightDp = SelectorPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun PoolSelectorSurahsTabDarkScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Surahs,
+        darkTheme = true,
+    )
 
 @PreviewTest
 @Preview(
@@ -50,18 +52,26 @@ fun PoolSelectorSurahsTabScreenshot() {
     showBackground = true,
 )
 @Composable
-fun PoolSelectorJuzTabScreenshot() {
-    PoolSelectorScreenshotFrame {
-        val optionsByCategory = sampleOptionsByCategory()
-        PoolSelectorTabsPanel(
-            selectedCategory = SelectionCategory.Juz,
-            optionsForCategory = { category -> optionsByCategory.getValue(category) },
-            selectedPool = emptyList(),
-            onCategorySelected = {},
-            onToggleSelection = {},
-        )
-    }
-}
+fun PoolSelectorJuzTabScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Juz,
+        darkTheme = false,
+    )
+
+@PreviewTest
+@Preview(
+    name = "pool_selector_juz_tab_dark",
+    locale = "ar",
+    widthDp = SelectorPreviewWidth,
+    heightDp = SelectorPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun PoolSelectorJuzTabDarkScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Juz,
+        darkTheme = true,
+    )
 
 @PreviewTest
 @Preview(
@@ -72,18 +82,26 @@ fun PoolSelectorJuzTabScreenshot() {
     showBackground = true,
 )
 @Composable
-fun PoolSelectorHizbTabScreenshot() {
-    PoolSelectorScreenshotFrame {
-        val optionsByCategory = sampleOptionsByCategory()
-        PoolSelectorTabsPanel(
-            selectedCategory = SelectionCategory.Hizb,
-            optionsForCategory = { category -> optionsByCategory.getValue(category) },
-            selectedPool = emptyList(),
-            onCategorySelected = {},
-            onToggleSelection = {},
-        )
-    }
-}
+fun PoolSelectorHizbTabScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Hizb,
+        darkTheme = false,
+    )
+
+@PreviewTest
+@Preview(
+    name = "pool_selector_hizb_tab_dark",
+    locale = "ar",
+    widthDp = SelectorPreviewWidth,
+    heightDp = SelectorPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun PoolSelectorHizbTabDarkScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Hizb,
+        darkTheme = true,
+    )
 
 @PreviewTest
 @Preview(
@@ -94,27 +112,41 @@ fun PoolSelectorHizbTabScreenshot() {
     showBackground = true,
 )
 @Composable
-fun PoolSelectorRubTabScreenshot() {
-    PoolSelectorScreenshotFrame {
+fun PoolSelectorRubTabScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Rub,
+        darkTheme = false,
+    )
+
+@PreviewTest
+@Preview(
+    name = "pool_selector_rub_tab_dark",
+    locale = "ar",
+    widthDp = SelectorPreviewWidth,
+    heightDp = SelectorPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun PoolSelectorRubTabDarkScreenshot() =
+    PoolSelectorScreenshotFrame(
+        selectedCategory = SelectionCategory.Rub,
+        darkTheme = true,
+    )
+
+@Composable
+private fun PoolSelectorScreenshotFrame(
+    selectedCategory: SelectionCategory,
+    darkTheme: Boolean,
+) {
+    ThemedScreenshotFrame(darkTheme = darkTheme, padded = false) {
         val optionsByCategory = sampleOptionsByCategory()
         PoolSelectorTabsPanel(
-            selectedCategory = SelectionCategory.Rub,
+            selectedCategory = selectedCategory,
             optionsForCategory = { category -> optionsByCategory.getValue(category) },
             selectedPool = emptyList(),
             onCategorySelected = {},
             onToggleSelection = {},
         )
-    }
-}
-
-@Composable
-private fun PoolSelectorScreenshotFrame(content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        TathbeetTheme {
-            Box(modifier = Modifier.fillMaxSize()) {
-                content()
-            }
-        }
     }
 }
 

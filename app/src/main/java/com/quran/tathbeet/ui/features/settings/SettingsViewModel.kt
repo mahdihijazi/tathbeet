@@ -61,6 +61,7 @@ class SettingsViewModel(
 
                     _uiState.value = SettingsUiState(
                         isLoading = false,
+                        forceDarkTheme = settings.forceDarkTheme,
                         globalNotificationsEnabled = settings.globalNotificationsEnabled,
                         motivationalMessagesEnabled = settings.motivationalMessagesEnabled,
                         reminderHour = settings.reminderHour,
@@ -99,6 +100,13 @@ class SettingsViewModel(
         viewModelScope.launch {
             settingsRepository.setReminderTime(hour, minute)
             localReminderScheduler.syncSchedules()
+        }
+    }
+
+    fun toggleForceDarkTheme() {
+        val enabled = !_uiState.value.forceDarkTheme
+        viewModelScope.launch {
+            settingsRepository.setForceDarkTheme(enabled)
         }
     }
 

@@ -1,16 +1,9 @@
 package com.quran.tathbeet.ui.features.progress
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import com.android.tools.screenshot.PreviewTest
-import com.quran.tathbeet.ui.components.TathbeetBackdrop
-import com.quran.tathbeet.ui.theme.TathbeetTheme
+import com.quran.tathbeet.ui.screenshot.ThemedScreenshotFrame
 
 private const val ProgressPreviewWidth = 411
 private const val ProgressPreviewHeight = 1500
@@ -24,14 +17,20 @@ private const val ProgressPreviewHeight = 1500
     showBackground = true,
 )
 @Composable
-fun ProgressScreenEmptyScreenshot() {
-    ProgressScreenshotBox {
-        ProgressScreen(
-            uiState = ProgressPreviewFactory.emptyState(),
-            onOpenReview = {},
-        )
-    }
-}
+fun ProgressScreenEmptyScreenshot() =
+    ProgressScreenshotFrame(darkTheme = false) { ProgressPreviewFactory.emptyState() }
+
+@PreviewTest
+@Preview(
+    name = "progress_screen_empty_dark",
+    locale = "ar",
+    widthDp = ProgressPreviewWidth,
+    heightDp = ProgressPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun ProgressScreenEmptyDarkScreenshot() =
+    ProgressScreenshotFrame(darkTheme = true) { ProgressPreviewFactory.emptyState() }
 
 @PreviewTest
 @Preview(
@@ -42,14 +41,20 @@ fun ProgressScreenEmptyScreenshot() {
     showBackground = true,
 )
 @Composable
-fun ProgressScreenPartialScreenshot() {
-    ProgressScreenshotBox {
-        ProgressScreen(
-            uiState = ProgressPreviewFactory.partialState(),
-            onOpenReview = {},
-        )
-    }
-}
+fun ProgressScreenPartialScreenshot() =
+    ProgressScreenshotFrame(darkTheme = false) { ProgressPreviewFactory.partialState() }
+
+@PreviewTest
+@Preview(
+    name = "progress_screen_partial_dark",
+    locale = "ar",
+    widthDp = ProgressPreviewWidth,
+    heightDp = ProgressPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun ProgressScreenPartialDarkScreenshot() =
+    ProgressScreenshotFrame(darkTheme = true) { ProgressPreviewFactory.partialState() }
 
 @PreviewTest
 @Preview(
@@ -60,27 +65,35 @@ fun ProgressScreenPartialScreenshot() {
     showBackground = true,
 )
 @Composable
-fun ProgressScreenCompleteScreenshot() {
-    ProgressScreenshotBox {
-        ProgressScreen(
-            uiState = ProgressPreviewFactory.completeState(),
-            onOpenReview = {},
-        )
-    }
-}
+fun ProgressScreenCompleteScreenshot() =
+    ProgressScreenshotFrame(darkTheme = false) { ProgressPreviewFactory.completeState() }
+
+@PreviewTest
+@Preview(
+    name = "progress_screen_complete_dark",
+    locale = "ar",
+    widthDp = ProgressPreviewWidth,
+    heightDp = ProgressPreviewHeight,
+    showBackground = true,
+)
+@Composable
+fun ProgressScreenCompleteDarkScreenshot() =
+    ProgressScreenshotFrame(darkTheme = true) { ProgressPreviewFactory.completeState() }
 
 @Composable
-private fun ProgressScreenshotBox(
-    content: @Composable () -> Unit,
+private fun ProgressScreenshotFrame(
+    darkTheme: Boolean,
+    state: () -> ProgressUiState,
 ) {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        TathbeetTheme {
-            TathbeetBackdrop {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    content()
-                }
-            }
-        }
+    ThemedScreenshotFrame(
+        darkTheme = darkTheme,
+        padded = false,
+        withBackdrop = true,
+    ) {
+        ProgressScreen(
+            uiState = state(),
+            onOpenReview = {},
+        )
     }
 }
 

@@ -1,5 +1,6 @@
 package com.quran.tathbeet.ui
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.quran.tathbeet.BuildConfig
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
+import com.quran.tathbeet.domain.model.AppSettings
 import com.quran.tathbeet.ui.components.AppShell
 import com.quran.tathbeet.ui.features.progress.ProgressScreen
 import com.quran.tathbeet.ui.features.progress.ProgressViewModel
@@ -64,12 +66,12 @@ fun TathbeetApp(
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
     val currentDestination = currentBackStackEntry?.destination?.route.toAppDestination()
     val activeAccount by appContainer.profileRepository.observeActiveAccount().collectAsState(initial = null)
+    val appSettings by appContainer.settingsRepository.observeSettings().collectAsState(initial = AppSettings())
+    val darkThemeEnabled = appSettings.forceDarkTheme || isSystemInDarkTheme()
     var onReviewResetAction by remember { mutableStateOf({}) }
     var reviewSortActionState by remember { mutableStateOf<com.quran.tathbeet.ui.features.review.ReviewSortActionState?>(null) }
-    var debugUiCatalogDarkTheme by remember { mutableStateOf(false) }
 
     LaunchedEffect(appContainer) {
         appContainer.profileRepository.ensureDefaultAccount(
@@ -116,9 +118,8 @@ fun TathbeetApp(
         }
     }
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        val useDebugCatalogDarkTheme = currentRoute == RouteDebugUiCatalog && debugUiCatalogDarkTheme
-        val appContent: @Composable () -> Unit = {
+    TathbeetTheme(darkTheme = darkThemeEnabled) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             AppShell(
                 currentDestination = currentDestination,
                 reviewTitle = activeAccount?.name
@@ -344,10 +345,7 @@ fun TathbeetApp(
                         LocalNotificationsDebugRoute(appContainer = appContainer)
                     }
                     composable(RouteDebugUiCatalog) {
-                        UiCatalogDebugRoute(
-                            darkThemeEnabled = debugUiCatalogDarkTheme,
-                            onDarkThemeChanged = { debugUiCatalogDarkTheme = it },
-                        )
+                        UiCatalogDebugRoute()
                     }
                 }
 
@@ -390,14 +388,7 @@ fun TathbeetApp(
                         },
                     )
                 }
-                }
             }
-        }
-
-        if (useDebugCatalogDarkTheme) {
-            TathbeetTheme(darkTheme = true, content = appContent)
-        } else {
-            appContent()
         }
     }
 }

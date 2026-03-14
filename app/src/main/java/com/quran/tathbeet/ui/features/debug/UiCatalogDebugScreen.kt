@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,10 +43,7 @@ import com.quran.tathbeet.ui.model.SelectionCategory
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
-fun UiCatalogDebugScreen(
-    darkThemeEnabled: Boolean,
-    onDarkThemeChanged: (Boolean) -> Unit,
-) {
+fun UiCatalogDebugScreen() {
     var chipSelected by remember { mutableStateOf(true) }
     var fixedPagerTab by remember { mutableStateOf(CatalogFixedTab.Today) }
     var scrollablePagerTab by remember { mutableStateOf(SelectionCategory.Juz) }
@@ -65,13 +61,6 @@ fun UiCatalogDebugScreen(
                     SectionHeader(
                         title = stringResource(R.string.debug_ui_catalog_title),
                         subtitle = stringResource(R.string.debug_ui_catalog_subtitle),
-                    )
-                }
-
-                item {
-                    CatalogThemeToggleCard(
-                        darkThemeEnabled = darkThemeEnabled,
-                        onDarkThemeChanged = onDarkThemeChanged,
                     )
                 }
 
@@ -317,50 +306,4 @@ private enum class CatalogFixedTab(
         labelRes = R.string.review_tab_full_plan,
         bodyRes = R.string.debug_ui_catalog_tabbed_pager_page_full_plan,
     ),
-}
-
-@Composable
-private fun CatalogThemeToggleCard(
-    darkThemeEnabled: Boolean,
-    onDarkThemeChanged: (Boolean) -> Unit,
-) {
-    TitledCardSection(
-        title = stringResource(R.string.debug_ui_catalog_theme_title),
-    ) {
-        androidx.compose.material3.Text(
-            text = stringResource(R.string.debug_ui_catalog_theme_body),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("debug-ui-catalog-theme-toggle-row"),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half),
-            ) {
-                androidx.compose.material3.Text(
-                    text = stringResource(R.string.debug_ui_catalog_theme_toggle),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                AppPill(
-                    text = stringResource(
-                        if (darkThemeEnabled) {
-                            R.string.debug_ui_catalog_theme_dark_state
-                        } else {
-                            R.string.debug_ui_catalog_theme_light_state
-                        },
-                    ),
-                )
-            }
-            Switch(
-                checked = darkThemeEnabled,
-                onCheckedChange = onDarkThemeChanged,
-                modifier = Modifier.testTag("debug-ui-catalog-theme-toggle"),
-            )
-        }
-    }
 }

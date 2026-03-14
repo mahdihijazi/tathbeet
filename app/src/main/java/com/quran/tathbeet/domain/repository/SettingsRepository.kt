@@ -16,4 +16,6 @@ interface SettingsRepository {
         hour: Int,
         minute: Int,
     )
+
+    suspend fun setForceDarkTheme(enabled: Boolean)
 }

@@ -37,6 +37,7 @@ private const val VisibleProfileThreshold = 5
 fun SettingsScreen(
     uiState: SettingsUiState,
     hasNotificationPermission: Boolean,
+    onForceDarkThemeChanged: () -> Unit,
     onGlobalNotificationsChanged: () -> Unit,
     onMotivationalMessagesChanged: () -> Unit,
     onProfileNotificationsChanged: (String) -> Unit,
@@ -60,6 +61,13 @@ fun SettingsScreen(
         title = stringResource(R.string.settings_title),
         subtitle = "",
     ) {
+        item {
+            ThemeSettingsCard(
+                forceDarkTheme = uiState.forceDarkTheme,
+                onToggle = onForceDarkThemeChanged,
+            )
+        }
+
         if (!hasNotificationPermission) {
             item {
                 InfoActionCard(
@@ -132,6 +140,22 @@ fun SettingsScreen(
                 onReminderTimeSelected(hour, minute)
                 showReminderDialog = false
             },
+        )
+    }
+}
+
+@Composable
+internal fun ThemeSettingsCard(
+    forceDarkTheme: Boolean,
+    onToggle: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        SettingToggleRow(
+            label = stringResource(R.string.settings_theme_title),
+            supporting = stringResource(R.string.settings_theme_supporting),
+            enabled = forceDarkTheme,
+            onToggle = onToggle,
+            switchTag = "settings-dark-theme-toggle",
         )
     }
 }
@@ -283,7 +307,7 @@ private fun SettingToggleRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 18.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(

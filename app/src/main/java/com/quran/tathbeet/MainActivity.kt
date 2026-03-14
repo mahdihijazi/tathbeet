@@ -12,7 +12,6 @@ import androidx.compose.runtime.setValue
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.app.AndroidLocalReminderScheduler
 import com.quran.tathbeet.ui.TathbeetApp
-import com.quran.tathbeet.ui.theme.TathbeetTheme
 
 class MainActivity : ComponentActivity() {
     private var notificationTargetProfileId by mutableStateOf<String?>(null)
@@ -23,13 +22,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val appContainer = remember { AppContainer(applicationContext) }
-            TathbeetTheme {
-                TathbeetApp(
-                    appContainer = appContainer,
-                    notificationTargetProfileId = notificationTargetProfileId,
-                    onNotificationTargetHandled = { notificationTargetProfileId = null },
-                )
-            }
+            TathbeetApp(
+                appContainer = appContainer,
+                notificationTargetProfileId = notificationTargetProfileId,
+                onNotificationTargetHandled = { notificationTargetProfileId = null },
+            )
         }
     }
 
