@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
+import com.quran.tathbeet.app.ReminderNotificationContent
 import com.quran.tathbeet.ui.features.debug.DebugToolsScreen
 import com.quran.tathbeet.ui.features.settings.SettingsScreen
 import com.quran.tathbeet.ui.features.settings.SettingsViewModel
@@ -64,9 +65,17 @@ internal fun DebugToolsRoute(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val activeAccount by appContainer.profileRepository.observeActiveAccount().collectAsState(initial = null)
+    val activeTimelineState = activeAccount
+        ?.id
+        ?.let(appContainer.reviewRepository::observeReviewTimeline)
+        ?.collectAsState(initial = emptyList())
 
     DebugToolsScreen(
         sampleProfileName = activeAccount?.name ?: context.getString(R.string.profile_name_self),
+        sampleTask = ReminderNotificationContent.nextAvailableTask(
+            timeline = activeTimelineState?.value.orEmpty(),
+            today = appContainer.timeProvider.today(),
+        ),
         reminderScenarios = appContainer.debugNotificationController.reminderScenarios,
         onTriggerReminder = { scenario ->
             scope.launch {

@@ -118,18 +118,16 @@ class AndroidLocalReminderScheduler(
         }
 
         val account = profileRepository.observeAccounts().first().firstOrNull() ?: return
+        val copy = reminderDebugCopy(
+            scenario = scenario,
+            account = account,
+        )
         postReminderNotification(
             notificationId = debugNotificationId(scenario),
             requestCode = debugNotificationId(scenario),
             profileId = account.id,
-            title = reminderNotificationTitle(
-                accountName = account.name,
-                includeProfileName = scenario.includeProfileName,
-            ),
-            body = reminderNotificationBody(
-                baseBodyResId = scenario.baseBodyResId,
-                hadithEntry = scenario.hadithEntry,
-            ),
+            title = copy.title,
+            body = copy.body,
         )
     }
 
@@ -137,11 +135,8 @@ class AndroidLocalReminderScheduler(
         account: LearnerAccount,
         motivationalMessagesEnabled: Boolean,
     ) {
-        val title = reminderNotificationTitle(
-            accountName = account.name,
-            includeProfileName = shouldIncludeProfileName(account),
-        )
-        val body = buildReminderBody(
+        val copy = buildReminderCopy(
+            account = account,
             learnerId = account.id,
             motivationalMessagesEnabled = motivationalMessagesEnabled,
         )
@@ -149,36 +144,52 @@ class AndroidLocalReminderScheduler(
             notificationId = notificationRequestCode(account.id),
             requestCode = notificationRequestCode(account.id),
             profileId = account.id,
-            title = title,
-            body = body,
+            title = copy.title,
+            body = copy.body,
         )
     }
 
-    private suspend fun buildReminderBody(
+    private suspend fun buildReminderCopy(
+        account: LearnerAccount,
         learnerId: String,
         motivationalMessagesEnabled: Boolean,
-    ): String {
+    ): ReminderNotificationCopy {
         val timeline = reviewRepository.observeReviewTimeline(learnerId).first()
         val today = timeProvider.today()
         val hasRollover = timeline.any { day ->
             day.assignedForDate.isBefore(today) && day.assignments.any { assignment -> !assignment.isDone }
         }
-        val baseBody = appContext.getString(
-            if (hasRollover) {
-                R.string.reminder_notification_body_rollover
-            } else {
-                R.string.reminder_notification_body_today
-            },
-        )
-        return reminderNotificationBody(
-            baseBody = baseBody,
-            hadithEntry = if (motivationalMessagesEnabled) {
+        return ReminderNotificationContent.buildCopy(
+            templates = reminderNotificationTemplates(account.name),
+            includeProfileName = shouldIncludeProfileName(account),
+            nextTask = ReminderNotificationContent.nextAvailableTask(
+                timeline = timeline,
+                today = today,
+            ),
+            hasRollover = hasRollover,
+            motivation = if (motivationalMessagesEnabled) {
                 ReminderHadithCatalog.notificationEntryFor(timeProvider.today().dayOfYear)
+                    .toMotivation(appContext::getString)
             } else {
                 null
             },
         )
     }
+
+    private suspend fun reminderDebugCopy(
+        scenario: ReminderNotificationDebugScenario,
+        account: LearnerAccount,
+    ): ReminderNotificationCopy =
+        ReminderNotificationContent.buildCopy(
+            templates = reminderNotificationTemplates(account.name),
+            includeProfileName = scenario.includeProfileName,
+            nextTask = ReminderNotificationContent.nextAvailableTask(
+                timeline = reviewRepository.observeReviewTimeline(account.id).first(),
+                today = timeProvider.today(),
+            ),
+            hasRollover = scenario.hasRollover,
+            motivation = scenario.hadithEntry?.toMotivation(appContext::getString),
+        )
 
     private suspend fun shouldIncludeProfileName(account: LearnerAccount): Boolean {
         val accounts = profileRepository.observeAccounts().first()
@@ -254,37 +265,17 @@ class AndroidLocalReminderScheduler(
         )
     }
 
-    private fun reminderNotificationTitle(
+    private fun reminderNotificationTemplates(
         accountName: String,
-        includeProfileName: Boolean,
-    ): String =
-        if (includeProfileName) {
-            appContext.getString(R.string.reminder_notification_title_for_profile, accountName)
-        } else {
-            appContext.getString(R.string.reminder_notification_title)
-        }
-
-    private fun reminderNotificationBody(
-        baseBody: String,
-        hadithEntry: ReminderHadithEntry?,
-    ): String =
-        if (hadithEntry == null) {
-            baseBody
-        } else {
-            appContext.getString(
-                R.string.reminder_notification_body_with_motivation,
-                baseBody,
-                appContext.getString(hadithEntry.textResId),
-                appContext.getString(hadithEntry.sourceResId),
-            )
-        }
-
-    private fun reminderNotificationBody(
-        baseBodyResId: Int,
-        hadithEntry: ReminderHadithEntry?,
-    ): String = reminderNotificationBody(
-        baseBody = appContext.getString(baseBodyResId),
-        hadithEntry = hadithEntry,
+    ) = ReminderNotificationTemplates(
+        generalTitle = appContext.getString(R.string.reminder_notification_title),
+        namedTitle = appContext.getString(R.string.reminder_notification_title_for_profile, accountName),
+        taskTitle = appContext.getString(R.string.reminder_notification_title_with_task),
+        fallbackTodayBody = appContext.getString(R.string.reminder_notification_body_today),
+        fallbackRolloverBody = appContext.getString(R.string.reminder_notification_body_rollover),
+        nextTaskTodayBody = appContext.getString(R.string.reminder_notification_body_next_task),
+        nextTaskRolloverBody = appContext.getString(R.string.reminder_notification_body_next_task_rollover),
+        motivationBody = appContext.getString(R.string.reminder_notification_body_with_motivation),
     )
 
     private fun postReminderNotification(
@@ -327,16 +318,17 @@ class AndroidLocalReminderScheduler(
     }
 }
 
-private val ReminderNotificationDebugScenario.baseBodyResId: Int
-    get() = if (hasRollover) {
-        R.string.reminder_notification_body_rollover
-    } else {
-        R.string.reminder_notification_body_today
-    }
-
 private val ReminderNotificationDebugScenario.hadithEntry: ReminderHadithEntry?
     get() = if (includesMotivation) {
         ReminderHadithCatalog.notificationEntries[motivationalEntryIndex]
     } else {
         null
     }
+
+private fun ReminderHadithEntry.toMotivation(
+    resolve: (Int) -> String,
+): ReminderNotificationMotivation =
+    ReminderNotificationMotivation(
+        text = resolve(textResId),
+        source = resolve(sourceResId),
+    )

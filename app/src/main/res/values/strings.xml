@@ -335,13 +335,15 @@
 
     <string name="reminder_channel_name">تذكيرات الورد اليومي</string>
     <string name="reminder_channel_description">إشعارات محلية لتذكيرك بورد اليوم والحسابات المفعّلة على هذا الجهاز.</string>
-    <string name="reminder_notification_title">ورد اليوم جاهز</string>
-    <string name="reminder_notification_title_for_profile">الورد لـ %1$s</string>
-    <string name="reminder_notification_body_today">ورد اليوم جاهز للمراجعة.</string>
-    <string name="reminder_notification_body_rollover">لديك ورد مؤجل مع ورد اليوم.</string>
+    <string name="reminder_notification_title">حان موعد وردك</string>
+    <string name="reminder_notification_title_for_profile">حان موعد الورد لـ %1$s</string>
+    <string name="reminder_notification_title_with_task">%1$s - %2$s</string>
+    <string name="reminder_notification_body_today">افتح التطبيق وابدأ أول مقطع من ورد اليوم.</string>
+    <string name="reminder_notification_body_rollover">افتح التطبيق وأكمل المقاطع المؤجلة مع ورد اليوم.</string>
+    <string name="reminder_notification_body_next_task">ابدأ الآن بـ %1$s</string>
+    <string name="reminder_notification_body_next_task_rollover">ابدأ الآن بـ %1$s ولديك أيضاً مراجعات مؤجلة من الأيام السابقة.</string>
     <string name="reminder_notification_body_with_motivation">%1$s
-%2$s
-%3$s</string>
+%2$s</string>
     <string name="reminder_hadith_notification_1_text">إِنَّمَا مَثَلُ صَاحِبِ الْقُرْآنِ كَمَثَلِ صَاحِبِ الْإِبِلِ الْمُعَقَّلَةِ، إِنْ عَاهَدَ عَلَيْهَا أَمْسَكَهَا، وَإِنْ أَطْلَقَهَا ذَهَبَتْ.</string>
     <string name="reminder_hadith_notification_1_source">صحيح البخاري</string>
     <string name="reminder_hadith_notification_2_text">تَعَاهَدُوا الْقُرْآنَ، فَوَالَّذِي نَفْسِي بِيَدِهِ لَهُوَ أَشَدُّ تَفَصِّيًا مِنَ الْإِبِلِ فِي عُقُلِهَا.</string>
