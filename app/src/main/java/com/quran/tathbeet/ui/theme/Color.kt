@@ -1,5 +1,7 @@
 package com.quran.tathbeet.ui.theme
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 internal val ActionPrimary = Color(0xFF2E6772)
@@ -15,3 +17,26 @@ internal val SurfaceAccent = Color(0xFFFFE4C4)
 internal val ContentPrimary = Color(0xFF1F1B16)
 internal val ContentSecondary = Color(0xFF5B544B)
 internal val StrokeSubtle = Color(0xFF938777)
+
+internal fun tathbeetLightColorScheme(): ColorScheme =
+    lightColorScheme(
+        primary = ActionPrimary,
+        onPrimary = OnActionPrimary,
+        primaryContainer = SurfaceHighlight,
+        onPrimaryContainer = ContentPrimary,
+        secondary = ActionSecondary,
+        onSecondary = OnActionSecondary,
+        secondaryContainer = SurfaceMuted,
+        onSecondaryContainer = ContentPrimary,
+        tertiary = AccentSupport,
+        onTertiary = OnActionPrimary,
+        tertiaryContainer = SurfaceAccent,
+        onTertiaryContainer = ContentPrimary,
+        background = SurfacePrimary,
+        onBackground = ContentPrimary,
+        surface = SurfaceSecondary,
+        onSurface = ContentPrimary,
+        surfaceVariant = SurfaceMuted,
+        onSurfaceVariant = ContentSecondary,
+        outline = StrokeSubtle,
+    )

@@ -22,8 +22,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabIndicatorScope
-import androidx.compose.material3.TabPosition
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,15 +36,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import com.quran.tathbeet.ui.model.QuranSelectionItem
 import com.quran.tathbeet.ui.model.SelectionCategory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlin.math.ceil
-import kotlin.math.floor
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -169,51 +166,15 @@ fun PoolSelectorTabsPanel(
 private fun TabIndicatorScope.PoolSelectorTabIndicator(
     pagerState: PagerState,
 ) {
-    Spacer(
+    TabRowDefaults.PrimaryIndicator(
         modifier = Modifier
-            .tabIndicatorLayout { measurable, constraints, tabPositions ->
-                val (indicatorOffset, indicatorWidth) =
-                    tabPositions.indicatorBoundsFor(pagerState = pagerState)
-                val placeable = measurable.measure(
-                    constraints.copy(
-                        minWidth = indicatorWidth.roundToPx(),
-                        maxWidth = indicatorWidth.roundToPx(),
-                    ),
-                )
-                layout(constraints.maxWidth, constraints.maxHeight) {
-                    placeable.placeRelative(
-                        x = indicatorOffset.roundToPx(),
-                        y = constraints.maxHeight - placeable.height,
-                    )
-                }
-            }
-            .height(3.dp)
-            .background(
-                color = MaterialTheme.colorScheme.primary,
-                shape = CircleShape,
-            ),
+            .tabIndicatorOffset(
+                selectedTabIndex = pagerState.currentPage,
+                matchContentSize = true,
+            )
+            .height(3.dp),
+        width = Dp.Unspecified,
+        color = MaterialTheme.colorScheme.primary,
+        shape = CircleShape,
     )
 }
-
-private fun List<TabPosition>.indicatorBoundsFor(
-    pagerState: PagerState,
-): Pair<Dp, Dp> {
-    if (isEmpty()) {
-        return 0.dp to 0.dp
-    }
-
-    val maxIndex = lastIndex
-    val pageOffset = (pagerState.currentPage + pagerState.currentPageOffsetFraction)
-        .coerceIn(0f, maxIndex.toFloat())
-    val startIndex = floor(pageOffset).toInt()
-    val endIndex = ceil(pageOffset).toInt()
-    val progress = pageOffset - startIndex
-    val start = this[startIndex].indicatorStart()
-    val end = this[endIndex].indicatorStart()
-    val width = lerp(this[startIndex].contentWidth, this[endIndex].contentWidth, progress)
-    val offset = lerp(start, end, progress)
-
-    return offset to width
-}
-
-private fun TabPosition.indicatorStart(): Dp = left + ((width - contentWidth) / 2f)
