@@ -17,6 +17,7 @@ import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.app.ReminderNotificationContent
 import com.quran.tathbeet.ui.features.debug.DebugToolsScreen
+import com.quran.tathbeet.ui.features.debug.LocalNotificationsDebugScreen
 import com.quran.tathbeet.ui.features.settings.SettingsScreen
 import com.quran.tathbeet.ui.features.settings.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -61,6 +62,16 @@ internal fun SettingsRoute(
 @Composable
 internal fun DebugToolsRoute(
     appContainer: AppContainer,
+    onOpenLocalNotifications: () -> Unit,
+) {
+    DebugToolsScreen(
+        onOpenLocalNotifications = onOpenLocalNotifications,
+    )
+}
+
+@Composable
+internal fun LocalNotificationsDebugRoute(
+    appContainer: AppContainer,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -70,7 +81,7 @@ internal fun DebugToolsRoute(
         ?.let(appContainer.reviewRepository::observeReviewTimeline)
         ?.collectAsState(initial = emptyList())
 
-    DebugToolsScreen(
+    LocalNotificationsDebugScreen(
         sampleProfileName = activeAccount?.name ?: context.getString(R.string.profile_name_self),
         sampleTask = ReminderNotificationContent.nextAvailableTask(
             timeline = activeTimelineState?.value.orEmpty(),

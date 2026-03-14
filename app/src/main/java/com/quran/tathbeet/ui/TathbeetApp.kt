@@ -322,7 +322,17 @@ fun TathbeetApp(
 
                 if (BuildConfig.DEBUG) {
                     composable(RouteDebug) {
-                        DebugToolsRoute(appContainer = appContainer)
+                        DebugToolsRoute(
+                            appContainer = appContainer,
+                            onOpenLocalNotifications = {
+                                navController.navigate(RouteDebugLocalNotifications) {
+                                    launchSingleTop = true
+                                }
+                            },
+                        )
+                    }
+                    composable(RouteDebugLocalNotifications) {
+                        LocalNotificationsDebugRoute(appContainer = appContainer)
                     }
                 }
 

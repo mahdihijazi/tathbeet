@@ -28,6 +28,12 @@ class SettingsDebugFlowTest : BaseUiFlowTest() {
             composeRule.activity.getString(R.string.debug_tools_title),
         ).assertIsDisplayed()
 
+        composeRule.onNodeWithTag("debug-open-local-notifications").performClick()
+
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.debug_notifications_title),
+        ).assertIsDisplayed()
+
         composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
             hasTestTag("debug-notification-trigger-${ReminderNotificationDebugScenario.TodayGeneral.id}"),
         )

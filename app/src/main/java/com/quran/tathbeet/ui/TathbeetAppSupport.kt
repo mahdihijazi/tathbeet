@@ -33,6 +33,7 @@ internal const val RouteProfiles = "profiles"
 internal const val RouteProgress = "progress"
 internal const val RouteSettings = "settings"
 internal const val RouteDebug = "debug"
+internal const val RouteDebugLocalNotifications = "debug_local_notifications"
 internal const val RouteShared = "shared"
 
 @Composable
@@ -127,6 +128,7 @@ internal fun String?.toAppDestination(): AppDestination = when (this) {
     RouteShared -> AppDestination.Shared
     RouteSettings -> AppDestination.Settings
     RouteDebug -> AppDestination.Debug
+    RouteDebugLocalNotifications -> AppDestination.Debug
     else -> AppDestination.Review
 }
 

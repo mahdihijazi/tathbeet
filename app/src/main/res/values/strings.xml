@@ -322,7 +322,12 @@
     <string name="settings_toggle_account_mode">تبديل وضع الحساب</string>
 
     <string name="debug_tools_title">أدوات التجربة</string>
-    <string name="debug_tools_subtitle">هذه الشاشة متاحة في نسخة التصحيح فقط لتجربة الإشعارات فوراً داخل التطبيق.</string>
+    <string name="debug_tools_subtitle">هذه الشاشة متاحة في نسخة التصحيح فقط لتجميع أدوات التجربة داخل التطبيق.</string>
+    <string name="debug_tools_sections_title">مساحات التجربة</string>
+    <string name="debug_tools_sections_subtitle">كل زر يفتح مساحة مستقلة لتجربة جزء محدد من التطبيق.</string>
+    <string name="debug_tools_local_notifications_title">اختبار الإشعارات المحلية</string>
+    <string name="debug_tools_local_notifications_subtitle">افتح شاشة مستقلة فيها كل بطاقات إشعارات التذكير لتوسيعها لاحقاً بدون ازدحام الشاشة الرئيسية.</string>
+    <string name="debug_tools_local_notifications_action">فتح شاشة الإشعارات المحلية</string>
     <string name="debug_notifications_title">معاينة إشعارات التذكير</string>
     <string name="debug_notifications_subtitle">كل بطاقة تمثل شكلاً فعلياً يمكن أن يرسله التطبيق. اضغط الزر لإظهار الإشعار مباشرة.</string>
     <string name="debug_notifications_trigger">إرسال الإشعار الآن</string>
