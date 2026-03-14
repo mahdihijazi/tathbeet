@@ -139,6 +139,8 @@ Accounts are optional for single-device use and required for cloud sync or share
 - users can use the app without creating an account for local-only usage
 - adults who want their own profile available across devices can sign in with Firebase email-link auth
 - adults who create or join a shared learner profile must sign in with Firebase email-link auth
+- when a local self profile signs in, that self profile should become cloud-synced immediately rather than waiting for a separate opt-in sync action
+- each signed-in adult account should have exactly one cloud-synced personal profile in MVP
 - Google sign-in is not part of MVP
 - the sync system should not require a custom backend service
 - local device settings remain local and do not sync
@@ -481,6 +483,9 @@ The shared-profile model in MVP should be intentionally small:
 - the owner can invite and remove other adults
 - invited adults join as editors
 - editors can fully update the revision plan, add or edit cycles, restart the cycle, and update daily task state
+- editors may leave at any time and lose access immediately
+- the owner must not be allowed to leave, delete the profile, or remove their own membership while any editors still remain
+- cloud data for a learner profile should be deleted only when the owner deletes it after all editor memberships have already been removed, or when a solo synced profile has no remaining membership
 - local reminder settings stay device-local and are never shared
 - the system does not need an audit log in MVP
 
@@ -510,6 +515,8 @@ That plan is the source of truth for:
 - a profile may be local-only, cloud-synced solo, or shared
 - the original creator of a shared learner profile is its only owner
 - only the owner can invite or remove other adults from a shared learner profile
+- editors may remove themselves from a shared learner profile at any time
+- the owner must remove all editors before deleting a shared learner profile
 
 ### 13.2 Schedule Creation
 
@@ -676,7 +683,6 @@ These items should be resolved during design and implementation planning:
 
 - exact algorithm for converting juz-per-day targets into mixed review segments
 - exact invitation entry points in the UI between profile details and Settings
-- exact UI entry point for turning a local profile into a cloud-synced solo profile
 - whether motivational content is bundled locally, fetched remotely, or both
 - how much schedule editing is allowed once a profile has active progress
 

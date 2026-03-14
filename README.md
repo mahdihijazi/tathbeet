@@ -119,7 +119,7 @@ Signed-in adults should be able to share a learner profile with more than one ma
 
 ### Cloud-Synced Solo Profile
 
-Signed-in adults should also be able to keep their own profile synced across devices without sharing it with anyone else.
+Signed-in adults should also be able to keep their own profile synced across devices without sharing it with anyone else. In MVP, each adult account has one personal synced profile, and the current local self profile becomes synced as soon as that adult signs in.
 
 ## Notifications
 

@@ -28,6 +28,9 @@ The same cloud model should support two states:
 - solo synced profile: one owner, no editors
 - shared learner profile: one owner, one or more editors
 
+Each signed-in adult account should have exactly one solo synced personal profile in MVP.
+That personal profile should become cloud-synced immediately when the adult signs in.
+
 ## 3. Scope Split
 
 ### Shared in Firestore
@@ -58,6 +61,7 @@ The same cloud model should support two states:
 - can remove editors
 - can edit all shared learner data
 - cannot transfer ownership in MVP
+- cannot leave or delete a shared profile while any editors still remain
 
 ### Editor
 
@@ -94,6 +98,7 @@ Suggested fields:
 
 - `email`
 - `normalizedEmail`
+- `personalProfileId`
 - `createdAt`
 - `lastSeenAt`
 
@@ -252,6 +257,22 @@ Solo synced profiles do not need invites. They only need the owner membership re
 3. App deletes or disables that member record.
 4. Removed adults lose future shared access after sync refresh.
 
+### Editor Leave Flow
+
+1. Editor opens the shared learner profile.
+2. Editor chooses to leave that shared profile.
+3. App removes that editor membership.
+4. The editor loses access immediately after sync refresh.
+
+### Profile Removal Rule
+
+- editors may remove themselves at any time
+- removing one editor membership must not delete the profile data while other memberships remain
+- the owner must not be allowed to remove their own membership while any editors still remain
+- the owner must remove all editors before deleting a shared profile
+- deleting a shared profile should delete its Firestore data only after no editor memberships remain
+- deleting a solo synced profile should delete it because no other memberships exist
+
 ## 8. Security Rules Direction
 
 The MVP should rely on Firestore Security Rules instead of a custom backend.
@@ -261,6 +282,8 @@ Rules should enforce:
 - only authenticated adults can access cloud-synced learner data
 - only members of a learner profile can read that profile, its plan, and its tasks
 - only the owner can create invites or remove members
+- editors may delete only their own membership
+- the owner may not delete their own membership from a shared profile while other member documents still exist
 - editors can update plan, cycle, and task data
 - editors cannot update `ownerUid` or membership documents
 - invite acceptance is allowed only when the signed-in email matches the invited email
@@ -287,6 +310,7 @@ The planner should stay deterministic and local to the app. Firestore stores the
 ### Slice 2: Owner-Created Synced Profile
 
 - create a cloud-synced profile with owner membership
+- convert the local self profile into the synced personal profile immediately after sign-in
 - restore the owner's synced profile on another signed-in device
 - read synced profile data from Firestore
 
@@ -309,7 +333,133 @@ The planner should stay deterministic and local to the app. Firestore stores the
 - clearer sync status feedback
 - conflict handling UX if last-write-wins proves too confusing
 
-## 11. Explicit Non-Goals For This Plan
+## 11. Estimated Firebase Cost
+
+These estimates are based on the current official Firebase and Firestore pricing documentation and on the current Tathbeet sync design.
+
+Important setup note:
+
+- this plan should use the `Blaze` plan from the beginning
+- the reason is not expected spend, but email-link auth limits
+- Firebase Auth currently allows only `5 email link sign-in emails/day` on Spark and `25,000/day` on Blaze, which makes Spark too restrictive for real testing and launch
+
+### Pricing Basis
+
+- Firestore no-cost tier: `50,000 reads/day`, `20,000 writes/day`, `20,000 deletes/day`, `1 GiB` storage, `10 GiB/month` outbound data
+- Firestore operation rates used for this estimate: `$0.06 / 100,000 reads`, `$0.18 / 100,000 writes`, `$0.02 / 100,000 deletes`
+- Firebase Auth with Identity Platform pricing on Blaze starts charging after `50,000 MAUs`, so auth cost should remain effectively `$0` for MVP-scale usage
+
+Sources:
+
+- [Firebase pricing](https://firebase.google.com/pricing)
+- [Firebase Authentication](https://firebase.google.com/docs/auth/)
+- [Firebase Authentication limits](https://firebase.google.com/docs/auth/limits)
+- [Firestore pricing](https://firebase.google.com/docs/firestore/pricing)
+- [Firestore Native billing example](https://cloud.google.com/firestore/native/docs/billing-example)
+
+### Tathbeet Usage Assumptions
+
+These are product-specific assumptions for the current app design:
+
+- one signed-in active profile opens synced review data `2` times per active day
+- each open loads about `63` documents:
+  - `1` profile document
+  - `1` membership or ownership document
+  - `1` plan metadata document
+  - `60` task or cycle-visible documents
+- this gives roughly `126 reads/day` per active signed-in profile
+- each active signed-in profile performs about `8 writes/day`
+  - task completion updates
+  - rating edits
+  - occasional plan or cycle metadata updates averaged into the estimate
+- average retained storage per synced profile is about `0.25 MB`
+- these estimates assume moderate collaboration, not continuous long-lived listeners between several adults all day
+
+If shared profiles become the dominant use case and several adults keep the same learner profile open at the same time, add about `15% to 25%` to the read and write budget.
+
+### Cost Per Active Signed-In Profile
+
+Using the assumptions above:
+
+- reads: about `126/day`, or `3,780/month`
+- writes: about `8/day`, or `240/month`
+- estimated Firestore operations cost per fully active signed-in profile is about `$0.0027/month` before free-tier offsets
+
+This means the sync architecture is operationally cheap as long as reads stay bounded to the active profile and active cycle.
+
+### Monthly Scenario Estimates
+
+These scenarios use:
+
+- the assumptions above
+- the Firestore free tier
+- storage estimates based on `0.25 MB` per synced profile
+- auth cost assumed to remain `$0` at MVP scale
+- network egress excluded from the main total because it is highly region-dependent after the free tier, though it should stay negligible at pilot scale
+
+| Scenario | DAU | Signed-in MAU | Estimated monthly cost |
+| --- | ---: | ---: | ---: |
+| Pilot test | 200 | 1,000 | about `$0` |
+| Small launch | 1,000 | 5,000 | about `$1.41/month` |
+| Growing MVP | 5,000 | 25,000 | about `$12.47/month` |
+| Upper MVP range | 10,000 | 50,000 | about `$27.09/month` |
+
+### Optional Egress Add-On
+
+Inference:
+
+- if synced payloads average about `100 KB/day` per active signed-in profile, outbound network usually stays within the free tier at pilot and small-launch scale
+- at around `5,000 DAU`, extra outbound traffic may add roughly another `$0.5/month`
+- at around `10,000 DAU`, extra outbound traffic may add roughly another `$2 to $3/month`
+
+### Practical Conclusion
+
+For the current Tathbeet design:
+
+- Firebase is financially reasonable for MVP
+- Blaze is required because of email-link sign-in limits, not because the app is expected to be expensive
+- with efficient queries, the likely monthly bill should stay near `$0` in pilot and low-single-digits in a small launch
+- the biggest cost risk is unnecessary Firestore reads, especially loading too many task documents or using broad listeners too often
+
+### Cost-Control Implementation Rules
+
+These implementation rules should be treated as part of the sync design, not optional optimizations.
+
+- only listen to the active profile, never all profiles at once
+- only query the active cycle and the visible task window for the current screen
+- do not load full completion history on app launch
+- paginate or defer older tasks and previous cycles behind explicit user actions
+- avoid long-lived listeners for screens the user is not actively viewing
+- prefer one-shot reads for low-change screens like sharing settings or membership lists
+- keep `plan/meta`, cycle records, and task records separate so small edits do not force rereading a large schedule blob
+- update task documents directly instead of rewriting the whole plan after each completion
+- denormalize small UI-critical fields when it avoids fan-out reads, for example the active cycle id or lightweight profile summary counts
+- cache stable Quran reference data locally and never store or fetch that catalog from Firestore
+- keep local device settings entirely outside Firestore
+- avoid collection scans by always querying tasks through indexed fields such as `cycleId`, `scheduledDate`, and status
+- do not attach listeners for profiles the signed-in user cannot currently open from the visible UI
+- when reopening the app, restore from local cache first and let Firestore refresh in the background
+- keep invite documents short-lived and delete or archive them after acceptance or revocation
+- if a screen only needs counts or status chips, store lightweight derived summary fields instead of recomputing them from many task reads every time
+
+### Query Design Tips
+
+- the review screen should read only:
+  - the profile document
+  - the caller's membership document
+  - `plan/meta`
+  - tasks for the active cycle and current visible range
+- the profiles list should show lightweight summary cards and should not subscribe to every task collection for every profile
+- the shared-profile screen should read members and pending invites only while that screen is open
+- progress should start with a small recent window, such as the last `7` days, instead of the full history
+
+### Data Retention Tips
+
+- keep only the active cycle hot in the default queries
+- archive older cycles out of the default UI path
+- consider pruning or compacting old per-task history later if history volume grows faster than expected
+
+## 12. Explicit Non-Goals For This Plan
 
 - Google sign-in
 - backup export/import
