@@ -33,6 +33,13 @@
     <string name="debug_ui_catalog_pill_title">AppPill</string>
     <string name="debug_ui_catalog_pill_text">AppPill</string>
     <string name="debug_ui_catalog_wizard_title">WizardHeader</string>
+    <string name="debug_ui_catalog_tabbed_pager_title">AppTabbedPager</string>
+    <string name="debug_ui_catalog_tabbed_pager_body">نسخة مشتركة من التبويبات مع السحب الأفقي تستخدمها الشاشات التي تحتاج التنقل بين صفحات متجاورة.</string>
+    <string name="debug_ui_catalog_tabbed_pager_fixed_title">تبويبات ثابتة</string>
+    <string name="debug_ui_catalog_tabbed_pager_scrollable_title">تبويبات قابلة للتمرير</string>
+    <string name="debug_ui_catalog_tabbed_pager_page_today">هذه معاينة للصفحة اليومية داخل المكوّن المشترك.</string>
+    <string name="debug_ui_catalog_tabbed_pager_page_full_plan">هذه معاينة لصفحة كامل المحفوظ داخل المكوّن المشترك.</string>
+    <string name="debug_ui_catalog_tabbed_pager_page_selection">هذه معاينة لصفحة %1$s داخل المكوّن المشترك.</string>
     <string name="debug_ui_catalog_key_value_label">AppKeyValueRow</string>
     <string name="debug_ui_catalog_key_value_value">قيمة تجريبية</string>
     <string name="debug_ui_catalog_buttons_title">Buttons</string>

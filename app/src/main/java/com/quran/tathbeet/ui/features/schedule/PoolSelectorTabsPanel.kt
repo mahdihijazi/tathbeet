@@ -1,49 +1,31 @@
 package com.quran.tathbeet.ui.features.schedule
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.background
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabIndicatorScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.quran.tathbeet.ui.components.AppTabbedPager
+import com.quran.tathbeet.ui.components.AppTabbedPagerStyle
+import com.quran.tathbeet.ui.components.AppTabbedPagerTab
 import com.quran.tathbeet.ui.model.QuranSelectionItem
 import com.quran.tathbeet.ui.model.SelectionCategory
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PoolSelectorTabsPanel(
     selectedCategory: SelectionCategory,
@@ -53,66 +35,23 @@ fun PoolSelectorTabsPanel(
     onToggleSelection: (QuranSelectionItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val categories = SelectionCategory.entries
-    val selectedPage = categories.indexOf(selectedCategory).coerceAtLeast(0)
-    val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(
-        initialPage = selectedPage,
-        pageCount = { categories.size },
-    )
-
-    LaunchedEffect(selectedCategory) {
-        val page = categories.indexOf(selectedCategory).coerceAtLeast(0)
-        if (pagerState.settledPage != page && pagerState.targetPage != page) {
-            pagerState.scrollToPage(page)
-        }
+    val tabs = SelectionCategory.entries.map { category ->
+        AppTabbedPagerTab(
+            value = category,
+            label = stringResource(category.labelRes),
+            tabTestTag = "pool-selector-tab-${category.name}",
+        )
     }
 
-    LaunchedEffect(pagerState, selectedCategory) {
-        snapshotFlow { pagerState.settledPage }
-            .filter { page -> page in categories.indices }
-            .distinctUntilChanged()
-            .collectLatest { page ->
-                val category = categories[page]
-                if (category != selectedCategory) {
-                    onCategorySelected(category)
-                }
-            }
-    }
-
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        PrimaryScrollableTabRow(
-            selectedTabIndex = pagerState.currentPage,
-            edgePadding = 0.dp,
-            modifier = Modifier.fillMaxWidth(),
-            indicator = { PoolSelectorTabIndicator(pagerState = pagerState) },
-        ) {
-            categories.forEachIndexed { index, category ->
-                Tab(
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        if (pagerState.targetPage != index || pagerState.settledPage != index) {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        }
-                    },
-                    modifier = Modifier.testTag("pool-selector-tab-${category.name}"),
-                    text = { Text(stringResource(category.labelRes)) },
-                )
-            }
-        }
-
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .weight(1f)
-                .testTag("pool-selector-pager"),
-        ) { page ->
-            val pageCategory = categories[page]
+    AppTabbedPager(
+        tabs = tabs,
+        selectedTab = selectedCategory,
+        onTabSelected = onCategorySelected,
+        modifier = modifier,
+        rowStyle = AppTabbedPagerStyle.Scrollable(edgePadding = 0.dp),
+        pagerTestTag = "pool-selector-pager",
+        verticalSpacing = 12.dp,
+    ) { pageCategory ->
             val pageOptions = optionsForCategory(pageCategory)
             LazyColumn(
                 modifier = Modifier
@@ -158,23 +97,5 @@ fun PoolSelectorTabsPanel(
                     }
                 }
             }
-        }
     }
-}
-
-@Composable
-private fun TabIndicatorScope.PoolSelectorTabIndicator(
-    pagerState: PagerState,
-) {
-    TabRowDefaults.PrimaryIndicator(
-        modifier = Modifier
-            .tabIndicatorOffset(
-                selectedTabIndex = pagerState.currentPage,
-                matchContentSize = true,
-            )
-            .height(3.dp),
-        width = Dp.Unspecified,
-        color = MaterialTheme.colorScheme.primary,
-        shape = CircleShape,
-    )
 }

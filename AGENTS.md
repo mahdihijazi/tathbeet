@@ -18,6 +18,8 @@ Current repo structure:
 - `ui/theme/` for colors, typography, and theme setup
 - `app/src/androidTest/test/` for shared UI test infrastructure such as base test classes and helpers
 
+If a composable pattern can reasonably be reused by more than one feature, extract it into `ui/components/` instead of keeping parallel copies inside feature packages. Feature modules should keep only screen-specific composition and domain-specific UI content.
+
 Android resources are in `app/src/main/res`, and user-facing strings should live in XML resources rather than Kotlin files.
 
 Product and planning documents live at the repo root in `README.md` and `PRD.md`, with supporting flow and screen docs under `docs/`.

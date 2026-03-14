@@ -1,6 +1,8 @@
 # group:id
 
 # Shared components
+components:app_tabbed_pager_fixed
+components:app_tabbed_pager_scrollable
 components:wizard_header_step_1
 components:wizard_header_step_2
 components:wizard_header_step_3
