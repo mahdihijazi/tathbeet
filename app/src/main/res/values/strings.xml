@@ -306,6 +306,8 @@
     <string name="settings_reminder_supporting">يستخدم التطبيق وقتاً واحداً لكل الحسابات، ثم يطبّق تفعيل كل حساب على حدة.</string>
     <string name="settings_reminder_change">تغيير الوقت</string>
     <string name="settings_reminder_dialog_title">اختر وقت التذكير اليومي</string>
+    <string name="settings_reminder_hour_label">الساعة</string>
+    <string name="settings_reminder_minute_label">الدقيقة</string>
     <string name="settings_reminder_selected">الحالي</string>
     <string name="settings_profiles_title">الحسابات</string>
     <string name="settings_profiles_subtitle">فعّل التذكير للحسابات التي تريد تنبيهها.</string>

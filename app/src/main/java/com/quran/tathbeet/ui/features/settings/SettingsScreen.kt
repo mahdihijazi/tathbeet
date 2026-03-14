@@ -9,13 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -231,18 +228,14 @@ private fun SettingsRowDivider() {
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun ReminderTimeDialog(
     selectedHour: Int,
     selectedMinute: Int,
     onDismiss: () -> Unit,
     onSelected: (Int, Int) -> Unit,
 ) {
-    val timePickerState = rememberTimePickerState(
-        initialHour = selectedHour,
-        initialMinute = selectedMinute,
-        is24Hour = true,
-    )
+    var editedHour by remember(selectedHour) { mutableStateOf(selectedHour) }
+    var editedMinute by remember(selectedMinute) { mutableStateOf(selectedMinute) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -250,14 +243,21 @@ private fun ReminderTimeDialog(
         },
         text = {
             Box(modifier = Modifier.testTag("settings-time-input")) {
-                TimeInput(state = timePickerState)
+                ReminderTimeEditor(
+                    initialHour = selectedHour,
+                    initialMinute = selectedMinute,
+                    onValueChanged = { hour, minute ->
+                        editedHour = hour
+                        editedMinute = minute
+                    },
+                )
             }
         },
         confirmButton = {
             AppPrimaryButton(
                 text = stringResource(R.string.action_save),
                 onClick = {
-                    onSelected(timePickerState.hour, timePickerState.minute)
+                    onSelected(editedHour, editedMinute)
                 },
                 modifier = Modifier.testTag("settings-time-save"),
             )
