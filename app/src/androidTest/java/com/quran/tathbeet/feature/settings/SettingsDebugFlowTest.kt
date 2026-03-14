@@ -18,15 +18,7 @@ class SettingsDebugFlowTest : BaseUiFlowTest() {
     @Test
     fun debug_tools_from_settings_can_trigger_a_reminder_preview() {
         completeOnboardingWithJuzOne()
-        openSettingsTab()
-
-        composeRule.onNodeWithContentDescription(
-            composeRule.activity.getString(R.string.content_open_debug_tools),
-        ).performClick()
-
-        composeRule.onNodeWithText(
-            composeRule.activity.getString(R.string.debug_tools_title),
-        ).assertIsDisplayed()
+        openDebugTools()
 
         composeRule.onNodeWithTag("debug-open-local-notifications").performClick()
 
@@ -45,5 +37,44 @@ class SettingsDebugFlowTest : BaseUiFlowTest() {
             listOf(ReminderNotificationDebugScenario.TodayGeneral),
             appContainer.recordingDebugNotificationController.triggeredScenarios,
         )
+    }
+
+    @Test
+    fun debug_tools_ui_catalog_can_be_opened_backed_out_and_reopened() {
+        completeOnboardingWithJuzOne()
+        openDebugTools()
+
+        composeRule.onNodeWithTag("debug-open-ui-catalog").performClick()
+
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.debug_ui_catalog_title),
+        ).assertIsDisplayed()
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.debug_ui_catalog_screen_layout_title),
+        ).assertIsDisplayed()
+
+        navigateBack()
+
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.debug_tools_title),
+        ).assertIsDisplayed()
+
+        composeRule.onNodeWithTag("debug-open-ui-catalog").performClick()
+
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.debug_ui_catalog_title),
+        ).assertIsDisplayed()
+    }
+
+    private fun openDebugTools() {
+        openSettingsTab()
+
+        composeRule.onNodeWithContentDescription(
+            composeRule.activity.getString(R.string.content_open_debug_tools),
+        ).performClick()
+
+        composeRule.onNodeWithText(
+            composeRule.activity.getString(R.string.debug_tools_title),
+        ).assertIsDisplayed()
     }
 }

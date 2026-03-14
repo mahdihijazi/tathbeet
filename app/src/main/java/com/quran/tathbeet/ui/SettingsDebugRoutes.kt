@@ -18,6 +18,7 @@ import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.app.ReminderNotificationContent
 import com.quran.tathbeet.ui.features.debug.DebugToolsScreen
 import com.quran.tathbeet.ui.features.debug.LocalNotificationsDebugScreen
+import com.quran.tathbeet.ui.features.debug.UiCatalogDebugScreen
 import com.quran.tathbeet.ui.features.settings.SettingsScreen
 import com.quran.tathbeet.ui.features.settings.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -61,11 +62,12 @@ internal fun SettingsRoute(
 
 @Composable
 internal fun DebugToolsRoute(
-    appContainer: AppContainer,
     onOpenLocalNotifications: () -> Unit,
+    onOpenUiCatalog: () -> Unit,
 ) {
     DebugToolsScreen(
         onOpenLocalNotifications = onOpenLocalNotifications,
+        onOpenUiCatalog = onOpenUiCatalog,
     )
 }
 
@@ -94,4 +96,9 @@ internal fun LocalNotificationsDebugRoute(
             }
         },
     )
+}
+
+@Composable
+internal fun UiCatalogDebugRoute() {
+    UiCatalogDebugScreen()
 }

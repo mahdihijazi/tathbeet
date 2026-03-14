@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debug_tools_ui_catalog_title">كتالوج الواجهة</string>
+    <string name="debug_tools_ui_catalog_subtitle">افتح شاشة تعرض أمثلة حية لكل المكوّنات المشتركة في الواجهة.</string>
+    <string name="debug_tools_ui_catalog_action">فتح كتالوج الواجهة</string>
+
+    <string name="debug_ui_catalog_title">كتالوج الواجهة</string>
+    <string name="debug_ui_catalog_subtitle">هذه الشاشة تجمع أمثلة مرئية للمكوّنات المشتركة حتى تراجع شكلها بسرعة أثناء التطوير.</string>
+    <string name="debug_ui_catalog_screen_layout_title">ScreenLayout</string>
+    <string name="debug_ui_catalog_screen_layout_body">هذه الشاشة نفسها مبنية بمكوّن ScreenLayout، لذلك ترى هنا مثالاً حقيقياً له وهو يلف كل العناصر.</string>
+    <string name="debug_ui_catalog_section_header_title">SectionHeader</string>
+    <string name="debug_ui_catalog_section_header_subtitle">عنوان قسم مع وصف قصير يوضّح الغرض منه.</string>
+    <string name="debug_ui_catalog_hero_eyebrow">HeroCard</string>
+    <string name="debug_ui_catalog_hero_title">بطاقة تمهيدية بارزة</string>
+    <string name="debug_ui_catalog_hero_body">تصلح لتقديم شاشة أو حالة مهمة برسالة مختصرة وواضحة.</string>
+    <string name="debug_ui_catalog_metric_title">MetricCard</string>
+    <string name="debug_ui_catalog_metric_value">١٢ / ١٥</string>
+    <string name="debug_ui_catalog_metric_supporting">مؤشر رقمي مع وصف داعم أسفله.</string>
+    <string name="debug_ui_catalog_app_card_title">AppCard</string>
+    <string name="debug_ui_catalog_app_card_body">هذا مثال مباشر على البطاقة الأساسية مع نغمة Accent.</string>
+    <string name="debug_ui_catalog_card_section_title">CardSection</string>
+    <string name="debug_ui_catalog_card_section_body">قسم بطاقة بسيط يضيف الحواف والمسافات الداخلية القياسية.</string>
+    <string name="debug_ui_catalog_info_action_title">InfoActionCard</string>
+    <string name="debug_ui_catalog_info_action_body">بطاقة عنوانها في الأعلى وتحتها محتوى معلوماتي أو إجراء.</string>
+    <string name="debug_ui_catalog_titled_section_title">TitledCardSection</string>
+    <string name="debug_ui_catalog_titled_section_body">نسخة معنونة من القسم القابل لإعادة الاستخدام مع دعم النغمات المختلفة.</string>
+    <string name="debug_ui_catalog_body_text">BodyTextCard: بطاقة نصية مباشرة لعرض رسالة قصيرة أو ملاحظة واحدة.</string>
+    <string name="debug_ui_catalog_pill_title">AppPill</string>
+    <string name="debug_ui_catalog_pill_text">AppPill</string>
+    <string name="debug_ui_catalog_wizard_title">WizardHeader</string>
+    <string name="debug_ui_catalog_key_value_label">AppKeyValueRow</string>
+    <string name="debug_ui_catalog_key_value_value">قيمة تجريبية</string>
+    <string name="debug_ui_catalog_buttons_title">Buttons</string>
+    <string name="debug_ui_catalog_primary_button">زر أساسي</string>
+    <string name="debug_ui_catalog_secondary_button">زر ثانوي</string>
+    <string name="debug_ui_catalog_selection_title">AppSelectionChip</string>
+    <string name="debug_ui_catalog_selection_primary">الخيار الأول</string>
+    <string name="debug_ui_catalog_selection_secondary">الخيار الثاني</string>
+</resources>

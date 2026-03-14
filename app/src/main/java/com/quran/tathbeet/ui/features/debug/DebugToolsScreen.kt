@@ -17,36 +17,57 @@ import com.quran.tathbeet.ui.theme.TathbeetTokens
 @Composable
 fun DebugToolsScreen(
     onOpenLocalNotifications: () -> Unit,
+    onOpenUiCatalog: () -> Unit,
 ) {
     ScreenLayout(
         title = stringResource(R.string.debug_tools_title),
         subtitle = stringResource(R.string.debug_tools_subtitle),
     ) {
         item {
-            LocalNotificationsEntryCard(onOpen = onOpenLocalNotifications)
+            DebugEntryCard(
+                title = stringResource(R.string.debug_tools_local_notifications_title),
+                subtitle = stringResource(R.string.debug_tools_local_notifications_subtitle),
+                action = stringResource(R.string.debug_tools_local_notifications_action),
+                testTag = "debug-open-local-notifications",
+                onOpen = onOpenLocalNotifications,
+            )
+        }
+
+        item {
+            DebugEntryCard(
+                title = stringResource(R.string.debug_tools_ui_catalog_title),
+                subtitle = stringResource(R.string.debug_tools_ui_catalog_subtitle),
+                action = stringResource(R.string.debug_tools_ui_catalog_action),
+                testTag = "debug-open-ui-catalog",
+                onOpen = onOpenUiCatalog,
+            )
         }
     }
 }
 
 @Composable
-private fun LocalNotificationsEntryCard(
+private fun DebugEntryCard(
+    title: String,
+    subtitle: String,
+    action: String,
+    testTag: String,
     onOpen: () -> Unit,
 ) {
     TitledCardSection(
-        title = stringResource(R.string.debug_tools_local_notifications_title),
+        title = title,
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
         ) {
             Text(
-                text = stringResource(R.string.debug_tools_local_notifications_subtitle),
+                text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             AppPrimaryButton(
-                text = stringResource(R.string.debug_tools_local_notifications_action),
+                text = action,
                 onClick = onOpen,
-                modifier = Modifier.testTag("debug-open-local-notifications"),
+                modifier = Modifier.testTag(testTag),
             )
         }
     }
