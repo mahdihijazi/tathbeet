@@ -3,6 +3,8 @@ package com.quran.tathbeet.ui.screenshot
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -46,6 +48,7 @@ private fun ScreenshotBox(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
             .then(
                 if (padded) {
                     Modifier.padding(TathbeetTokens.spacing.x3)

@@ -219,6 +219,7 @@ private fun CompletedTaskTitle(
             text = title,
             style = titleStyle,
             fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         return
     }
@@ -232,6 +233,7 @@ private fun CompletedTaskTitle(
         },
         style = titleStyle,
         fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurface,
         inlineContent = mapOf(
             inlineIconId to InlineTextContent(
                 Placeholder(
