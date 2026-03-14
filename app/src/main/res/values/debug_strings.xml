@@ -6,6 +6,11 @@
 
     <string name="debug_ui_catalog_title">كتالوج الواجهة</string>
     <string name="debug_ui_catalog_subtitle">هذه الشاشة تجمع أمثلة مرئية للمكوّنات المشتركة حتى تراجع شكلها بسرعة أثناء التطوير.</string>
+    <string name="debug_ui_catalog_theme_title">معاينة الثيم</string>
+    <string name="debug_ui_catalog_theme_body">فعّل الوضع الداكن هنا فقط حتى تراجع التباين وسلوك المكوّنات قبل تعميمه على التطبيق.</string>
+    <string name="debug_ui_catalog_theme_toggle">الوضع الداكن التجريبي</string>
+    <string name="debug_ui_catalog_theme_light_state">فاتح</string>
+    <string name="debug_ui_catalog_theme_dark_state">داكن</string>
     <string name="debug_ui_catalog_screen_layout_title">ScreenLayout</string>
     <string name="debug_ui_catalog_screen_layout_body">هذه الشاشة نفسها مبنية بمكوّن ScreenLayout، لذلك ترى هنا مثالاً حقيقياً له وهو يلف كل العناصر.</string>
     <string name="debug_ui_catalog_section_header_title">SectionHeader</string>

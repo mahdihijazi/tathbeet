@@ -1,15 +1,22 @@
 package com.quran.tathbeet.ui.features.debug
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.AppCard
@@ -31,172 +38,235 @@ import com.quran.tathbeet.ui.components.WizardHeader
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
 @Composable
-fun UiCatalogDebugScreen() {
+fun UiCatalogDebugScreen(
+    darkThemeEnabled: Boolean,
+    onDarkThemeChanged: (Boolean) -> Unit,
+) {
     var chipSelected by remember { mutableStateOf(true) }
 
-    ScreenLayout(
-        title = stringResource(R.string.debug_ui_catalog_title),
-        subtitle = stringResource(R.string.debug_ui_catalog_subtitle),
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
     ) {
-        item {
-            SectionHeader(
+        Box(modifier = Modifier.fillMaxSize()) {
+            ScreenLayout(
                 title = stringResource(R.string.debug_ui_catalog_title),
                 subtitle = stringResource(R.string.debug_ui_catalog_subtitle),
-            )
-        }
-
-        item {
-            TitledCardSection(
-                title = stringResource(R.string.debug_ui_catalog_screen_layout_title),
             ) {
-                androidx.compose.material3.Text(
-                    text = stringResource(R.string.debug_ui_catalog_screen_layout_body),
-                )
-            }
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.debug_ui_catalog_section_header_title),
-                subtitle = stringResource(R.string.debug_ui_catalog_section_header_subtitle),
-            )
-        }
-
-        item {
-            HeroCard(
-                eyebrow = stringResource(R.string.debug_ui_catalog_hero_eyebrow),
-                title = stringResource(R.string.debug_ui_catalog_hero_title),
-                body = stringResource(R.string.debug_ui_catalog_hero_body),
-            ) {
-                AppPill(text = stringResource(R.string.debug_ui_catalog_pill_text))
-            }
-        }
-
-        item {
-            MetricCard(
-                title = stringResource(R.string.debug_ui_catalog_metric_title),
-                value = stringResource(R.string.debug_ui_catalog_metric_value),
-                supporting = stringResource(R.string.debug_ui_catalog_metric_supporting),
-            )
-        }
-
-        item {
-            AppCard(
-                tone = AppCardTone.Accent,
-            ) {
-                Column(
-                    modifier = Modifier.padding(TathbeetTokens.spacing.x2Half),
-                    verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
-                ) {
-                    androidx.compose.material3.Text(
-                        text = stringResource(R.string.debug_ui_catalog_app_card_title),
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.debug_ui_catalog_title),
+                        subtitle = stringResource(R.string.debug_ui_catalog_subtitle),
                     )
-                    androidx.compose.material3.Text(
-                        text = stringResource(R.string.debug_ui_catalog_app_card_body),
+                }
+
+                item {
+                    CatalogThemeToggleCard(
+                        darkThemeEnabled = darkThemeEnabled,
+                        onDarkThemeChanged = onDarkThemeChanged,
                     )
+                }
+
+                item {
+                    TitledCardSection(
+                        title = stringResource(R.string.debug_ui_catalog_screen_layout_title),
+                    ) {
+                        androidx.compose.material3.Text(
+                            text = stringResource(R.string.debug_ui_catalog_screen_layout_body),
+                        )
+                    }
+                }
+
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.debug_ui_catalog_section_header_title),
+                        subtitle = stringResource(R.string.debug_ui_catalog_section_header_subtitle),
+                    )
+                }
+
+                item {
+                    HeroCard(
+                        eyebrow = stringResource(R.string.debug_ui_catalog_hero_eyebrow),
+                        title = stringResource(R.string.debug_ui_catalog_hero_title),
+                        body = stringResource(R.string.debug_ui_catalog_hero_body),
+                    ) {
+                        AppPill(text = stringResource(R.string.debug_ui_catalog_pill_text))
+                    }
+                }
+
+                item {
+                    MetricCard(
+                        title = stringResource(R.string.debug_ui_catalog_metric_title),
+                        value = stringResource(R.string.debug_ui_catalog_metric_value),
+                        supporting = stringResource(R.string.debug_ui_catalog_metric_supporting),
+                    )
+                }
+
+                item {
+                    AppCard(
+                        tone = AppCardTone.Accent,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(TathbeetTokens.spacing.x2Half),
+                            verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+                        ) {
+                            androidx.compose.material3.Text(
+                                text = stringResource(R.string.debug_ui_catalog_app_card_title),
+                            )
+                            androidx.compose.material3.Text(
+                                text = stringResource(R.string.debug_ui_catalog_app_card_body),
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    CardSection {
+                        androidx.compose.material3.Text(
+                            text = stringResource(R.string.debug_ui_catalog_card_section_title),
+                        )
+                        androidx.compose.material3.Text(
+                            text = stringResource(R.string.debug_ui_catalog_card_section_body),
+                        )
+                    }
+                }
+
+                item {
+                    InfoActionCard(
+                        title = stringResource(R.string.debug_ui_catalog_info_action_title),
+                    ) {
+                        androidx.compose.material3.Text(
+                            text = stringResource(R.string.debug_ui_catalog_info_action_body),
+                        )
+                        AppKeyValueRow(
+                            label = stringResource(R.string.debug_ui_catalog_key_value_label),
+                            value = stringResource(R.string.debug_ui_catalog_key_value_value),
+                        )
+                    }
+                }
+
+                item {
+                    TitledCardSection(
+                        title = stringResource(R.string.debug_ui_catalog_titled_section_title),
+                        tone = AppCardTone.Muted,
+                    ) {
+                        androidx.compose.material3.Text(
+                            text = stringResource(R.string.debug_ui_catalog_titled_section_body),
+                        )
+                    }
+                }
+
+                item {
+                    BodyTextCard(
+                        text = stringResource(R.string.debug_ui_catalog_body_text),
+                    )
+                }
+
+                item {
+                    TitledCardSection(
+                        title = stringResource(R.string.debug_ui_catalog_pill_title),
+                    ) {
+                        AppPill(text = stringResource(R.string.debug_ui_catalog_pill_text))
+                    }
+                }
+
+                item {
+                    TitledCardSection(
+                        title = stringResource(R.string.debug_ui_catalog_wizard_title),
+                    ) {
+                        WizardHeader(
+                            currentStep = 2,
+                            totalSteps = 4,
+                        )
+                    }
+                }
+
+                item {
+                    TitledCardSection(
+                        title = stringResource(R.string.debug_ui_catalog_buttons_title),
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+                        ) {
+                            AppPrimaryButton(
+                                text = stringResource(R.string.debug_ui_catalog_primary_button),
+                                onClick = {},
+                            )
+                            AppSecondaryButton(
+                                text = stringResource(R.string.debug_ui_catalog_secondary_button),
+                                onClick = {},
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    TitledCardSection(
+                        title = stringResource(R.string.debug_ui_catalog_selection_title),
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+                        ) {
+                            AppSelectionChip(
+                                text = stringResource(R.string.debug_ui_catalog_selection_primary),
+                                selected = chipSelected,
+                                onClick = { chipSelected = true },
+                            )
+                            AppSelectionChip(
+                                text = stringResource(R.string.debug_ui_catalog_selection_secondary),
+                                selected = !chipSelected,
+                                onClick = { chipSelected = false },
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+}
 
-        item {
-            CardSection {
-                androidx.compose.material3.Text(
-                    text = stringResource(R.string.debug_ui_catalog_card_section_title),
-                )
-                androidx.compose.material3.Text(
-                    text = stringResource(R.string.debug_ui_catalog_card_section_body),
-                )
-            }
-        }
-
-        item {
-            InfoActionCard(
-                title = stringResource(R.string.debug_ui_catalog_info_action_title),
+@Composable
+private fun CatalogThemeToggleCard(
+    darkThemeEnabled: Boolean,
+    onDarkThemeChanged: (Boolean) -> Unit,
+) {
+    TitledCardSection(
+        title = stringResource(R.string.debug_ui_catalog_theme_title),
+    ) {
+        androidx.compose.material3.Text(
+            text = stringResource(R.string.debug_ui_catalog_theme_body),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("debug-ui-catalog-theme-toggle-row"),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.half),
             ) {
                 androidx.compose.material3.Text(
-                    text = stringResource(R.string.debug_ui_catalog_info_action_body),
+                    text = stringResource(R.string.debug_ui_catalog_theme_toggle),
+                    style = MaterialTheme.typography.titleMedium,
                 )
-                AppKeyValueRow(
-                    label = stringResource(R.string.debug_ui_catalog_key_value_label),
-                    value = stringResource(R.string.debug_ui_catalog_key_value_value),
-                )
-            }
-        }
-
-        item {
-            TitledCardSection(
-                title = stringResource(R.string.debug_ui_catalog_titled_section_title),
-                tone = AppCardTone.Muted,
-            ) {
-                androidx.compose.material3.Text(
-                    text = stringResource(R.string.debug_ui_catalog_titled_section_body),
+                AppPill(
+                    text = stringResource(
+                        if (darkThemeEnabled) {
+                            R.string.debug_ui_catalog_theme_dark_state
+                        } else {
+                            R.string.debug_ui_catalog_theme_light_state
+                        },
+                    ),
                 )
             }
-        }
-
-        item {
-            BodyTextCard(
-                text = stringResource(R.string.debug_ui_catalog_body_text),
+            Switch(
+                checked = darkThemeEnabled,
+                onCheckedChange = onDarkThemeChanged,
+                modifier = Modifier.testTag("debug-ui-catalog-theme-toggle"),
             )
-        }
-
-        item {
-            TitledCardSection(
-                title = stringResource(R.string.debug_ui_catalog_pill_title),
-            ) {
-                AppPill(text = stringResource(R.string.debug_ui_catalog_pill_text))
-            }
-        }
-
-        item {
-            TitledCardSection(
-                title = stringResource(R.string.debug_ui_catalog_wizard_title),
-            ) {
-                WizardHeader(
-                    currentStep = 2,
-                    totalSteps = 4,
-                )
-            }
-        }
-
-        item {
-            TitledCardSection(
-                title = stringResource(R.string.debug_ui_catalog_buttons_title),
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
-                ) {
-                    AppPrimaryButton(
-                        text = stringResource(R.string.debug_ui_catalog_primary_button),
-                        onClick = {},
-                    )
-                    AppSecondaryButton(
-                        text = stringResource(R.string.debug_ui_catalog_secondary_button),
-                        onClick = {},
-                    )
-                }
-            }
-        }
-
-        item {
-            TitledCardSection(
-                title = stringResource(R.string.debug_ui_catalog_selection_title),
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
-                ) {
-                    AppSelectionChip(
-                        text = stringResource(R.string.debug_ui_catalog_selection_primary),
-                        selected = chipSelected,
-                        onClick = { chipSelected = true },
-                    )
-                    AppSelectionChip(
-                        text = stringResource(R.string.debug_ui_catalog_selection_secondary),
-                        selected = !chipSelected,
-                        onClick = { chipSelected = false },
-                    )
-                }
-            }
         }
     }
 }

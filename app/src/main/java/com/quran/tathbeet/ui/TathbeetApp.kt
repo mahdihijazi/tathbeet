@@ -45,6 +45,7 @@ import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.activeProfile
 import com.quran.tathbeet.ui.model.loadQuranCatalog
 import com.quran.tathbeet.ui.model.seedAppState
+import com.quran.tathbeet.ui.theme.TathbeetTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -63,10 +64,12 @@ fun TathbeetApp(
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
     val currentDestination = currentBackStackEntry?.destination?.route.toAppDestination()
     val activeAccount by appContainer.profileRepository.observeActiveAccount().collectAsState(initial = null)
     var onReviewResetAction by remember { mutableStateOf({}) }
     var reviewSortActionState by remember { mutableStateOf<com.quran.tathbeet.ui.features.review.ReviewSortActionState?>(null) }
+    var debugUiCatalogDarkTheme by remember { mutableStateOf(false) }
 
     LaunchedEffect(appContainer) {
         appContainer.profileRepository.ensureDefaultAccount(
@@ -114,35 +117,37 @@ fun TathbeetApp(
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        AppShell(
-            currentDestination = currentDestination,
-            reviewTitle = activeAccount?.name
-                ?.takeIf { currentDestination == AppDestination.Review }
-                ?.let { profileName -> context.getString(R.string.review_title_for_profile, profileName) },
-            reviewSortActionState = reviewSortActionState,
-            onNavigate = { destination ->
-                navController.navigateMain(destination.toRoute())
-            },
-            onBack = { navController.navigateUp() },
-            onReviewPlanAction = {
-                navController.navigate(RoutePoolSelector)
-            },
-            onReviewResetAction = onReviewResetAction,
-            onSettingsDebugAction = if (BuildConfig.DEBUG) {
-                {
-                    navController.navigate(RouteDebug) {
-                        launchSingleTop = true
+        val useDebugCatalogDarkTheme = currentRoute == RouteDebugUiCatalog && debugUiCatalogDarkTheme
+        val appContent: @Composable () -> Unit = {
+            AppShell(
+                currentDestination = currentDestination,
+                reviewTitle = activeAccount?.name
+                    ?.takeIf { currentDestination == AppDestination.Review }
+                    ?.let { profileName -> context.getString(R.string.review_title_for_profile, profileName) },
+                reviewSortActionState = reviewSortActionState,
+                onNavigate = { destination ->
+                    navController.navigateMain(destination.toRoute())
+                },
+                onBack = { navController.navigateUp() },
+                onReviewPlanAction = {
+                    navController.navigate(RoutePoolSelector)
+                },
+                onReviewResetAction = onReviewResetAction,
+                onSettingsDebugAction = if (BuildConfig.DEBUG) {
+                    {
+                        navController.navigate(RouteDebug) {
+                            launchSingleTop = true
+                        }
                     }
-                }
-            } else {
-                null
-            },
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = RouteLaunch,
+                } else {
+                    null
+                },
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             ) {
+                NavHost(
+                    navController = navController,
+                    startDestination = RouteLaunch,
+                ) {
                 composable(RouteLaunch) {
                     if (notificationTargetProfileId.isNullOrBlank()) {
                         LaunchRoute(
@@ -339,7 +344,10 @@ fun TathbeetApp(
                         LocalNotificationsDebugRoute(appContainer = appContainer)
                     }
                     composable(RouteDebugUiCatalog) {
-                        UiCatalogDebugRoute()
+                        UiCatalogDebugRoute(
+                            darkThemeEnabled = debugUiCatalogDarkTheme,
+                            onDarkThemeChanged = { debugUiCatalogDarkTheme = it },
+                        )
                     }
                 }
 
@@ -382,7 +390,14 @@ fun TathbeetApp(
                         },
                     )
                 }
+                }
             }
+        }
+
+        if (useDebugCatalogDarkTheme) {
+            TathbeetTheme(darkTheme = true, content = appContent)
+        } else {
+            appContent()
         }
     }
 }

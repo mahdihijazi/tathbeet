@@ -23,4 +23,11 @@ class ThemeSpecTest {
 
         assertTrue(themeSpec.useDarkSystemBarIcons)
     }
+
+    @Test
+    fun dark_theme_spec_uses_light_system_bar_icons() {
+        val themeSpec = resolveTathbeetThemeSpec(darkTheme = true)
+
+        assertFalse(themeSpec.useDarkSystemBarIcons)
+    }
 }

@@ -99,6 +99,12 @@ internal fun LocalNotificationsDebugRoute(
 }
 
 @Composable
-internal fun UiCatalogDebugRoute() {
-    UiCatalogDebugScreen()
+internal fun UiCatalogDebugRoute(
+    darkThemeEnabled: Boolean,
+    onDarkThemeChanged: (Boolean) -> Unit,
+) {
+    UiCatalogDebugScreen(
+        darkThemeEnabled = darkThemeEnabled,
+        onDarkThemeChanged = onDarkThemeChanged,
+    )
 }

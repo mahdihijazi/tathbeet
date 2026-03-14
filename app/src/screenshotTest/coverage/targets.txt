@@ -21,6 +21,10 @@ progress:progress_screen_empty
 progress:progress_screen_partial
 progress:progress_screen_complete
 
+# Debug
+debug:ui_catalog_light
+debug:ui_catalog_dark
+
 # Schedule
 schedule:onboarding_message_card_default
 schedule:pool_selector_surahs_tab

@@ -24,7 +24,7 @@ private fun resolveTathbeetColorScheme(
     darkTheme: Boolean,
 ): ColorScheme =
     if (darkTheme) {
-        tathbeetLightColorScheme()
+        tathbeetDarkColorScheme()
     } else {
         tathbeetLightColorScheme()
     }
