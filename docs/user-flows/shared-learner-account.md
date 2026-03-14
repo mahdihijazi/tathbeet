@@ -2,16 +2,17 @@
 
 ```mermaid
 flowchart TD
-    A["Open learner profile"] --> B["Open sharing controls"]
-    B --> C["Choose which managers can update the learner profile"]
-    C --> D{"Signed in?"}
-    D -- "No" --> E["Keep the profile in local-only or sync-pending state"]
-    D -- "Yes" --> F["Show shared state as sync-ready"]
-    E --> G["Continue using the learner profile on this device"]
-    F --> H["Sync schedule and task state across devices"]
+    A["Owner opens learner profile"] --> B["Open sharing controls"]
+    B --> C["Enter another adult's email"]
+    C --> D["Create pending invite"]
+    D --> E["Other adult signs in with email link"]
+    E --> F["Accept invite"]
+    F --> G["Join as editor"]
+    G --> H["All members sync schedule, cycle, and task updates"]
 ```
 
 Notes:
 - Shared access is optional.
-- Shared account wording should stay role-neutral and support family or class use cases.
+- The original creator is the only owner in MVP.
+- Invited adults join as editors and can fully update the revision plan and daily tasks.
 - The current prototype simulates sharing state and sync feedback locally.

@@ -21,7 +21,8 @@
 
 - create a new self or learner profile
 - define profile name and sharing state
-- later connect a guest profile to a signed-in account
+- support opt-in cloud sync for signed-in solo profiles
+- support owner-only sharing controls for shared learner profiles
 
 ## 4. Memorized Pool Selector
 
@@ -69,8 +70,9 @@
 ## 9. Shared Learner Profile
 
 - shows who can manage the learner profile
-- supports multiple managers updating the same schedule/task state
-- communicates sync status and recent shared changes
+- supports multiple managers updating the same schedule, cycle, and task state
+- makes owner-only actions explicit for invite and removal
+- communicates sync status without requiring an audit log in MVP
 
 ## 10. Settings
 
@@ -78,7 +80,8 @@
 - reminder timing
 - motivational message toggle
 - language and account state
-- sign-in or account-mode changes can be reached later from Settings instead of blocking first launch
+- email-link sign-in can be reached later from Settings instead of blocking first launch
+- account area should also expose cloud-sync state for signed-in solo profiles
 
 ## Current App Mapping
 

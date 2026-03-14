@@ -38,7 +38,7 @@ Tathbeet should make revision:
 - reduce the mental overhead of deciding what to review each day
 - encourage consistency through reminders and motivation
 - support multiple profiles on one device
-- allow optional account-based sync and backup
+- allow cloud-backed sync for signed-in profiles without a custom backend
 
 ### MVP Goals
 
@@ -48,9 +48,9 @@ Tathbeet should make revision:
 - generate daily review tasks from an active schedule
 - support offline usage for core flows
 - track daily completion
-- support optional Google sign-in
+- support Firebase email-link sign-in for adults who want sync or sharing
 - support notifications with per-profile controls
-- support sync across devices for signed-in users
+- support sync across devices for signed-in profiles
 - support shared learner profiles for collaborative management
 
 ## 4. Non-Goals
@@ -104,7 +104,8 @@ Two people who want shared visibility and edit access for the same learner profi
 ### Data and Services
 
 - local database: `Room`
-- auth and sync: `Firebase`
+- auth: `Firebase Auth` with email-link sign-in
+- shared sync store: `Cloud Firestore`
 - push notifications: `Firebase Cloud Messaging`
 - local reminders: Android local notification scheduling
 
@@ -124,19 +125,26 @@ Core schedule and review functionality must work offline:
 
 Internet is only required for:
 
-- Google sign-in
-- cloud sync
+- Firebase email-link sign-in
+- cloud sync for signed-in profiles
+- shared-profile invite acceptance
 - shared profile collaboration across devices
 - remote push delivery where applicable
 - opening a web fallback for Quran reading when no supported Quran app is installed
 
 ### 7.2 Account Model
 
-Accounts are optional in MVP.
+Accounts are optional for single-device use and required for cloud sync or shared learner profiles in MVP.
 
-- users can use the app without creating an account
-- a guest/local user can later sign in with Google
-- when they sign in, local data should be preserved and synced to their account
+- users can use the app without creating an account for local-only usage
+- adults who want their own profile available across devices can sign in with Firebase email-link auth
+- adults who create or join a shared learner profile must sign in with Firebase email-link auth
+- Google sign-in is not part of MVP
+- the sync system should not require a custom backend service
+- local device settings remain local and do not sync
+- any signed-in profile may sync its revision plans and task state through Firestore
+- a signed-in solo profile may later become a shared learner profile
+- local-only to cloud-synced migration may be deferred in the first sync milestone if it reduces implementation complexity
 - account creation should not block first-run schedule setup
 - the first-run experience should use a short one-time intro before the setup wizard, then proceed directly into schedule setup
 
@@ -455,6 +463,8 @@ The MVP will not include:
 
 A user should be able to create and edit additional learner profiles locally on one device.
 
+The MVP should also allow a signed-in adult to keep their own profile synced across devices without sharing it with anyone else.
+
 ### 12.2 Shared Learner Profile
 
 The MVP should support a shared learner profile so more than one manager can update the same learner profile and mark tasks as done from different devices.
@@ -465,7 +475,29 @@ This requires:
 - cloud-backed profile ownership and permissions
 - synchronized schedule and task state
 
-The data model should support shared ownership and conflict-safe synchronization from the beginning.
+The shared-profile model in MVP should be intentionally small:
+
+- each shared learner profile has exactly one owner, which is the original creator
+- the owner can invite and remove other adults
+- invited adults join as editors
+- editors can fully update the revision plan, add or edit cycles, restart the cycle, and update daily task state
+- local reminder settings stay device-local and are never shared
+- the system does not need an audit log in MVP
+
+The data model should support conflict-aware synchronization from the beginning by storing plans, cycles, and tasks as smaller records rather than one large plan document.
+
+### 12.3 Concrete Cloud Sync Plan
+
+The concrete cloud-sync design for implementation is defined in [Cloud Sync System Plan](docs/cloud-sync-system.md).
+
+That plan is the source of truth for:
+
+- Firebase email-link authentication
+- Firestore collections and document boundaries
+- owner and editor permissions
+- invite and acceptance flow
+- offline behavior and conflict boundaries
+- phased delivery for the sync milestone
 
 ## 13. Functional Requirements
 
@@ -475,6 +507,9 @@ The data model should support shared ownership and conflict-safe synchronization
 - users can edit profile names
 - users can delete profiles
 - each profile has independent schedule and settings
+- a profile may be local-only, cloud-synced solo, or shared
+- the original creator of a shared learner profile is its only owner
+- only the owner can invite or remove other adults from a shared learner profile
 
 ### 13.2 Schedule Creation
 
@@ -553,13 +588,20 @@ The data model should support shared ownership and conflict-safe synchronization
 ### 13.4 Offline Behavior
 
 - core flows work without internet
-- changes made offline sync later if the user has an account
+- signed-in solo-profile reads and writes should continue offline after that profile has been loaded on the device once
+- signed-in solo-profile changes made offline should sync later through Firestore when connectivity returns
+- shared-profile reads and writes should continue offline after that profile has been loaded on the device once
+- shared-profile changes made offline should sync later through Firestore when connectivity returns
+- local reminder settings should continue to work offline and remain device-local
+- same-document edit conflicts may resolve with last-write-wins behavior in MVP, so shared plan data must be split across smaller plan, cycle, and task records rather than one large schedule blob
 
 ### 13.5 Authentication
 
-- Google sign-in only
+- Firebase email-link sign-in only
 - guest users supported
-- guest users can later sign in and keep their local data
+- Google sign-in is out of scope for MVP
+- any adult who owns or joins a shared learner profile must authenticate with an email address
+- password management should not exist in the app UI
 
 ### 13.6 Notifications
 
@@ -572,16 +614,17 @@ The data model should support shared ownership and conflict-safe synchronization
 
 ### 13.7 Settings Screen
 
-- the MVP settings screen should focus on local reminder behavior rather than account management
+- the MVP settings screen should focus primarily on local reminder behavior
 - the screen should expose:
   - app-level notification enable/disable
   - motivational reminder enable/disable
   - one preferred reminder time for the whole app
   - per-profile reminder toggles
+  - current account state and email-link sign-in entry point for sync and sharing when applicable
 - the screen hierarchy should stay simple:
   - one muted intro line under the page title
   - one reminders section for app-level toggles and reminder time
-  - one accounts section for per-profile toggles
+  - one accounts section for sign-in state and sync or sharing entry points
 - the settings screen should not use a second hero title that competes with the main section headings
 - the per-profile list should show profiles directly when the list is short
 - if the profile list grows beyond five entries, the extra entries may be collapsed behind an expandable section
@@ -623,14 +666,17 @@ The MVP is successful if a user can:
 4. choose a daily revision pace
 5. receive a daily review plan
 6. mark revision as completed offline
-7. optionally sign in and sync data
+7. sign in with email link and see their own synced profile on another device
+8. share a learner profile with another adult
+9. see shared plan and task updates sync across devices
 
 ## 16. Open Product Questions
 
 These items should be resolved during design and implementation planning:
 
 - exact algorithm for converting juz-per-day targets into mixed review segments
-- exact permissions model for shared learner profiles
+- exact invitation entry points in the UI between profile details and Settings
+- exact UI entry point for turning a local profile into a cloud-synced solo profile
 - whether motivational content is bundled locally, fetched remotely, or both
 - how much schedule editing is allowed once a profile has active progress
 
@@ -646,10 +692,11 @@ These items should be resolved during design and implementation planning:
 
 ### Milestone 2: Accounts, Sync, and Shared Profiles
 
-- Google sign-in
-- sync local data to Firebase
-- restore data across devices
-- collaboration permissions for shared profiles
+- Firebase email-link sign-in
+- create cloud-synced profiles with one owner
+- restore a signed-in solo profile across devices
+- invite and accept editor access without a custom backend
+- sync shared plans, cycles, and tasks through Firestore
 - synchronized updates by multiple managers
 
 ### Milestone 3: Product Polish

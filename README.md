@@ -25,7 +25,9 @@ The app is Android-only in the MVP and is planned as a native app using:
 - Jetpack Compose
 - Kotlin Flow
 - Room for local offline storage
-- Firebase for optional authentication, sync, and push notifications
+- Firebase Auth email-link sign-in for sync and sharing identity
+- Cloud Firestore for profile sync
+- Firebase Cloud Messaging for later push work
 
 ## MVP Scope
 
@@ -34,7 +36,7 @@ The MVP supports:
 - Android app with Arabic-first RTL UX and English support
 - offline-first core flows for creating schedules, viewing daily tasks, and marking revision progress
 - external Quran launch from each task row, with direct app opening first and browser fallback if needed
-- optional account creation using Google sign-in
+- optional account creation for adults who want sync or shared learner profiles
 - use without an account
 - local profiles for multiple users on one device
 - one active revision schedule per profile
@@ -48,7 +50,8 @@ The MVP supports:
 - motivational notifications
 - a simple Progress screen with today's summary, a weekly rhythm view, and one motivational card
 - profile-level notification settings
-- cloud sync for signed-in users
+- email-link sign-in for sync and sharing
+- cloud sync for signed-in profiles through Firestore
 - shared learner profiles so more than one manager can update schedule and completion state
 
 The MVP does not include:
@@ -108,11 +111,15 @@ Missed work rolls over to the next day rather than being dropped.
 2. Configure each learner profile separately.
 3. Enable or disable notifications per profile.
 4. Mark revision as completed for each learner.
-5. Optionally sign in and sync data.
+5. Sign in with email link when a profile needs cloud sync or sharing.
 
 ### Shared Learner Profile
 
-Signed-in users should be able to share a learner profile with more than one manager so each person can update schedule state and completed tasks across devices.
+Signed-in adults should be able to share a learner profile with more than one manager so each person can update schedule state and completed tasks across devices. The original creator remains the only owner, and invited adults join as editors.
+
+### Cloud-Synced Solo Profile
+
+Signed-in adults should also be able to keep their own profile synced across devices without sharing it with anyone else.
 
 ## Notifications
 
@@ -140,6 +147,7 @@ This repository will hold:
 
 - Mermaid MVP user flow: [docs/mvp-user-flow.md](/Users/mahdi/personal-repos/tathbeet/docs/mvp-user-flow.md)
 - Screen inventory: [docs/screen-list.md](/Users/mahdi/personal-repos/tathbeet/docs/screen-list.md)
+- Cloud sync plan: [docs/cloud-sync-system.md](/Users/mahdi/personal-repos/tathbeet/docs/cloud-sync-system.md)
 - Android app entry point: [MainActivity.kt](/Users/mahdi/personal-repos/tathbeet/app/src/main/java/com/quran/tathbeet/MainActivity.kt)
 
 The current app build is:
@@ -153,7 +161,7 @@ The current app build is:
 - asks for the active profile name on the intro step with a lightweight single input before memorized-pool selection
 - reopens the wizard from محفوظ selection after onboarding
 - sends users with an existing schedule straight to review on launch
-- keeps sign-in and account-mode changes as a later Settings action in the prototype
+- keeps email-link sign-in as a later Settings action in the prototype
 - uses Arabic-only user-facing copy
 - renders in RTL for Arabic layout review even on non-Arabic devices
 - moves memorized-pool selection into a standalone screen

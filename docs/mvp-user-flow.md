@@ -10,6 +10,7 @@ This index links the MVP user journeys as separate flow documents so each one st
 - [Add And Manage Profiles](/Users/mahdi/personal-repos/tathbeet/docs/user-flows/add-and-manage-accounts.md)
 - [Shared Learner Account](/Users/mahdi/personal-repos/tathbeet/docs/user-flows/shared-learner-account.md)
 - [Create Account Later](/Users/mahdi/personal-repos/tathbeet/docs/user-flows/create-account-later.md)
+- [Cloud Sync System Plan](/Users/mahdi/personal-repos/tathbeet/docs/cloud-sync-system.md)
 
 ## Flow Rules
 
