@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.data.local.entity.LearnerAccountEntity
 import com.quran.tathbeet.domain.model.LearnerAccount
+import com.quran.tathbeet.domain.model.ProfileSyncMode
 import com.quran.tathbeet.domain.repository.ProfileRepository
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,8 @@ class ProfileRepositoryImpl(
                 isShared = false,
                 notificationsEnabled = true,
                 isActive = true,
+                syncMode = ProfileSyncMode.LocalOnly.name,
+                cloudProfileId = null,
             ),
         )
     }
@@ -48,6 +51,8 @@ class ProfileRepositoryImpl(
             isShared = false,
             notificationsEnabled = false,
             isActive = true,
+            syncMode = ProfileSyncMode.LocalOnly.name,
+            cloudProfileId = null,
         )
         database.withTransaction {
             database.learnerAccountDao().clearActiveAccount()
@@ -112,6 +117,8 @@ class ProfileRepositoryImpl(
             isSelfProfile = isSelfProfile,
             isShared = isShared,
             notificationsEnabled = notificationsEnabled,
+            syncMode = ProfileSyncMode.valueOf(syncMode),
+            cloudProfileId = cloudProfileId,
         )
 
     companion object {

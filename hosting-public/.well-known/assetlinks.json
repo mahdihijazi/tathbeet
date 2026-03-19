@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.quran.tathbeet",
+      "sha256_cert_fingerprints": [
+        "1E:CF:AB:A2:A2:F3:76:15:DA:5E:9D:B6:CE:BC:79:E3:7A:78:9D:9E:CF:13:FC:CF:2A:11:78:D7:4C:2B:1D:CF"
+      ]
+    }
+  }
+]

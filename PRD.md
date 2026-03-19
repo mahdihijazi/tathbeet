@@ -48,7 +48,7 @@ Tathbeet should make revision:
 - generate daily review tasks from an active schedule
 - support offline usage for core flows
 - track daily completion
-- support Firebase email-link sign-in for adults who want sync or sharing
+- support email-link sign-in for adults who want sync or sharing through the configured cloud auth provider
 - support notifications with per-profile controls
 - support sync across devices for signed-in profiles
 - support shared learner profiles for collaborative management
@@ -104,9 +104,9 @@ Two people who want shared visibility and edit access for the same learner profi
 ### Data and Services
 
 - local database: `Room`
-- auth: `Firebase Auth` with email-link sign-in
-- shared sync store: `Cloud Firestore`
-- push notifications: `Firebase Cloud Messaging`
+- auth: app-owned cloud auth provider abstraction with email-link sign-in as the MVP auth method
+- shared sync store: app-owned cloud sync provider abstraction
+- push notifications: local Android notifications for MVP, with any future third-party push provider wrapped behind an app-owned adapter
 - local reminders: Android local notification scheduling
 
 ## 7. Core Product Decisions
@@ -122,11 +122,13 @@ Core schedule and review functionality must work offline:
 - launch the assigned Quran portion in an external reader if one is installed locally
 - view completion rate
 - manage notification settings already stored on device
+- render cached local data immediately on app launch; cloud bootstrap and sync reconciliation must happen in the background
+- do not block first paint on duplicate sync passes or on rebuilding already-cached review/profile data
 
 Internet is only required for:
 
-- Firebase email-link sign-in
-- cloud sync for signed-in profiles
+- email-link sign-in through the configured cloud auth provider
+- cloud sync for signed-in profiles through the configured cloud sync provider
 - shared-profile invite acceptance
 - shared profile collaboration across devices
 - remote push delivery where applicable
@@ -137,14 +139,14 @@ Internet is only required for:
 Accounts are optional for single-device use and required for cloud sync or shared learner profiles in MVP.
 
 - users can use the app without creating an account for local-only usage
-- adults who want their own profile available across devices can sign in with Firebase email-link auth
-- adults who create or join a shared learner profile must sign in with Firebase email-link auth
+- adults who want their own profile available across devices can sign in with the configured cloud auth provider using email-link auth
+- adults who create or join a shared learner profile must sign in with the configured cloud auth provider using email-link auth
 - when a local self profile signs in, that self profile should become cloud-synced immediately rather than waiting for a separate opt-in sync action
 - each signed-in adult account should have exactly one cloud-synced personal profile in MVP
 - Google sign-in is not part of MVP
 - the sync system should not require a custom backend service
 - local device settings remain local and do not sync
-- any signed-in profile may sync its revision plans and task state through Firestore
+- any signed-in profile may sync its revision plans and task state through the configured cloud sync provider
 - a signed-in solo profile may later become a shared learner profile
 - local-only to cloud-synced migration may be deferred in the first sync milestone if it reduces implementation complexity
 - account creation should not block first-run schedule setup
@@ -184,10 +186,11 @@ Before implementation of real backend, database, or sync logic, the team should 
 Prototype rules:
 
 - all backend behavior may be faked locally in UI state during validation
-- no network, Firebase, or Room implementation is required during prototype validation
+- no network, cloud provider, or Room implementation is required during prototype validation
 - user-facing strings should come from Android XML resources rather than hardcoded Kotlin strings
 - Arabic UI review should happen in RTL layouts
 - prototype feedback must be reflected back into this PRD and the README when it changes UX, scope, or flow expectations
+- repeated identical cloud sync writes should be treated as no-ops so local listeners are not retriggered unnecessarily
 
 ### 7.6 Implementation and Testing Rules
 
@@ -209,6 +212,8 @@ Hard testing rules:
 - do not use mocking libraries
 - test doubles should be handwritten fakes, stubs, or no-op implementations
 - prefer in-memory Room and real repositories for integration-style tests where practical
+
+Post-MVP cloud sync optimization work should be tracked separately in [docs/firebase-sync-followups.md](/Users/mahdi/personal-repos/tathbeet/docs/firebase-sync-followups.md) so the MVP can stay simple while the main product flow is still being finished.
 
 ## 8. Quran Content Model
 
@@ -348,12 +353,13 @@ The review experience should also support early completion beyond today:
 - the review screen should use a two-tab pager
 - the right tab should keep the current dated review timeline in one continuous list
 - that dated timeline should include:
-  - carried-over work from previous days
-  - today’s work
-  - tomorrow’s work
-  - all later dates until the end of the current revision cycle
+  - only unfinished carried-over work from previous days
+  - all of today’s assigned tasks, whether complete or incomplete
+  - unfinished future work assigned after today in date order
+- completed tasks from previous days must not appear in the dated `ورد اليوم` tab
+- completed tasks from today must remain visible in the dated `ورد اليوم` tab so the user can still review and edit the memorization rating
 - the left tab should be labeled `كامل المحفوظ`
-- the `كامل المحفوظ` tab should show the same cycle tasks as one flat list without date section headers
+- the `كامل المحفوظ` tab should show the same cycle tasks as one flat list without date section headers, regardless of completion status
 - the `كامل المحفوظ` tab should include a top app bar sort action with these modes:
   - by memorization rating, worst first
   - by last memorization date, furthest away first
@@ -497,8 +503,8 @@ The concrete cloud-sync design for implementation is defined in [Cloud Sync Syst
 
 That plan is the source of truth for:
 
-- Firebase email-link authentication
-- Firestore collections and document boundaries
+- the cloud auth provider contract used for email-link authentication
+- the cloud sync provider contract and document boundaries
 - owner and editor permissions
 - invite and acceptance flow
 - offline behavior and conflict boundaries
@@ -542,9 +548,12 @@ That plan is the source of truth for:
 
 - app shows the daily review screen as a two-tab pager
 - the right tab keeps the dated current-cycle list used today
-- that dated list begins with carried-over overdue work, then today’s work, then future dated work until the end of the current cycle
+- that dated list begins with unfinished carried-over overdue work, then all of today’s tasks, then unfinished future work scheduled after today until the end of the current cycle
+- the dated `ورد اليوم` tab must hide completed tasks from previous days
+- if the user completes a task from the dated tab on today’s date, that task should remain visible in today’s section with its completed state and rating controls
+- if a task was completed on a previous day, it must not reappear in the dated tab as `مؤجل`
 - the left tab is labeled `كامل المحفوظ`
-- the `كامل المحفوظ` tab shows all current-cycle tasks in one flat list without section headers
+- the `كامل المحفوظ` tab shows all current-cycle tasks in one flat list without section headers, including completed and incomplete tasks
 - the `كامل المحفوظ` tab uses the same task-row UI and completion/rating actions as the dated list
 - completing or rating a task from either tab updates the same task in the other tab immediately
 - the review screen top app bar should show a sort action only while the `كامل المحفوظ` tab is active
@@ -579,9 +588,9 @@ That plan is the source of truth for:
 - app can determine when the day is complete
 - incomplete items roll over to the next day
 - review should support three categories of work:
-  - carried-over work from previous days
-  - current day assignments
-- future dated assignments already visible inline through the end of the current cycle
+  - unfinished carried-over work from previous days
+  - unfinished current day assignments
+  - unfinished future dated assignments already visible inline through the end of the current cycle
 - the review screen should stay structurally simple: dated tab with compact top summary and sectioned task list, plus a flat `كامل المحفوظ` tab using the same rows
 - each task row should include a secondary action to open that exact Quran range in an external reader
 - if Quran for Android is installed, tapping that action should open the task directly with a `quran://surah/ayah` deep link
@@ -591,20 +600,26 @@ That plan is the source of truth for:
 - editing the revision plan should be available from the review screen top app bar rather than from the review body
 - cycle reset should also be available from the review screen top app bar as a separate action from editing the plan
 - saving an edited revision plan should rebuild the active visible review cycle from the updated pool so the review list reflects the latest selections immediately
+- when a saved edited plan still contains an existing task, that task should keep its completion status and saved rating
+- completed tasks preserved across a plan edit should remain available in `كامل المحفوظ` and remain hidden from the dated `ورد اليوم` tab
+- unfinished existing tasks preserved across a plan edit should stay visible in the dated tab when they still belong to the active carried-over, current, or future schedule
+- newly added tasks from a plan edit should be inserted into the rebuilt schedule based on the new plan order and dates, whether they fall before or after already completed tasks in Quran order
+- if a pending future task is removed by the edited plan, it should disappear from both tabs after the rebuild
+- if an existing completed task is removed by the edited plan, it should also disappear from both tabs after the rebuild because it is no longer part of the active plan
 
 ### 13.4 Offline Behavior
 
 - core flows work without internet
 - signed-in solo-profile reads and writes should continue offline after that profile has been loaded on the device once
-- signed-in solo-profile changes made offline should sync later through Firestore when connectivity returns
+- signed-in solo-profile changes made offline should sync later through the configured cloud sync provider when connectivity returns
 - shared-profile reads and writes should continue offline after that profile has been loaded on the device once
-- shared-profile changes made offline should sync later through Firestore when connectivity returns
+- shared-profile changes made offline should sync later through the configured cloud sync provider when connectivity returns
 - local reminder settings should continue to work offline and remain device-local
 - same-document edit conflicts may resolve with last-write-wins behavior in MVP, so shared plan data must be split across smaller plan, cycle, and task records rather than one large schedule blob
 
 ### 13.5 Authentication
 
-- Firebase email-link sign-in only
+- email-link sign-in only through the configured cloud auth provider
 - guest users supported
 - Google sign-in is out of scope for MVP
 - any adult who owns or joins a shared learner profile must authenticate with an email address
@@ -698,11 +713,11 @@ These items should be resolved during design and implementation planning:
 
 ### Milestone 2: Accounts, Sync, and Shared Profiles
 
-- Firebase email-link sign-in
+- email-link sign-in through the configured cloud auth provider
 - create cloud-synced profiles with one owner
 - restore a signed-in solo profile across devices
 - invite and accept editor access without a custom backend
-- sync shared plans, cycles, and tasks through Firestore
+- sync shared plans, cycles, and tasks through the configured cloud sync provider
 - synchronized updates by multiple managers
 
 ### Milestone 3: Product Polish

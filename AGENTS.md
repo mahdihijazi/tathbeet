@@ -3,6 +3,17 @@
 ## Project Structure & Module Organization
 `tathbeet` is a single-module Android app built with Gradle Kotlin DSL. The app code lives in `app/src/main/java/com/quran/tathbeet`.
 
+## Dependency Inversion
+Any third-party SDK, service, or platform integration that is not vanilla Android must be wrapped behind an app-owned abstraction before feature code uses it. This includes Firebase and any future external dependency.
+
+Rules:
+
+- Define the app-facing interface in the app/domain layer.
+- Put the concrete SDK implementation behind a wrapper in a sync, data, or infrastructure package.
+- Inject the wrapper into ViewModels, coordinators, and other feature code through constructors or factories.
+- Do not import or call third-party SDK classes directly from feature UI, presentation, or domain logic.
+- Keep tests targeting the wrapper or app-owned interface, not the external SDK directly, unless the test is explicitly about the adapter layer.
+
 Current repo structure:
 
 - `app/` for the app container, navigation wiring, and ViewModel factories

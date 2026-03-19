@@ -35,6 +35,7 @@ fun ProfilesScreen(
     onProfileNotificationsToggled: (String) -> Unit,
     onAddProfileRequested: () -> Unit,
     onEditActiveProfileRequested: () -> Unit,
+    onOpenSharedProfile: (String) -> Unit,
     onProfileNameChanged: (String) -> Unit,
     onSaveProfile: () -> Unit,
     onDismissProfileDialog: () -> Unit,
@@ -86,6 +87,7 @@ fun ProfilesScreen(
                 profile = profile,
                 onSelected = { onProfileSelected(profile.id) },
                 onToggleNotifications = { onProfileNotificationsToggled(profile.id) },
+                onOpenSharedProfile = onOpenSharedProfile,
             )
         }
 
@@ -122,6 +124,7 @@ private fun ProfileCard(
     profile: ProfileCardUiState,
     onSelected: () -> Unit,
     onToggleNotifications: () -> Unit,
+    onOpenSharedProfile: (String) -> Unit,
 ) {
     val scheduleValue = profile.paceLabelRes?.let { labelRes ->
         stringResource(labelRes)
@@ -206,6 +209,18 @@ private fun ProfileCard(
                         modifier = Modifier.testTag("profiles-notifications-${profile.id}"),
                     )
                 }
+            }
+            if (!profile.isSelfProfile) {
+                AppSecondaryButton(
+                    text = stringResource(R.string.profile_button_manage_sharing),
+                    onClick = {
+                        onSelected()
+                        onOpenSharedProfile(profile.id)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("profiles-open-shared-${profile.id}"),
+                )
             }
         }
     }

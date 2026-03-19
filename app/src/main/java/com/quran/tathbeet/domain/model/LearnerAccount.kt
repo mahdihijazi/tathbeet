@@ -6,4 +6,6 @@ data class LearnerAccount(
     val isSelfProfile: Boolean,
     val isShared: Boolean,
     val notificationsEnabled: Boolean,
+    val syncMode: ProfileSyncMode = ProfileSyncMode.LocalOnly,
+    val cloudProfileId: String? = null,
 )

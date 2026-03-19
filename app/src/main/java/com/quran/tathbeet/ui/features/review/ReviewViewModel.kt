@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(
@@ -29,7 +30,6 @@ class ReviewViewModel(
     private val timeProvider: TimeProvider,
     private val quranExternalLauncher: QuranExternalLauncher,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ReviewUiState())
     val uiState: StateFlow<ReviewUiState> = _uiState.asStateFlow()
 
@@ -38,6 +38,7 @@ class ReviewViewModel(
     private var showCycleResetWarningDialog: Boolean = false
     private var showCycleResetDialog: Boolean = false
     private var cycleResetDialogDismissed: Boolean = false
+    private var initialRefreshComplete: Boolean = false
     private var externalQuranDialog: ReviewExternalQuranDialogUiState? = null
     private var selectedTab: ReviewTab = ReviewTab.Daily
     private var fullPlanSortMode: ReviewFullPlanSortMode = ReviewFullPlanSortMode.Rating
@@ -48,21 +49,27 @@ class ReviewViewModel(
         viewModelScope.launch {
             profileRepository.observeActiveAccount()
                 .filterNotNull()
+                .distinctUntilChangedBy { account -> account.id }
                 .collectLatest { account ->
                     currentLearnerId = account.id
+                    initialRefreshComplete = false
                     showCycleResetWarningDialog = false
                     showCycleResetDialog = false
                     cycleResetDialogDismissed = false
                     externalQuranDialog = null
-                    reviewRepository.ensureAssignmentsForDate(
-                        learnerId = account.id,
-                        assignedForDate = timeProvider.today(),
-                    )
+                    launch {
+                        reviewRepository.ensureAssignmentsForDate(
+                            learnerId = account.id,
+                            assignedForDate = timeProvider.today(),
+                        )
+                        initialRefreshComplete = true
+                        publishUiState()
+                    }
                     reviewRepository.observeReviewTimeline(account.id)
-                        .collect { reviewDays ->
-                            timeline = reviewDays.sortedBy { it.assignedForDate }
-                            publishUiState()
-                        }
+                    .collect { reviewDays ->
+                        timeline = reviewDays.sortedBy { it.assignedForDate }
+                        publishUiState()
+                    }
                 }
         }
     }
@@ -169,51 +176,59 @@ class ReviewViewModel(
 
     private fun publishUiState() {
         val today = timeProvider.today()
-        val overdueAssignments = timeline
+        val pastAssignments = timeline
             .filter { it.assignedForDate.isBefore(today) }
             .flatMap { it.assignments }
+        val visibleOverdueAssignments = pastAssignments.filterNot { it.isDone }
 
         val currentAndFutureDays = timeline
             .filter { !it.assignedForDate.isBefore(today) }
             .sortedBy { it.assignedForDate }
         val visibleSections = buildList {
-            if (overdueAssignments.isNotEmpty()) {
+            if (visibleOverdueAssignments.isNotEmpty()) {
                 add(
                     ReviewSectionUiState(
                         id = "overdue",
                         title = TextSpec(R.string.review_rollover_chip),
-                        status = sectionStatusFor(overdueAssignments),
-                        tasks = overdueAssignments.sortedBy { it.assignedForDate }
+                        status = sectionStatusFor(visibleOverdueAssignments),
+                        tasks = visibleOverdueAssignments.sortedBy { it.assignedForDate }
                             .thenByDisplayOrder(),
                     ),
                 )
             }
 
             currentAndFutureDays.forEach { day ->
-                add(
-                    ReviewSectionUiState(
-                        id = day.assignedForDate.toString(),
-                        title = sectionTitleFor(day.assignedForDate, today),
-                        status = sectionStatusFor(day.assignments),
-                        tasks = day.assignments.sortedBy { it.displayOrder }
-                            .map { assignment -> assignment.toTaskUiState() },
-                    ),
-                )
+                val visibleAssignments = if (day.assignedForDate == today) {
+                    day.assignments
+                } else {
+                    day.assignments.filterNot { assignment -> assignment.isDone }
+                }
+                if (visibleAssignments.isNotEmpty()) {
+                    add(
+                        ReviewSectionUiState(
+                            id = day.assignedForDate.toString(),
+                            title = sectionTitleFor(day.assignedForDate, today),
+                            status = sectionStatusFor(visibleAssignments),
+                            tasks = visibleAssignments.sortedBy { it.displayOrder }
+                                .map { assignment -> assignment.toTaskUiState() },
+                        ),
+                    )
+                }
             }
         }
 
-        val progressAssignments = overdueAssignments + (currentAndFutureDays
+        val progressAssignments = visibleOverdueAssignments + (currentAndFutureDays
             .firstOrNull { it.assignedForDate == today }
             ?.assignments
             .orEmpty())
         val completedWeight = progressAssignments.filter { it.isDone }.sumOf { assignment -> assignment.weight }
         val totalWeight = progressAssignments.sumOf { assignment -> assignment.weight }
-        val allCycleAssignments = overdueAssignments + currentAndFutureDays.flatMap { it.assignments }
+        val allCycleAssignments = pastAssignments + currentAndFutureDays.flatMap { it.assignments }
         val allDone = allCycleAssignments.isNotEmpty() && allCycleAssignments.all { it.isDone }
         if (!allDone) {
             cycleResetDialogDismissed = false
         }
-        showCycleResetDialog = allDone && !cycleResetDialogDismissed
+        showCycleResetDialog = initialRefreshComplete && allDone && !cycleResetDialogDismissed
 
         val fullPlanTasks = allAssignments()
             .sortedWith(fullPlanComparator(fullPlanSortMode))

@@ -1,7 +1,10 @@
 package com.quran.tathbeet.feature.settings
 
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -12,6 +15,7 @@ import com.quran.tathbeet.app.ReminderNotificationDebugScenario
 import com.quran.tathbeet.test.BaseUiFlowTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlinx.coroutines.runBlocking
 
 class SettingsDebugFlowTest : BaseUiFlowTest() {
 
@@ -64,6 +68,31 @@ class SettingsDebugFlowTest : BaseUiFlowTest() {
         composeRule.onNodeWithText(
             composeRule.activity.getString(R.string.debug_ui_catalog_title),
         ).assertIsDisplayed()
+    }
+
+    @Test
+    fun debug_tools_can_copy_cached_auth_link_for_replay() {
+        completeOnboardingWithJuzOne()
+
+        val expectedAuthLink = "https://example.com/finishSignIn?oobCode=debug-link"
+        runBlocking {
+            appContainer.debugAuthLinkStore.setLastAuthLink(expectedAuthLink)
+        }
+
+        openDebugTools()
+
+        composeRule.onNodeWithTag("debug-auth-link-input").assertTextEquals(expectedAuthLink)
+        composeRule.onNodeWithTag("debug-copy-auth-link").performClick()
+
+        val clipboard = composeRule.activity
+            .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val copiedText = clipboard.primaryClip
+            ?.getItemAt(0)
+            ?.coerceToText(composeRule.activity)
+            ?.toString()
+
+        assertEquals(expectedAuthLink, copiedText)
+        composeRule.onNodeWithTag("debug-open-auth-link").assertIsDisplayed()
     }
 
     private fun openDebugTools() {

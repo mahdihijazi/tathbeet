@@ -19,7 +19,6 @@ import com.quran.tathbeet.ui.model.ReviewUnitTemplate
 import com.quran.tathbeet.ui.model.buildReviewUnits
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -156,16 +155,16 @@ class ReviewRepositoryImpl(
         }
 
         val existingAssignments = database.reviewAssignmentDao().getAssignmentsForLearner(learnerId)
-        val generatedAssignments = buildGeneratedAssignments(
+        val rebuildResult = rebuildReviewCycleAssignments(
             learnerId = learnerId,
             restartDate = restartDate,
             schedule = schedule,
             allUnits = allUnits,
             existingAssignments = existingAssignments,
+            preservedRatings = preservedRatingsByLearner[learnerId].orEmpty(),
         )
 
-        val allAssignments = existingAssignments + generatedAssignments
-        val reviewDays = allAssignments
+        val reviewDays = rebuildResult.allAssignments
             .groupBy { assignment -> assignment.assignedForDate }
             .map { (dateKey, assignments) ->
                 ReviewDayEntity(
@@ -177,98 +176,16 @@ class ReviewRepositoryImpl(
             }
 
         database.withTransaction {
-            if (generatedAssignments.isNotEmpty()) {
-                database.reviewAssignmentDao().insertAll(generatedAssignments)
+            if (rebuildResult.staleAssignmentIds.isNotEmpty()) {
+                database.reviewAssignmentDao().deleteByIds(rebuildResult.staleAssignmentIds)
+            }
+            if (rebuildResult.generatedAssignments.isNotEmpty()) {
+                database.reviewAssignmentDao().insertAll(rebuildResult.generatedAssignments)
             }
             if (reviewDays.isNotEmpty()) {
                 database.reviewDayDao().upsertAll(reviewDays)
             }
             database.reviewDayDao().deleteEmptyDays(learnerId)
-        }
-    }
-
-    private fun buildGeneratedAssignments(
-        learnerId: String,
-        restartDate: LocalDate,
-        schedule: RevisionSchedule,
-        allUnits: List<ReviewUnitTemplate>,
-        existingAssignments: List<ReviewAssignmentEntity>,
-    ): List<ReviewAssignmentEntity> {
-        val assignedKeys = existingAssignments.mapTo(linkedSetOf()) { assignment -> assignment.taskKey }
-        val remainingUnits = ArrayDeque(
-            allUnits.filterNot { unit -> unit.id in assignedKeys },
-        )
-        if (remainingUnits.isEmpty()) {
-            return emptyList()
-        }
-
-        val generatedAssignments = mutableListOf<ReviewAssignmentEntity>()
-        val preservedRatings = preservedRatingsByLearner[learnerId].orEmpty()
-        var cursorDate = restartDate
-
-        while (remainingUnits.isNotEmpty()) {
-            val dateKey = cursorDate.toString()
-            val assignmentsForDate = (existingAssignments + generatedAssignments)
-                .filter { assignment -> assignment.assignedForDate == dateKey }
-            val dailyCapacity = dailyCapacityForDate(
-                schedule = schedule,
-                restartDate = restartDate,
-                cursorDate = cursorDate,
-                remainingUnits = remainingUnits.toList(),
-            )
-            val remainingCapacity = dailyCapacity - assignmentsForDate.sumOf { it.weight }
-
-            if (remainingCapacity > EPSILON) {
-                val unitsForDate = remainingUnits.toList()
-                val endExclusive = determineEndExclusive(
-                    units = unitsForDate,
-                    dailyCapacity = remainingCapacity,
-                )
-                if (endExclusive > 0) {
-                    val baseOrder = (assignmentsForDate.maxOfOrNull { it.displayOrder } ?: -1) + 1
-                    val selectedUnits = List(endExclusive) { remainingUnits.removeFirst() }
-                    generatedAssignments += selectedUnits.mapIndexed { index, unit ->
-                        ReviewAssignmentEntity(
-                            id = "$dateKey-${unit.id}",
-                            reviewDayId = "$learnerId-$dateKey",
-                            learnerId = learnerId,
-                            assignedForDate = dateKey,
-                            taskKey = unit.id,
-                            rubId = unit.rubId,
-                            startSurahId = unit.start.surahId,
-                            startAyah = unit.start.ayah,
-                            endSurahId = unit.end.surahId,
-                            endAyah = unit.end.ayah,
-                            title = unit.title,
-                            detail = unit.detail,
-                            weight = unit.weight,
-                            displayOrder = baseOrder + index,
-                            isRollover = cursorDate.isBefore(restartDate),
-                            isDone = false,
-                            rating = preservedRatings[unit.id],
-                            completedAt = null,
-                        )
-                    }
-                }
-            }
-            cursorDate = cursorDate.plusDays(1)
-        }
-
-        return generatedAssignments
-    }
-
-    private fun dailyCapacityForDate(
-        schedule: RevisionSchedule,
-        restartDate: LocalDate,
-        cursorDate: LocalDate,
-        remainingUnits: List<ReviewUnitTemplate>,
-    ): Double = when (schedule.paceMethod) {
-        PaceMethod.Manual -> schedule.manualPace.dailySegments.toDouble()
-        PaceMethod.CycleTarget -> {
-            val elapsedDays = ChronoUnit.DAYS.between(restartDate, cursorDate).toInt()
-            val remainingDays = (schedule.cycleTarget.days - elapsedDays).coerceAtLeast(1)
-            val remainingWeight = remainingUnits.sumOf { unit -> unit.weight }
-            (remainingWeight / remainingDays.toDouble()).coerceAtLeast(EPSILON)
         }
     }
 
@@ -348,36 +265,9 @@ class ReviewRepositoryImpl(
             ?: detail
     }
 
-    private fun determineEndExclusive(
-        units: List<ReviewUnitTemplate>,
-        dailyCapacity: Double,
-    ): Int {
-        var currentIndex = 0
-        var consumedWeight = 0.0
-
-        while (currentIndex < units.size) {
-            val nextWeight = units[currentIndex].weight
-            val wouldExceedCapacity = consumedWeight + nextWeight > dailyCapacity + EPSILON
-            if (currentIndex > 0 && wouldExceedCapacity) {
-                break
-            }
-            consumedWeight += nextWeight
-            currentIndex += 1
-            if (consumedWeight >= dailyCapacity - EPSILON) {
-                break
-            }
-        }
-
-        return currentIndex.coerceAtLeast(1)
-    }
-
     private fun completionRate(assignments: List<ReviewAssignmentEntity>): Int {
         if (assignments.isEmpty()) return 0
         val completed = assignments.count { assignment -> assignment.isDone }
         return (completed * 100) / assignments.size
-    }
-
-    private companion object {
-        private const val EPSILON = 0.0001
     }
 }

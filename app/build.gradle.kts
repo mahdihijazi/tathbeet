@@ -17,8 +17,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
     jacoco
 }
+
+fun placeholderBuildValue(
+    key: String,
+    fallback: String,
+): String =
+    providers.gradleProperty(key)
+        .orElse(providers.environmentVariable(key))
+        .orElse(fallback)
+        .get()
 
 android {
     namespace = "com.quran.tathbeet"
@@ -33,6 +43,50 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigField(
+            "String",
+            "FIREBASE_API_KEY",
+            "\"${placeholderBuildValue("FIREBASE_API_KEY", "TODO_FIREBASE_API_KEY")}\"",
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_APPLICATION_ID",
+            "\"${placeholderBuildValue("FIREBASE_APPLICATION_ID", "TODO_FIREBASE_APPLICATION_ID")}\"",
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_PROJECT_ID",
+            "\"${placeholderBuildValue("FIREBASE_PROJECT_ID", "TODO_FIREBASE_PROJECT_ID")}\"",
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_STORAGE_BUCKET",
+            "\"${placeholderBuildValue("FIREBASE_STORAGE_BUCKET", "TODO_FIREBASE_STORAGE_BUCKET")}\"",
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_AUTH_DOMAIN",
+            "\"${placeholderBuildValue("FIREBASE_AUTH_DOMAIN", "tathbeet-b40d5.firebaseapp.com")}\"",
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_AUTH_HOST",
+            "\"${placeholderBuildValue("FIREBASE_AUTH_HOST", "tathbeet-b40d5.firebaseapp.com")}\"",
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_ANDROID_PACKAGE_NAME",
+            "\"${placeholderBuildValue("FIREBASE_ANDROID_PACKAGE_NAME", "com.quran.tathbeet")}\"",
+        )
+        buildConfigField(
+            "String",
+            "FIREBASE_EMAIL_LINK_URL",
+            "\"${placeholderBuildValue("FIREBASE_EMAIL_LINK_URL", "https://tathbeet-b40d5.firebaseapp.com/finishSignIn/")}\"",
+        )
+
+        manifestPlaceholders["firebaseAuthHost"] =
+            placeholderBuildValue("FIREBASE_AUTH_HOST", "tathbeet-b40d5.firebaseapp.com")
     }
 
     buildTypes {
@@ -58,6 +112,10 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
@@ -153,8 +211,10 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
@@ -165,6 +225,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.play.services.auth)
     ksp(libs.androidx.room.compiler)
 
     debugImplementation(libs.androidx.compose.ui.tooling)

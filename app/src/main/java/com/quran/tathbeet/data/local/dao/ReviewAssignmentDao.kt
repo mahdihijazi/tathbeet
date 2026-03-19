@@ -51,6 +51,9 @@ interface ReviewAssignmentDao {
     )
     suspend fun getAssignmentsForLearner(learnerId: String): List<ReviewAssignmentEntity>
 
+    @Query("SELECT * FROM review_assignment WHERE id = :assignmentId LIMIT 1")
+    suspend fun getAssignment(assignmentId: String): ReviewAssignmentEntity?
+
     @Query(
         """
         SELECT * FROM review_assignment
@@ -116,4 +119,7 @@ interface ReviewAssignmentDao {
 
     @Query("DELETE FROM review_assignment WHERE learner_id = :learnerId")
     suspend fun deleteForLearner(learnerId: String)
+
+    @Query("DELETE FROM review_assignment WHERE id IN (:assignmentIds)")
+    suspend fun deleteByIds(assignmentIds: List<String>)
 }

@@ -2,37 +2,41 @@ package com.quran.tathbeet.ui.features.shared
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.quran.tathbeet.R
+import com.quran.tathbeet.domain.model.ProfileSyncMode
+import com.quran.tathbeet.sync.AuthSessionStatus
+import com.quran.tathbeet.sync.CloudProfileMemberRole
 import com.quran.tathbeet.ui.components.BodyTextCard
 import com.quran.tathbeet.ui.components.HeroCard
 import com.quran.tathbeet.ui.components.InfoActionCard
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
-import com.quran.tathbeet.ui.model.AccountMode
-import com.quran.tathbeet.ui.model.AppProfile
-import com.quran.tathbeet.ui.model.Guardian
-import com.quran.tathbeet.ui.model.SyncState
-import com.quran.tathbeet.ui.model.asString
-import com.quran.tathbeet.ui.model.displayLabelRes
 
 @Composable
 fun SharedProfileScreen(
-    profile: AppProfile,
-    accountMode: AccountMode,
-    syncState: SyncState,
-    onGuardianToggled: (Guardian) -> Unit,
-    onSimulateSync: () -> Unit,
+    uiState: SharedProfileUiState,
+    onEnableSharing: () -> Unit,
+    onInviteEditor: (String) -> Unit,
+    onRemoveEditor: (String) -> Unit,
+    onLeaveProfile: () -> Unit,
 ) {
+    var showInviteDialog by remember { mutableStateOf(false) }
+
     ScreenLayout(
         title = stringResource(R.string.shared_title),
         subtitle = stringResource(R.string.shared_subtitle),
@@ -40,39 +44,16 @@ fun SharedProfileScreen(
         item {
             HeroCard(
                 eyebrow = stringResource(R.string.shared_eyebrow),
-                title = profile.name.asString(),
-                body = stringResource(R.string.shared_body),
-            )
-        }
-
-        item {
-            SectionHeader(
-                title = stringResource(R.string.shared_editors_title),
-                subtitle = stringResource(R.string.shared_editors_subtitle),
-            )
-        }
-
-        item {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Guardian.entries.forEach { guardian ->
-                    FilterChip(
-                        selected = guardian in profile.guardians,
-                        onClick = { onGuardianToggled(guardian) },
-                        label = {
-                            Text(
-                                if (guardian == Guardian.Mother) {
-                                    stringResource(R.string.guardian_mother)
-                                } else {
-                                    stringResource(R.string.guardian_father)
-                                },
-                            )
-                        },
+                title = uiState.profileName,
+                body = when (uiState.authStatus) {
+                    AuthSessionStatus.SignedIn -> stringResource(
+                        R.string.shared_body_signed_in,
+                        uiState.signedInEmail.orEmpty(),
                     )
-                }
-            }
+                    AuthSessionStatus.LinkSent -> stringResource(R.string.shared_body_link_sent)
+                    AuthSessionStatus.SignedOut -> stringResource(R.string.shared_body_signed_out)
+                },
+            )
         }
 
         item {
@@ -80,38 +61,141 @@ fun SharedProfileScreen(
                 title = stringResource(R.string.shared_state_title),
             ) {
                 Text(
-                    stringResource(
-                        R.string.shared_account_mode,
-                        if (accountMode == AccountMode.Guest) {
-                            stringResource(R.string.account_mode_guest)
-                        } else {
-                            stringResource(R.string.account_mode_account)
-                        },
+                    text = stringResource(
+                        R.string.shared_sync_mode,
+                        stringResource(uiState.syncMode.labelRes()),
                     ),
                 )
-                Text(stringResource(R.string.shared_sync_state, stringResource(syncState.displayLabelRes())))
-                Text(
-                    text = if (profile.isShared) {
-                        stringResource(R.string.shared_state_on)
-                    } else {
-                        stringResource(R.string.shared_state_off)
-                    },
-                )
-                Button(onClick = onSimulateSync) {
-                    Text(stringResource(R.string.shared_simulate_sync))
+                uiState.banner?.let { banner ->
+                    Text(text = stringResource(banner.labelRes()))
+                }
+                when {
+                    uiState.canEnableSharing -> {
+                        Button(onClick = onEnableSharing) {
+                            Text(stringResource(R.string.shared_enable_action))
+                        }
+                    }
+                    uiState.canInviteEditors -> {
+                        Button(onClick = { showInviteDialog = true }) {
+                            Text(stringResource(R.string.shared_invite_action))
+                        }
+                    }
+                    uiState.canLeaveProfile -> {
+                        OutlinedButton(onClick = onLeaveProfile) {
+                            Text(stringResource(R.string.shared_leave_action))
+                        }
+                    }
                 }
             }
         }
 
-        item {
-            SectionHeader(
-                title = stringResource(R.string.shared_activity_title),
-                subtitle = stringResource(R.string.shared_activity_subtitle),
-            )
-        }
+        if (uiState.members.isNotEmpty()) {
+            item {
+                SectionHeader(
+                    title = stringResource(R.string.shared_members_title),
+                    subtitle = stringResource(R.string.shared_members_subtitle),
+                )
+            }
 
-        items(profile.activityFeed) { entry ->
-            BodyTextCard(text = entry.asString())
+            items(uiState.members.size) { index ->
+                val member = uiState.members[index]
+                InfoActionCard(
+                    title = member.email,
+                ) {
+                    Text(
+                        text = stringResource(
+                            if (member.role == CloudProfileMemberRole.Owner) {
+                                R.string.shared_role_owner
+                            } else {
+                                R.string.shared_role_editor
+                            },
+                        ),
+                    )
+                    if (member.isCurrentUser) {
+                        Text(stringResource(R.string.shared_member_you))
+                    }
+                    if (uiState.canInviteEditors && member.role == CloudProfileMemberRole.Editor) {
+                        OutlinedButton(onClick = { onRemoveEditor(member.email) }) {
+                            Text(stringResource(R.string.shared_remove_editor_action))
+                        }
+                    }
+                }
+            }
+        } else {
+            item {
+                BodyTextCard(
+                    text = stringResource(
+                        if (uiState.isSelfProfile || uiState.syncMode == ProfileSyncMode.LocalOnly) {
+                            R.string.shared_empty_state_local
+                        } else {
+                            R.string.shared_empty_state_waiting
+                        },
+                    ),
+                )
+            }
         }
     }
+
+    if (showInviteDialog) {
+        InviteEditorDialog(
+            onDismiss = { showInviteDialog = false },
+            onConfirm = { email ->
+                onInviteEditor(email)
+                showInviteDialog = false
+            },
+        )
+    }
+}
+
+@Composable
+private fun InviteEditorDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    var email by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.shared_invite_dialog_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(R.string.shared_invite_dialog_body))
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.shared_invite_email_label)) },
+                )
+            }
+        },
+        confirmButton = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { onConfirm(email) }) {
+                    Text(stringResource(R.string.shared_invite_confirm))
+                }
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) {
+                Text(stringResource(R.string.shared_invite_cancel))
+            }
+        },
+    )
+}
+
+private fun ProfileSyncMode.labelRes(): Int = when (this) {
+    ProfileSyncMode.LocalOnly -> R.string.shared_sync_mode_local
+    ProfileSyncMode.SoloSynced -> R.string.shared_sync_mode_solo
+    ProfileSyncMode.SharedOwner -> R.string.shared_sync_mode_owner
+    ProfileSyncMode.SharedEditor -> R.string.shared_sync_mode_editor
+}
+
+private fun SharedProfileBanner.labelRes(): Int = when (this) {
+    SharedProfileBanner.SharedEnabled -> R.string.shared_banner_enabled
+    SharedProfileBanner.InviteSent -> R.string.shared_banner_invite_sent
+    SharedProfileBanner.EditorRemoved -> R.string.shared_banner_editor_removed
+    SharedProfileBanner.LeftProfile -> R.string.shared_banner_left_profile
+    SharedProfileBanner.EditorsMustBeRemovedFirst -> R.string.shared_banner_remove_editors_first
+    SharedProfileBanner.SignInRequired -> R.string.shared_banner_sign_in_required
+    SharedProfileBanner.ShareUnavailable -> R.string.shared_banner_unavailable
 }

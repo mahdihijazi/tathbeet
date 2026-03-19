@@ -11,11 +11,10 @@ import com.quran.tathbeet.ui.features.progress.ProgressViewModelFactory
 import com.quran.tathbeet.ui.features.profiles.ProfilesViewModelFactory
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModelFactory
 import com.quran.tathbeet.ui.features.settings.SettingsViewModelFactory
-import com.quran.tathbeet.ui.model.AccountMode
-import com.quran.tathbeet.ui.model.AppDestination
+import com.quran.tathbeet.ui.features.shared.SharedProfileViewModelFactory
 import com.quran.tathbeet.ui.model.AppUiState
+import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.model.Guardian
-import com.quran.tathbeet.ui.model.SyncState
 import com.quran.tathbeet.ui.model.TextSpec
 import com.quran.tathbeet.ui.model.activeProfile
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +35,10 @@ internal const val RouteDebug = "debug"
 internal const val RouteDebugLocalNotifications = "debug_local_notifications"
 internal const val RouteDebugUiCatalog = "debug_ui_catalog"
 internal const val RouteShared = "shared"
+internal const val RouteSharedProfileIdArg = "profileId"
+internal const val RouteSharedProfile = "$RouteShared/{$RouteSharedProfileIdArg}"
+
+internal fun sharedProfileRoute(profileId: String): String = "$RouteShared/$profileId"
 
 @Composable
 internal fun LaunchRoute(
@@ -98,6 +101,7 @@ internal fun settingsViewModelFactory(
     profileRepository = appContainer.profileRepository,
     scheduleRepository = appContainer.scheduleRepository,
     localReminderScheduler = appContainer.localReminderScheduler,
+    authSessionRepository = appContainer.authSessionRepository,
 )
 
 internal fun progressViewModelFactory(
@@ -106,6 +110,16 @@ internal fun progressViewModelFactory(
     profileRepository = appContainer.profileRepository,
     reviewRepository = appContainer.reviewRepository,
     timeProvider = appContainer.timeProvider,
+)
+
+internal fun sharedProfileViewModelFactory(
+    appContainer: AppContainer,
+    selectedProfileId: String,
+) = SharedProfileViewModelFactory(
+    selectedProfileId = selectedProfileId,
+    profileRepository = appContainer.profileRepository,
+    authSessionRepository = appContainer.authSessionRepository,
+    cloudSyncManager = appContainer.cloudSyncManager,
 )
 
 internal fun AppDestination.toRoute(): String = when (this) {
@@ -120,17 +134,17 @@ internal fun AppDestination.toRoute(): String = when (this) {
     AppDestination.Debug -> RouteDebug
 }
 
-internal fun String?.toAppDestination(): AppDestination = when (this) {
-    RouteProfiles -> AppDestination.Profiles
-    RouteScheduleIntro -> AppDestination.ScheduleIntro
-    RoutePoolSelector -> AppDestination.PoolSelector
-    RouteScheduleDose -> AppDestination.ScheduleDose
-    RouteProgress -> AppDestination.Progress
-    RouteShared -> AppDestination.Shared
-    RouteSettings -> AppDestination.Settings
-    RouteDebug -> AppDestination.Debug
-    RouteDebugLocalNotifications -> AppDestination.Debug
-    RouteDebugUiCatalog -> AppDestination.Debug
+internal fun String?.toAppDestination(): AppDestination = when {
+    this == RouteProfiles -> AppDestination.Profiles
+    this == RouteScheduleIntro -> AppDestination.ScheduleIntro
+    this == RoutePoolSelector -> AppDestination.PoolSelector
+    this == RouteScheduleDose -> AppDestination.ScheduleDose
+    this == RouteProgress -> AppDestination.Progress
+    this == RouteShared || this?.startsWith("$RouteShared/") == true -> AppDestination.Shared
+    this == RouteSettings -> AppDestination.Settings
+    this == RouteDebug -> AppDestination.Debug
+    this == RouteDebugLocalNotifications -> AppDestination.Debug
+    this == RouteDebugUiCatalog -> AppDestination.Debug
     else -> AppDestination.Review
 }
 
@@ -172,13 +186,3 @@ internal fun TextSpec.resolve(context: Context): String =
             else -> arg
         }
     }.toTypedArray())
-
-internal fun AppUiState.toggleAccountMode(): AppUiState =
-    copy(
-        accountMode = if (accountMode == AccountMode.Guest) AccountMode.Google else AccountMode.Guest,
-        syncState = if (accountMode == AccountMode.Guest) {
-            SyncState.Synced
-        } else {
-            SyncState.OfflineReady
-        },
-    )

@@ -11,10 +11,12 @@ Build the smallest cloud sync system that satisfies these product requirements:
 - the system does not require a custom backend service
 - local reminder settings stay local to each device
 
+This plan describes the current Firebase-backed adapter, but the app layer is written against app-owned auth and cloud-sync interfaces so another provider can replace Firebase later without refactoring the whole app.
+
 ## 2. Chosen Approach
 
-- `Firebase Auth` with email-link sign-in for adult identity
-- `Cloud Firestore` as the shared source of truth for learner profiles, revision plans, cycles, and daily tasks
+- app-owned cloud auth interface, currently backed by Firebase Auth email-link sign-in
+- app-owned cloud sync store interface, currently backed by Cloud Firestore for learner profiles, revision plans, cycles, and daily tasks
 - `Room` and local Android storage for device-local settings and cached app state
 - no Google sign-in in MVP
 - no custom backend service in MVP
@@ -80,10 +82,10 @@ The cloud-sync model should avoid one giant schedule document. Firestore handles
 
 - `users/{uid}`
 - `profiles/{profileId}`
-- `profiles/{profileId}/members/{uid}`
-- `profiles/{profileId}/invites/{inviteId}`
+- `users/{uid}/accessibleProfiles/{profileId}`
+- `profiles/{profileId}/members/{normalizedEmail}`
 - `profiles/{profileId}/plan/meta`
-- `profiles/{profileId}/plan/cycles/{cycleId}`
+- `profiles/{profileId}/reviewDays/{date}`
 - `profiles/{profileId}/tasks/{taskId}`
 
 ### `users/{uid}`
@@ -98,9 +100,23 @@ Suggested fields:
 
 - `email`
 - `normalizedEmail`
-- `personalProfileId`
 - `createdAt`
 - `lastSeenAt`
+
+### `users/{uid}/accessibleProfiles/{profileId}`
+
+Purpose:
+
+- small membership summary for the signed-in adult
+- quick list/query source without loading full profile documents
+
+Suggested fields:
+
+- `displayName`
+- `ownerEmail`
+- `syncMode`
+- `role`
+- `updatedAt`
 
 ### `profiles/{profileId}`
 
@@ -117,33 +133,19 @@ Suggested fields:
 - `updatedAt`
 - `updatedBy`
 
-### `profiles/{profileId}/members/{uid}`
+### `profiles/{profileId}/members/{normalizedEmail}`
 
 Purpose:
 
-- membership and ownership for one cloud-synced profile
+- membership and ownership for one cloud-synced profile keyed by normalized email
 
 Suggested fields:
 
+- `email`
+- `userId` once that adult signs in on a device
 - `role` with values `owner` or `editor`
-- `joinedAt`
-- `addedBy`
-
-### `profiles/{profileId}/invites/{inviteId}`
-
-Purpose:
-
-- pending invite before the invited adult accepts access
-
-Suggested fields:
-
-- `normalizedEmail`
-- `role`
-- `status` with values `pending`, `accepted`, `revoked`
-- `createdAt`
-- `createdBy`
-- `acceptedAt`
-- `acceptedBy`
+- `invitedBy`
+- `updatedAt`
 
 ### `profiles/{profileId}/plan/meta`
 
@@ -162,21 +164,17 @@ Suggested fields:
 - `updatedAt`
 - `updatedBy`
 
-### `profiles/{profileId}/plan/cycles/{cycleId}`
+### `profiles/{profileId}/reviewDays/{date}`
 
 Purpose:
 
-- one concrete cycle instance
+- lightweight day summary keyed by assigned date
 
 Suggested fields:
 
-- `state` with values like `active`, `completed`, `archived`
-- `startsOn`
-- `endsOn`
-- `planVersion`
-- `createdAt`
-- `createdBy`
-- `restartedFromCycleId`
+- `assignedForDate`
+- `completionRate`
+- `updatedAt`
 
 ### `profiles/{profileId}/tasks/{taskId}`
 
@@ -212,9 +210,8 @@ Suggested fields:
 When an adult edits the revision plan:
 
 - update `plan/meta`
-- create a new active cycle document
-- generate a fresh set of task documents for that cycle
-- mark the old active cycle as archived or superseded
+- regenerate the `reviewDays` summaries
+- regenerate the task documents that belong to the active cycle
 
 This should happen in one transaction or one batched write so all devices observe one coherent plan version.
 
@@ -222,12 +219,12 @@ This should happen in one transaction or one batched write so all devices observ
 
 When an adult restarts the cycle:
 
-- create a new active cycle document
-- generate a fresh task set for the new cycle
-- keep the previous cycle document as completed or archived
-- point `plan/meta.activeCycleId` to the new cycle
+- keep the same learner profile and plan metadata
+- regenerate `reviewDays`
+- generate a fresh task set for the restarted cycle window
+- preserve completed ratings locally where the review engine already supports that behavior
 
-This avoids mutating the old cycle in place and keeps collaborative sync simpler.
+This keeps collaborative sync simpler because all active review state still lives in `reviewDays` and `tasks`.
 
 ## 7. Invite Flow
 
@@ -239,22 +236,21 @@ Solo synced profiles do not need invites. They only need the owner membership re
 
 1. Owner opens the learner profile sharing screen.
 2. Owner enters the other adult's email address.
-3. App normalizes the email and creates a pending invite document.
-4. App can show a system share action with a simple message telling the other adult to install the app and sign in with that same email address.
+3. App normalizes the email and creates `members/{normalizedEmail}` with role `editor`.
+4. App can show a simple share message telling the other adult to install the app and sign in with that same email address.
 
 ### Invite Acceptance Flow
 
-1. Invited adult signs in with Firebase email-link using the invited email address.
-2. App checks for pending invites where `normalizedEmail` matches the signed-in email.
-3. Adult accepts the invite.
-4. App writes `members/{uid}` with role `editor`.
-5. App marks the invite as accepted.
+1. Invited adult signs in with the configured cloud auth provider using the invited email address.
+2. App queries the `members` collection group for documents where `email` matches the signed-in email.
+3. App claims those profiles into `users/{uid}/accessibleProfiles`.
+4. App writes the signed-in `userId` back into the matching membership document.
 
 ### Member Removal Flow
 
 1. Owner opens the sharing screen.
 2. Owner removes an editor.
-3. App deletes or disables that member record.
+3. App deletes that member record.
 4. Removed adults lose future shared access after sync refresh.
 
 ### Editor Leave Flow
@@ -292,8 +288,8 @@ Rules should enforce:
 
 Recommended repository split:
 
-- auth layer for Firebase email-link session handling
-- cloud-profile repository backed by Firestore
+- auth layer for the configured cloud auth provider
+- cloud-profile repository backed by the configured cloud sync provider
 - local settings repository backed by Room or DataStore
 - planner layer remains the source of task generation logic
 
@@ -468,3 +464,11 @@ These implementation rules should be treated as part of the sync design, not opt
 - viewer-only role
 - audit trail of every edit
 - push-based collaboration alerts
+
+## 13. Post-MVP Firebase Optimization Backlog
+
+If the MVP ships before the sync layer is fully optimized, defer the remaining improvements to:
+
+- [Firebase Sync Follow-Ups](/Users/mahdi/personal-repos/tathbeet/docs/firebase-sync-followups.md)
+
+That backlog should stay separate from the MVP path so the current sync implementation remains simple until the main product flow is complete.

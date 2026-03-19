@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -31,7 +32,6 @@ class ProfilesViewModel(
     private val timeProvider: TimeProvider,
     private val localReminderScheduler: LocalReminderScheduler,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ProfilesUiState())
     val uiState: StateFlow<ProfilesUiState> = _uiState.asStateFlow()
 
@@ -42,20 +42,28 @@ class ProfilesViewModel(
                 profileRepository.observeActiveAccount(),
                 settingsRepository.observeSettings(),
             ) { accounts, activeAccount, settings ->
-                Triple(accounts, activeAccount, settings)
-            }.collectLatest { (accounts, activeAccount, settings) ->
+                ProfilesInputs(
+                    accounts = accounts,
+                    activeAccount = activeAccount,
+                    settings = settings,
+                )
+            }
+                .distinctUntilChanged()
+                .collectLatest { inputs ->
                 val today = timeProvider.today()
-                accounts.forEach { account ->
-                    val schedule = scheduleRepository.observeActiveSchedule(account.id).first()
-                    if (schedule != null) {
-                        reviewRepository.ensureAssignmentsForDate(
-                            learnerId = account.id,
-                            assignedForDate = today,
-                        )
+                launch {
+                    inputs.accounts.forEach { account ->
+                        val schedule = scheduleRepository.observeActiveSchedule(account.id).first()
+                        if (schedule != null) {
+                            reviewRepository.ensureAssignmentsForDate(
+                                learnerId = account.id,
+                                assignedForDate = today,
+                            )
+                        }
                     }
                 }
 
-                val profileSummaryFlows = accounts.map { account ->
+                val profileSummaryFlows = inputs.accounts.map { account ->
                     combine(
                         scheduleRepository.observeActiveSchedule(account.id),
                         reviewRepository.observeReviewTimeline(account.id),
@@ -64,7 +72,7 @@ class ProfilesViewModel(
                             schedule = schedule,
                             timeline = timeline,
                             today = today,
-                            isActive = account.id == activeAccount?.id,
+                            isActive = account.id == inputs.activeAccount?.id,
                         )
                     }
                 }
@@ -83,7 +91,7 @@ class ProfilesViewModel(
 
                     _uiState.value = ProfilesUiState(
                         isLoading = false,
-                        hasSeenScheduleIntro = settings.hasSeenScheduleIntro,
+                        hasSeenScheduleIntro = inputs.settings.hasSeenScheduleIntro,
                         activeProfile = sortedProfiles.firstOrNull { it.isActive } ?: sortedProfiles.firstOrNull(),
                         profiles = sortedProfiles,
                         editor = _uiState.value.editor?.let { editor ->
@@ -135,7 +143,7 @@ class ProfilesViewModel(
             editor = ProfileEditorUiState(
                 profileId = activeProfile.id,
                 name = activeProfile.name,
-                canDelete = !activeProfile.isSelfProfile,
+                canDelete = !activeProfile.isSelfProfile && !activeProfile.isShared,
             ),
         )
     }
@@ -222,6 +230,7 @@ class ProfilesViewModel(
             id = id,
             name = name,
             isSelfProfile = isSelfProfile,
+            isShared = isShared,
             isActive = isActive,
             notificationsEnabled = notificationsEnabled,
             paceLabelRes = schedule?.manualPace?.toLabelRes(),
@@ -255,6 +264,12 @@ class ProfilesViewModelFactory(
         error("Unknown ViewModel class: ${modelClass.name}")
     }
 }
+
+private data class ProfilesInputs(
+    val accounts: List<com.quran.tathbeet.domain.model.LearnerAccount>,
+    val activeAccount: com.quran.tathbeet.domain.model.LearnerAccount?,
+    val settings: com.quran.tathbeet.domain.model.AppSettings,
+)
 
 private fun PaceOption.toLabelRes(): Int = when (this) {
     PaceOption.OneRub -> R.string.pace_one_rub

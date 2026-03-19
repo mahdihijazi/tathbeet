@@ -15,6 +15,7 @@ data class ProfileCardUiState(
     val id: String,
     val name: String,
     val isSelfProfile: Boolean,
+    val isShared: Boolean,
     val isActive: Boolean,
     val notificationsEnabled: Boolean,
     @param:StringRes val paceLabelRes: Int?,

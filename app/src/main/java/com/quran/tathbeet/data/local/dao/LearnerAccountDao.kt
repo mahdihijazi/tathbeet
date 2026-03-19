@@ -21,6 +21,12 @@ interface LearnerAccountDao {
     @Query("SELECT * FROM learner_account WHERE id = :accountId LIMIT 1")
     suspend fun getAccount(accountId: String): LearnerAccountEntity?
 
+    @Query("SELECT * FROM learner_account WHERE cloud_profile_id = :cloudProfileId LIMIT 1")
+    suspend fun getByCloudProfileId(cloudProfileId: String): LearnerAccountEntity?
+
+    @Query("SELECT * FROM learner_account WHERE cloud_profile_id IS NOT NULL AND is_self_profile = 0")
+    suspend fun getSyncedSubAccounts(): List<LearnerAccountEntity>
+
     @Query(
         """
         SELECT * FROM learner_account

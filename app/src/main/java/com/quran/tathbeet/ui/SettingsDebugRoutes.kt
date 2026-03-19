@@ -1,6 +1,7 @@
 package com.quran.tathbeet.ui
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quran.tathbeet.R
@@ -53,6 +55,8 @@ internal fun SettingsRoute(
         onMotivationalMessagesChanged = settingsViewModel::toggleMotivationalMessages,
         onProfileNotificationsChanged = settingsViewModel::toggleProfileNotifications,
         onReminderTimeSelected = settingsViewModel::selectReminderTime,
+        onRequestEmailLink = settingsViewModel::requestEmailLink,
+        onSignOut = settingsViewModel::signOut,
         onRequestNotificationPermission = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -63,10 +67,30 @@ internal fun SettingsRoute(
 
 @Composable
 internal fun DebugToolsRoute(
+    appContainer: AppContainer,
     onOpenLocalNotifications: () -> Unit,
     onOpenUiCatalog: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val lastAuthLink by appContainer.debugAuthLinkStore.observeLastAuthLink().collectAsState(initial = null)
+    var authLinkDraft by remember(lastAuthLink) { mutableStateOf(lastAuthLink.orEmpty()) }
+
     DebugToolsScreen(
+        authLink = authLinkDraft,
+        onAuthLinkChanged = { authLinkDraft = it },
+        onCopyAuthLink = {
+            if (authLinkDraft.isNotBlank()) {
+                clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(authLinkDraft))
+            }
+        },
+        onOpenAuthLink = {
+            if (authLinkDraft.isNotBlank()) {
+                context.startActivity(
+                    Intent(Intent.ACTION_VIEW).setData(android.net.Uri.parse(authLinkDraft)),
+                )
+            }
+        },
         onOpenLocalNotifications = onOpenLocalNotifications,
         onOpenUiCatalog = onOpenUiCatalog,
     )

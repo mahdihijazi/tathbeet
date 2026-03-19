@@ -30,10 +30,12 @@ class ProgressViewModel(
             profileRepository.observeActiveAccount()
                 .filterNotNull()
                 .collectLatest { account ->
-                    reviewRepository.ensureAssignmentsForDate(
-                        learnerId = account.id,
-                        assignedForDate = timeProvider.today(),
-                    )
+                    launch {
+                        reviewRepository.ensureAssignmentsForDate(
+                            learnerId = account.id,
+                            assignedForDate = timeProvider.today(),
+                        )
+                    }
                     reviewRepository.observeReviewTimeline(account.id)
                         .collect { timeline ->
                             _uiState.value = timeline.toUiState(

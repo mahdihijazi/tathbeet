@@ -11,21 +11,23 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.quran.tathbeet.BuildConfig
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.domain.model.AppSettings
+import com.quran.tathbeet.domain.model.AppThemeMode
 import com.quran.tathbeet.ui.components.AppShell
 import com.quran.tathbeet.ui.features.progress.ProgressScreen
 import com.quran.tathbeet.ui.features.progress.ProgressViewModel
@@ -40,17 +42,11 @@ import com.quran.tathbeet.ui.features.schedule.ScheduleIntroScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleScreen
 import com.quran.tathbeet.ui.features.schedule.ScheduleWizardViewModel
 import com.quran.tathbeet.ui.features.shared.SharedProfileScreen
+import com.quran.tathbeet.ui.features.shared.SharedProfileViewModel
 import com.quran.tathbeet.ui.model.AppDestination
-import com.quran.tathbeet.ui.model.AppUiState
-import com.quran.tathbeet.ui.model.SyncState
-import com.quran.tathbeet.ui.model.TextSpec
-import com.quran.tathbeet.ui.model.activeProfile
-import com.quran.tathbeet.ui.model.loadQuranCatalog
-import com.quran.tathbeet.ui.model.seedAppState
 import com.quran.tathbeet.ui.theme.TathbeetTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -108,15 +104,6 @@ fun TathbeetApp(
             return@LaunchedEffect
         }
         navigateToNotificationTarget(notificationTargetProfileId)
-    }
-
-    fun mutateLegacy(message: TextSpec? = null, transform: (AppUiState) -> AppUiState) {
-        legacyUiState = transform(legacyUiState)
-        if (message != null) {
-            scope.launch {
-                snackbarHostState.showSnackbar(message.resolve(context))
-            }
-        }
     }
 
     TathbeetTheme(darkTheme = darkThemeEnabled) {
@@ -290,6 +277,11 @@ fun TathbeetApp(
                         onProfileNotificationsToggled = profilesViewModel::toggleProfileNotifications,
                         onAddProfileRequested = profilesViewModel::showCreateDialog,
                         onEditActiveProfileRequested = profilesViewModel::showEditActiveProfileDialog,
+                        onOpenSharedProfile = { profileId ->
+                            navController.navigate(sharedProfileRoute(profileId)) {
+                                launchSingleTop = true
+                            }
+                        },
                         onProfileNameChanged = profilesViewModel::updateEditorName,
                         onSaveProfile = {
                             profilesViewModel.saveEditor(
@@ -330,6 +322,7 @@ fun TathbeetApp(
                 if (BuildConfig.DEBUG) {
                     composable(RouteDebug) {
                         DebugToolsRoute(
+                            appContainer = appContainer,
                             onOpenLocalNotifications = {
                                 navController.navigate(RouteDebugLocalNotifications) {
                                     launchSingleTop = true
@@ -350,46 +343,33 @@ fun TathbeetApp(
                     }
                 }
 
-                composable(RouteShared) {
+                composable(
+                    route = RouteSharedProfile,
+                    arguments = listOf(
+                        navArgument(RouteSharedProfileIdArg) {
+                            type = NavType.StringType
+                        },
+                    ),
+                ) { backStackEntry ->
+                    val profileId = backStackEntry.arguments?.getString(RouteSharedProfileIdArg)
+                        ?: return@composable
+                    val sharedProfileViewModel: SharedProfileViewModel = viewModel(
+                        factory = sharedProfileViewModelFactory(
+                            appContainer = appContainer,
+                            selectedProfileId = profileId,
+                        ),
+                    )
+                    val uiState by sharedProfileViewModel.uiState.collectAsState()
                     SharedProfileScreen(
-                        profile = legacyUiState.activeProfile,
-                        accountMode = legacyUiState.accountMode,
-                        syncState = legacyUiState.syncState,
-                        onGuardianToggled = { guardian ->
-                            mutateLegacy {
-                                it.copy(
-                                    profiles = it.profiles.map { profile ->
-                                        if (profile.id == it.activeProfileId) {
-                                            val nextGuardians = profile.guardians.toMutableSet().apply {
-                                                if (!add(guardian)) {
-                                                    remove(guardian)
-                                                }
-                                            }
-                                            profile.copy(
-                                                guardians = nextGuardians,
-                                                isShared = nextGuardians.size > 1,
-                                            )
-                                        } else {
-                                            profile
-                                        }
-                                    },
-                                )
-                            }
-                        },
-                        onSimulateSync = {
-                            mutateLegacy {
-                                it.copy(
-                                    syncState = when (it.syncState) {
-                                        SyncState.OfflineReady -> SyncState.SyncPending
-                                        SyncState.SyncPending -> SyncState.Synced
-                                        SyncState.Synced -> SyncState.OfflineReady
-                                    },
-                                )
-                            }
-                        },
+                        uiState = uiState,
+                        onEnableSharing = sharedProfileViewModel::enableSharing,
+                        onInviteEditor = sharedProfileViewModel::inviteEditor,
+                        onRemoveEditor = sharedProfileViewModel::removeEditor,
+                        onLeaveProfile = sharedProfileViewModel::leaveProfile,
                     )
                 }
             }
         }
     }
+}
 }

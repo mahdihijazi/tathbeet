@@ -11,6 +11,7 @@ The core idea is:
 - the app works offline for core review and schedule tracking
 - each review task can jump straight into an external Quran reader
 - the app supports multiple local profiles, such as one user managing multiple learners in a family or class
+- core screens render from cached local data first, then reconcile cloud sync in the background
 
 ## Product Direction
 
@@ -25,8 +26,7 @@ The app is Android-only in the MVP and is planned as a native app using:
 - Jetpack Compose
 - Kotlin Flow
 - Room for local offline storage
-- Firebase Auth email-link sign-in for sync and sharing identity
-- Cloud Firestore for profile sync
+- app-owned cloud auth and sync abstractions, currently backed by Firebase Auth email-link sign-in and Cloud Firestore
 - Firebase Cloud Messaging for later push work
 
 ## MVP Scope
@@ -35,6 +35,7 @@ The MVP supports:
 
 - Android app with Arabic-first RTL UX and English support
 - offline-first core flows for creating schedules, viewing daily tasks, and marking revision progress
+- cached data should paint immediately on launch even while sync reconciliation continues in the background
 - external Quran launch from each task row, with direct app opening first and browser fallback if needed
 - optional account creation for adults who want sync or shared learner profiles
 - use without an account
@@ -51,7 +52,7 @@ The MVP supports:
 - a simple Progress screen with today's summary, a weekly rhythm view, and one motivational card
 - profile-level notification settings
 - email-link sign-in for sync and sharing
-- cloud sync for signed-in profiles through Firestore
+- cloud sync for signed-in profiles through the configured cloud sync provider
 - shared learner profiles so more than one manager can update schedule and completion state
 
 The MVP does not include:
@@ -148,6 +149,7 @@ This repository will hold:
 - Mermaid MVP user flow: [docs/mvp-user-flow.md](/Users/mahdi/personal-repos/tathbeet/docs/mvp-user-flow.md)
 - Screen inventory: [docs/screen-list.md](/Users/mahdi/personal-repos/tathbeet/docs/screen-list.md)
 - Cloud sync plan: [docs/cloud-sync-system.md](/Users/mahdi/personal-repos/tathbeet/docs/cloud-sync-system.md)
+- Cloud sync follow-ups: [docs/firebase-sync-followups.md](/Users/mahdi/personal-repos/tathbeet/docs/firebase-sync-followups.md)
 - Android app entry point: [MainActivity.kt](/Users/mahdi/personal-repos/tathbeet/app/src/main/java/com/quran/tathbeet/MainActivity.kt)
 
 The current app build is:
@@ -155,7 +157,7 @@ The current app build is:
 - high-fidelity
 - interactive
 - UI-only
-- intentionally fake for sync, Firebase, database, and backend behavior
+- intentionally fake for sync/provider, database, and backend behavior
 - uses a 3-step schedule wizard
 - shows a one-time intro on first app open
 - asks for the active profile name on the intro step with a lightweight single input before memorized-pool selection
@@ -172,7 +174,9 @@ The current app build is:
 - keeps exact task start/end ayah references so review rows can open Quran for Android directly or fall back to `quran.com`
 - appends the active profile name into the review top bar title so the current learner is always clear on shared devices
 - shows the review screen as a two-tab pager with the current dated ward on the right and `كامل المحفوظ` on the left
-- keeps the `كامل المحفوظ` tab on the same underlying task state so completion and rating changes reflect in the dated ward immediately
+- shows unfinished carried-over items first, keeps today’s tasks visible even after completion, and keeps upcoming future tasks visible in the dated ward
+- keeps completed tasks out of the dated ward while still showing all plan tasks in `كامل المحفوظ`
+- keeps the `كامل المحفوظ` tab on the same underlying task state so completion and rating changes reflect immediately across both tabs
 - adds a review top bar sort action for `كامل المحفوظ` with rating, last-memorized, and Quran-order sorting
 - appends completed review status directly into the task title text flow for finished rows, with an inline completed icon immediately after the text
 - reveals future review days inline as the current visible work is completed

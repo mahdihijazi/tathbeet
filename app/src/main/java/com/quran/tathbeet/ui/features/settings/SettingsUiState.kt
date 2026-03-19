@@ -11,6 +11,7 @@ data class SettingsUiState(
     val reminderHour: Int = 19,
     val reminderMinute: Int = 0,
     val profiles: List<SettingsProfileUiState> = emptyList(),
+    val account: SettingsAccountUiState = SettingsAccountUiState(),
 )
 
 data class SettingsProfileUiState(
@@ -20,4 +21,12 @@ data class SettingsProfileUiState(
     val isSelfProfile: Boolean,
     val notificationsEnabled: Boolean,
     val hasSchedule: Boolean,
+)
+
+data class SettingsAccountUiState(
+    val isRuntimeConfigured: Boolean = false,
+    val status: AuthSessionStatus = AuthSessionStatus.SignedOut,
+    val email: String? = null,
+    val pendingEmail: String? = null,
+    val debugSyncedProfileId: String? = null,
 )
