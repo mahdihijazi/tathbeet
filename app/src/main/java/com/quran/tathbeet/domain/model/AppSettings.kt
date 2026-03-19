@@ -6,5 +6,5 @@ data class AppSettings(
     val motivationalMessagesEnabled: Boolean = true,
     val reminderHour: Int = 19,
     val reminderMinute: Int = 0,
-    val forceDarkTheme: Boolean = false,
+    val themeMode: AppThemeMode = AppThemeMode.System,
 )

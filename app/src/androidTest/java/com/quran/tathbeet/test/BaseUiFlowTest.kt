@@ -141,11 +141,11 @@ abstract class BaseUiFlowTest {
         composeRule.onNodeWithTag("settings-global-toggle").performClick()
     }
 
-    protected fun toggleDarkTheme() {
+    protected fun selectDarkThemeMode() {
         composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
-            hasTestTag("settings-dark-theme-toggle"),
+            hasTestTag("settings-theme-mode-dark"),
         )
-        composeRule.onNodeWithTag("settings-dark-theme-toggle").performClick()
+        composeRule.onNodeWithTag("settings-theme-mode-dark").performClick()
     }
 
     protected fun toggleMotivationalMessages() {

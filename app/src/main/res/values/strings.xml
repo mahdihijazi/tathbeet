@@ -291,8 +291,11 @@
     <string name="account_mode_account">حساب</string>
 
     <string name="settings_title">الإعدادات</string>
-    <string name="settings_theme_title">تفعيل المظهر الداكن</string>
-    <string name="settings_theme_supporting">تفعيل المظهر الداكن في التطبيق</string>
+    <string name="settings_theme_title">المظهر</string>
+    <string name="settings_theme_supporting">اختر كيف يظهر التطبيق</string>
+    <string name="settings_theme_mode_system">تلقائي</string>
+    <string name="settings_theme_mode_light">فاتح</string>
+    <string name="settings_theme_mode_dark">داكن</string>
     <string name="settings_permission_title">السماح بإشعارات الجهاز</string>
     <string name="settings_permission_body">لن تصل التذكيرات اليومية إلا بعد السماح للإشعارات من إعدادات أندرويد أو من الزر التالي.</string>
     <string name="settings_permission_action">تفعيل الإشعارات</string>

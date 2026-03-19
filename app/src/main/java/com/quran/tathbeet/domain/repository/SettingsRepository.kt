@@ -1,6 +1,7 @@
 package com.quran.tathbeet.domain.repository
 
 import com.quran.tathbeet.domain.model.AppSettings
+import com.quran.tathbeet.domain.model.AppThemeMode
 import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
@@ -17,5 +18,5 @@ interface SettingsRepository {
         minute: Int,
     )
 
-    suspend fun setForceDarkTheme(enabled: Boolean)
+    suspend fun setThemeMode(themeMode: AppThemeMode)
 }

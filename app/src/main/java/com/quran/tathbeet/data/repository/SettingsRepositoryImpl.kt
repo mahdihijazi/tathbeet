@@ -3,6 +3,7 @@ package com.quran.tathbeet.data.repository
 import com.quran.tathbeet.data.local.TathbeetDatabase
 import com.quran.tathbeet.data.local.entity.AppSettingsEntity
 import com.quran.tathbeet.domain.model.AppSettings
+import com.quran.tathbeet.domain.model.AppThemeMode
 import com.quran.tathbeet.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,7 +22,12 @@ class SettingsRepositoryImpl(
                     motivationalMessagesEnabled = entity?.motivationalMessagesEnabled ?: true,
                     reminderHour = entity?.reminderHour ?: DEFAULT_REMINDER_HOUR,
                     reminderMinute = entity?.reminderMinute ?: DEFAULT_REMINDER_MINUTE,
-                    forceDarkTheme = entity?.forceDarkTheme ?: false,
+                    themeMode = entity?.themeMode?.toAppThemeMode()
+                        ?: if (entity?.forceDarkTheme == true) {
+                            AppThemeMode.Dark
+                        } else {
+                            AppThemeMode.System
+                        },
                 )
             }
 
@@ -49,8 +55,14 @@ class SettingsRepositoryImpl(
         }
     }
 
-    override suspend fun setForceDarkTheme(enabled: Boolean) {
-        updateSettings { entity -> entity.copy(forceDarkTheme = enabled) }
+    override suspend fun setThemeMode(themeMode: AppThemeMode) {
+        updateSettings {
+            entity ->
+            entity.copy(
+                themeMode = themeMode.name,
+                forceDarkTheme = themeMode == AppThemeMode.Dark,
+            )
+        }
     }
 
     private suspend fun updateSettings(
@@ -66,6 +78,7 @@ class SettingsRepositoryImpl(
         motivationalMessagesEnabled = true,
         reminderHour = DEFAULT_REMINDER_HOUR,
         reminderMinute = DEFAULT_REMINDER_MINUTE,
+        themeMode = AppThemeMode.System.name,
         forceDarkTheme = false,
     )
 
@@ -74,3 +87,7 @@ class SettingsRepositoryImpl(
         const val DEFAULT_REMINDER_MINUTE = 0
     }
 }
+
+private fun String.toAppThemeMode(): AppThemeMode =
+    runCatching { AppThemeMode.valueOf(this) }
+        .getOrDefault(AppThemeMode.System)

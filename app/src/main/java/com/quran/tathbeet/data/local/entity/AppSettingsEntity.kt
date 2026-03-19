@@ -12,5 +12,6 @@ data class AppSettingsEntity(
     val motivationalMessagesEnabled: Boolean,
     val reminderHour: Int,
     val reminderMinute: Int,
+    val themeMode: String,
     val forceDarkTheme: Boolean,
 )

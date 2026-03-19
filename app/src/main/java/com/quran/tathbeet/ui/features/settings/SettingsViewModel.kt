@@ -103,10 +103,9 @@ class SettingsViewModel(
         }
     }
 
-    fun toggleForceDarkTheme() {
-        val enabled = !_uiState.value.forceDarkTheme
-        viewModelScope.launch {
-            settingsRepository.setForceDarkTheme(enabled)
+    fun selectThemeMode(themeMode: AppThemeMode) {
+        launchUndispatched {
+            settingsRepository.setThemeMode(themeMode)
         }
     }
 

@@ -3,6 +3,7 @@ package com.quran.tathbeet.ui.features.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.quran.tathbeet.domain.model.AppThemeMode
 import com.quran.tathbeet.ui.screenshot.ThemedScreenshotFrame
 
 private const val SettingsThemeCardPreviewWidth = 411
@@ -20,8 +21,8 @@ private const val SettingsThemeCardPreviewHeight = 220
 fun SettingsThemeCardScreenshot() {
     ThemedScreenshotFrame(darkTheme = false) {
         ThemeSettingsCard(
-            forceDarkTheme = false,
-            onToggle = {},
+            themeMode = AppThemeMode.System,
+            onThemeModeSelected = {},
         )
     }
 }
@@ -38,8 +39,8 @@ fun SettingsThemeCardScreenshot() {
 fun SettingsThemeCardDarkScreenshot() {
     ThemedScreenshotFrame(darkTheme = true) {
         ThemeSettingsCard(
-            forceDarkTheme = true,
-            onToggle = {},
+            themeMode = AppThemeMode.Dark,
+            onThemeModeSelected = {},
         )
     }
 }

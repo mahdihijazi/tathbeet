@@ -60,16 +60,17 @@ fun TathbeetApp(
     onNotificationTargetHandled: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val quranCatalog = remember(context) { loadQuranCatalog(context) }
-    var legacyUiState by remember(quranCatalog) { mutableStateOf(seedAppState(context, quranCatalog)) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination?.route.toAppDestination()
     val activeAccount by appContainer.profileRepository.observeActiveAccount().collectAsState(initial = null)
     val appSettings by appContainer.settingsRepository.observeSettings().collectAsState(initial = AppSettings())
-    val darkThemeEnabled = appSettings.forceDarkTheme || isSystemInDarkTheme()
+    val darkThemeEnabled = when (appSettings.themeMode) {
+        AppThemeMode.System -> isSystemInDarkTheme()
+        AppThemeMode.Light -> false
+        AppThemeMode.Dark -> true
+    }
     var onReviewResetAction by remember { mutableStateOf({}) }
     var reviewSortActionState by remember { mutableStateOf<com.quran.tathbeet.ui.features.review.ReviewSortActionState?>(null) }
 

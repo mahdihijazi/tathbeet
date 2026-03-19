@@ -48,7 +48,7 @@ internal fun SettingsRoute(
     SettingsScreen(
         uiState = uiState,
         hasNotificationPermission = hasNotificationPermission,
-        onForceDarkThemeChanged = settingsViewModel::toggleForceDarkTheme,
+        onThemeModeSelected = settingsViewModel::selectThemeMode,
         onGlobalNotificationsChanged = settingsViewModel::toggleGlobalNotifications,
         onMotivationalMessagesChanged = settingsViewModel::toggleMotivationalMessages,
         onProfileNotificationsChanged = settingsViewModel::toggleProfileNotifications,

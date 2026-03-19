@@ -1,8 +1,10 @@
 package com.quran.tathbeet.feature.settings
 
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithTag
 import com.quran.tathbeet.test.BaseUiFlowTest
+import com.quran.tathbeet.domain.model.AppThemeMode
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -13,21 +15,21 @@ import org.junit.Test
 class SettingsFlowTest : BaseUiFlowTest() {
 
     @Test
-    fun dark_theme_override_persists_from_settings() {
+    fun theme_mode_persists_from_settings() {
         completeOnboardingWithJuzOne()
         openSettingsTab()
 
-        toggleDarkTheme()
+        selectDarkThemeMode()
 
         runBlocking {
             val settings = appContainer.settingsRepository.observeSettings().first()
-            assertTrue(settings.forceDarkTheme)
+            assertEquals(AppThemeMode.Dark, settings.themeMode)
         }
 
         openProfilesTab()
         openSettingsTab()
 
-        composeRule.onNodeWithTag("settings-dark-theme-toggle").assertIsOn()
+        composeRule.onNodeWithTag("settings-theme-mode-dark").assertIsSelected()
     }
 
     @Test

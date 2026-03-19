@@ -26,7 +26,7 @@ import com.quran.tathbeet.data.local.entity.ScheduleSelectionEntity
         ReviewDayEntity::class,
         ReviewAssignmentEntity::class,
     ],
-    version = 6,
+    version = 8,
     exportSchema = false,
 )
 abstract class TathbeetDatabase : RoomDatabase() {
@@ -50,6 +50,45 @@ abstract class TathbeetDatabase : RoomDatabase() {
                         """
                         ALTER TABLE app_settings
                         ADD COLUMN forceDarkTheme INTEGER NOT NULL DEFAULT 0
+                        """.trimIndent(),
+                    )
+                }
+            }
+
+        val Migration6To7 =
+            object : Migration(6, 7) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        """
+                        ALTER TABLE learner_account
+                        ADD COLUMN sync_mode TEXT NOT NULL DEFAULT 'LocalOnly'
+                        """.trimIndent(),
+                    )
+                    db.execSQL(
+                        """
+                        ALTER TABLE learner_account
+                        ADD COLUMN cloud_profile_id TEXT
+                        """.trimIndent(),
+                    )
+                }
+            }
+
+        val Migration7To8 =
+            object : Migration(7, 8) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        """
+                        ALTER TABLE app_settings
+                        ADD COLUMN themeMode TEXT NOT NULL DEFAULT 'System'
+                        """.trimIndent(),
+                    )
+                    db.execSQL(
+                        """
+                        UPDATE app_settings
+                        SET themeMode = CASE
+                            WHEN forceDarkTheme = 1 THEN 'Dark'
+                            ELSE 'System'
+                        END
                         """.trimIndent(),
                     )
                 }
