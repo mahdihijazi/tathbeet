@@ -63,14 +63,9 @@ class AuthSessionRepositoryImpl(
             return EmailLinkRequestResult.Error(message = "Email is required.")
         }
 
-        Log.i(
-            tag,
-            "requestEmailLink started for email=$normalizedEmail",
-        )
         return runCatching {
             authClient.sendSignInLink(normalizedEmail)
             pendingEmailStore.setPendingEmail(trimmedEmail)
-            Log.i(tag, "requestEmailLink succeeded for email=$trimmedEmail")
             EmailLinkRequestResult.Success
         }.getOrElse { throwable ->
             Log.e(
@@ -105,14 +100,12 @@ class AuthSessionRepositoryImpl(
             return EmailLinkCompletionResult.Error(message = "The link is not a valid sign-in link.")
         }
 
-        Log.i(tag, "completeEmailLinkSignIn started for email=$pendingEmail")
         return runCatching {
             authClient.signInWithEmailLink(
                 email = pendingEmail,
                 link = link,
             )
             pendingEmailStore.setPendingEmail(null)
-            Log.i(tag, "completeEmailLinkSignIn succeeded for email=$pendingEmail")
             EmailLinkCompletionResult.Success
         }.getOrElse { throwable ->
             Log.e(
@@ -127,9 +120,7 @@ class AuthSessionRepositoryImpl(
     }
 
     override suspend fun signOut() {
-        Log.i(tag, "signOut started")
         authClient.signOut()
         pendingEmailStore.setPendingEmail(null)
-        Log.i(tag, "signOut completed")
     }
 }

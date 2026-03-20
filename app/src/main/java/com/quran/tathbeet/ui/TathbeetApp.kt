@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -47,6 +48,7 @@ import com.quran.tathbeet.ui.model.AppDestination
 import com.quran.tathbeet.ui.theme.TathbeetTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -270,13 +272,14 @@ fun TathbeetApp(
                     val profilesViewModel: ProfilesViewModel = viewModel(
                         factory = profilesViewModelFactory(appContainer),
                     )
+                    val scope = rememberCoroutineScope()
                     val uiState by profilesViewModel.uiState.collectAsState()
                     ProfilesScreen(
                         uiState = uiState,
                         onProfileSelected = profilesViewModel::selectProfile,
                         onProfileNotificationsToggled = profilesViewModel::toggleProfileNotifications,
                         onAddProfileRequested = profilesViewModel::showCreateDialog,
-                        onEditActiveProfileRequested = profilesViewModel::showEditActiveProfileDialog,
+                        onEditProfileRequested = profilesViewModel::showEditProfileDialog,
                         onOpenSharedProfile = { profileId ->
                             navController.navigate(sharedProfileRoute(profileId)) {
                                 launchSingleTop = true
@@ -297,10 +300,24 @@ fun TathbeetApp(
                             )
                         },
                         onDismissProfileDialog = profilesViewModel::dismissEditor,
-                        onRequestDeleteProfile = profilesViewModel::requestDeleteFromEditor,
+                        onRequestDeleteProfile = profilesViewModel::requestDeleteProfile,
                         onDismissDeleteProfile = profilesViewModel::dismissDeleteConfirmation,
                         onConfirmDeleteProfile = profilesViewModel::confirmDelete,
-                        onOpenSchedule = { navController.navigate(RoutePoolSelector) },
+                        onOpenSchedule = { profileId ->
+                            profilesViewModel.selectProfile(profileId) {
+                                navController.navigate(RoutePoolSelector)
+                            }
+                        },
+                        onRequestEmailLink = { email ->
+                            scope.launch {
+                                appContainer.authSessionRepository.requestEmailLink(email)
+                            }
+                        },
+                        onSignOut = {
+                            scope.launch {
+                                appContainer.authSessionRepository.signOut()
+                            }
+                        },
                     )
                 }
 

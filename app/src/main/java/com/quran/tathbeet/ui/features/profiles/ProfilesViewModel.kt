@@ -9,10 +9,13 @@ import com.quran.tathbeet.core.time.TimeProvider
 import com.quran.tathbeet.domain.model.PaceOption
 import com.quran.tathbeet.domain.model.ReviewDay
 import com.quran.tathbeet.domain.model.RevisionSchedule
+import com.quran.tathbeet.domain.model.ProfileSyncMode
 import com.quran.tathbeet.domain.repository.ProfileRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
 import com.quran.tathbeet.domain.repository.ScheduleRepository
 import com.quran.tathbeet.domain.repository.SettingsRepository
+import com.quran.tathbeet.sync.AuthSessionRepository
+import com.quran.tathbeet.sync.AuthSessionState
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +32,7 @@ class ProfilesViewModel(
     private val scheduleRepository: ScheduleRepository,
     private val reviewRepository: ReviewRepository,
     private val settingsRepository: SettingsRepository,
+    private val authSessionRepository: AuthSessionRepository,
     private val timeProvider: TimeProvider,
     private val localReminderScheduler: LocalReminderScheduler,
 ) : ViewModel() {
@@ -41,11 +45,13 @@ class ProfilesViewModel(
                 profileRepository.observeAccounts(),
                 profileRepository.observeActiveAccount(),
                 settingsRepository.observeSettings(),
-            ) { accounts, activeAccount, settings ->
+                authSessionRepository.observeSession(),
+            ) { accounts, activeAccount, settings, session ->
                 ProfilesInputs(
                     accounts = accounts,
                     activeAccount = activeAccount,
                     settings = settings,
+                    session = session,
                 )
             }
                 .distinctUntilChanged()
@@ -91,6 +97,7 @@ class ProfilesViewModel(
 
                     _uiState.value = ProfilesUiState(
                         isLoading = false,
+                        account = inputs.session.toAccountUiState(),
                         hasSeenScheduleIntro = inputs.settings.hasSeenScheduleIntro,
                         activeProfile = sortedProfiles.firstOrNull { it.isActive } ?: sortedProfiles.firstOrNull(),
                         profiles = sortedProfiles,
@@ -110,9 +117,13 @@ class ProfilesViewModel(
         }
     }
 
-    fun selectProfile(profileId: String) {
+    fun selectProfile(
+        profileId: String,
+        onSelected: (() -> Unit)? = null,
+    ) {
         viewModelScope.launch {
             profileRepository.setActiveAccount(profileId)
+            onSelected?.invoke()
         }
     }
 
@@ -137,15 +148,20 @@ class ProfilesViewModel(
         )
     }
 
-    fun showEditActiveProfileDialog() {
-        val activeProfile = _uiState.value.activeProfile ?: return
+    fun showEditProfileDialog(profileId: String) {
+        val profile = _uiState.value.profiles.firstOrNull { it.id == profileId } ?: return
         _uiState.value = _uiState.value.copy(
             editor = ProfileEditorUiState(
-                profileId = activeProfile.id,
-                name = activeProfile.name,
-                canDelete = !activeProfile.isSelfProfile && !activeProfile.isShared,
+                profileId = profile.id,
+                name = profile.name,
+                canDelete = !profile.isSelfProfile && !profile.isShared,
             ),
         )
+    }
+
+    fun showEditActiveProfileDialog() {
+        val activeProfile = _uiState.value.activeProfile ?: return
+        showEditProfileDialog(activeProfile.id)
     }
 
     fun updateEditorName(name: String) {
@@ -197,6 +213,20 @@ class ProfilesViewModel(
         )
     }
 
+    fun requestDeleteProfile(profileId: String) {
+        val profile = _uiState.value.profiles.firstOrNull { it.id == profileId } ?: return
+        if (profile.isSelfProfile || profile.isShared) {
+            return
+        }
+
+        _uiState.value = _uiState.value.copy(
+            deleteConfirmation = ProfileDeleteConfirmationUiState(
+                profileId = profile.id,
+                profileName = profile.name,
+            ),
+        )
+    }
+
     fun dismissDeleteConfirmation() {
         _uiState.value = _uiState.value.copy(deleteConfirmation = null)
     }
@@ -233,6 +263,7 @@ class ProfilesViewModel(
             isShared = isShared,
             isActive = isActive,
             notificationsEnabled = notificationsEnabled,
+            syncMode = syncMode,
             paceLabelRes = schedule?.manualPace?.toLabelRes(),
             completionRate = lastSevenCompletionRates.average().toInt(),
             todayCompletedCount = todayAssignments.count { assignment -> assignment.isDone },
@@ -246,6 +277,7 @@ class ProfilesViewModelFactory(
     private val scheduleRepository: ScheduleRepository,
     private val reviewRepository: ReviewRepository,
     private val settingsRepository: SettingsRepository,
+    private val authSessionRepository: AuthSessionRepository,
     private val timeProvider: TimeProvider,
     private val localReminderScheduler: LocalReminderScheduler,
 ) : ViewModelProvider.Factory {
@@ -257,6 +289,7 @@ class ProfilesViewModelFactory(
                 scheduleRepository = scheduleRepository,
                 reviewRepository = reviewRepository,
                 settingsRepository = settingsRepository,
+                authSessionRepository = authSessionRepository,
                 timeProvider = timeProvider,
                 localReminderScheduler = localReminderScheduler,
             ) as T
@@ -269,6 +302,14 @@ private data class ProfilesInputs(
     val accounts: List<com.quran.tathbeet.domain.model.LearnerAccount>,
     val activeAccount: com.quran.tathbeet.domain.model.LearnerAccount?,
     val settings: com.quran.tathbeet.domain.model.AppSettings,
+    val session: AuthSessionState,
+)
+
+private fun AuthSessionState.toAccountUiState(): ProfilesAccountUiState = ProfilesAccountUiState(
+    isRuntimeConfigured = isRuntimeConfigured,
+    status = status,
+    email = email,
+    pendingEmail = pendingEmail,
 )
 
 private fun PaceOption.toLabelRes(): Int = when (this) {

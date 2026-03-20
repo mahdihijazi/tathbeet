@@ -17,7 +17,6 @@ object FirebaseBootstrapper {
             return false
         }
         if (FirebaseApp.getApps(context).isNotEmpty()) {
-            Log.d(TAG, "Firebase already initialized.")
             return true
         }
 
@@ -30,10 +29,6 @@ object FirebaseBootstrapper {
                 .build()
 
             FirebaseApp.initializeApp(context, options)
-            Log.i(
-                TAG,
-                "Firebase initialized for projectId=${config.projectId} applicationId=${config.applicationId}",
-            )
             true
         }.getOrElse { throwable ->
             Log.e(

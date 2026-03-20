@@ -12,8 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import com.quran.tathbeet.BuildConfig
 import com.quran.tathbeet.app.AppContainer
 import com.quran.tathbeet.app.AndroidLocalReminderScheduler
+import com.quran.tathbeet.sync.resolveAuthLink
 import com.quran.tathbeet.ui.TathbeetApp
-import java.net.URLDecoder
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -65,16 +65,5 @@ private fun Intent?.notificationTargetProfileId(): String? =
 private fun Intent?.authLink(): String? =
     takeIf { intent -> intent?.action == Intent.ACTION_VIEW }
         ?.data
-        ?.let { uri ->
-            when (uri.scheme) {
-                "http",
-                "https",
-                -> uri.toString()
-
-                "tathbeet" -> uri.getQueryParameter("emailLink")?.let { encoded ->
-                    URLDecoder.decode(encoded, Charsets.UTF_8.name())
-                }
-
-                else -> null
-            }
-        }
+        ?.toString()
+        ?.let(::resolveAuthLink)

@@ -18,6 +18,11 @@ import com.quran.tathbeet.domain.repository.ProfileRepository
 import com.quran.tathbeet.domain.repository.ReviewRepository
 import com.quran.tathbeet.domain.repository.ScheduleRepository
 import com.quran.tathbeet.domain.repository.SettingsRepository
+import com.quran.tathbeet.sync.AuthSessionRepository
+import com.quran.tathbeet.sync.AuthSessionState
+import com.quran.tathbeet.sync.AuthSessionStatus
+import com.quran.tathbeet.sync.EmailLinkCompletionResult
+import com.quran.tathbeet.sync.EmailLinkRequestResult
 import com.quran.tathbeet.testutil.MainDispatcherRule
 import java.time.LocalDate
 import java.time.ZoneId
@@ -74,6 +79,7 @@ class ProfilesViewModelTest {
             scheduleRepository = FakeScheduleRepository(),
             reviewRepository = reviewRepository,
             settingsRepository = FakeSettingsRepository(),
+            authSessionRepository = FakeAuthSessionRepository(),
             timeProvider = FixedTimeProvider(today),
             localReminderScheduler = NoOpLocalReminderScheduler,
         )
@@ -89,6 +95,36 @@ class ProfilesViewModelTest {
 
         ensureGate.complete(Unit)
         advanceUntilIdle()
+    }
+
+    @Test
+    fun auth_session_state_is_exposed_on_accounts_tab() = runTest {
+        val authRepository = FakeAuthSessionRepository().apply {
+            session.value = AuthSessionState(
+                isRuntimeConfigured = true,
+                status = AuthSessionStatus.SignedIn,
+                email = "owner@example.com",
+                userId = "uid-owner",
+                pendingEmail = null,
+            )
+        }
+        val viewModel = ProfilesViewModel(
+            profileRepository = FakeProfileRepository(
+                accounts = MutableStateFlow(emptyList()),
+                activeAccount = MutableStateFlow(null),
+            ),
+            scheduleRepository = FakeScheduleRepository(),
+            reviewRepository = FakeReviewRepository(timeline = emptyList()),
+            settingsRepository = FakeSettingsRepository(),
+            authSessionRepository = authRepository,
+            timeProvider = FixedTimeProvider(LocalDate.of(2026, 3, 19)),
+            localReminderScheduler = NoOpLocalReminderScheduler,
+        )
+
+        advanceUntilIdle()
+
+        assertEquals(AuthSessionStatus.SignedIn, viewModel.uiState.value.account.status)
+        assertEquals("owner@example.com", viewModel.uiState.value.account.email)
     }
 }
 
@@ -183,6 +219,40 @@ private class FakeSettingsRepository : SettingsRepository {
     ) = Unit
 
     override suspend fun setThemeMode(themeMode: AppThemeMode) = Unit
+}
+
+private class FakeAuthSessionRepository : AuthSessionRepository {
+    val session = MutableStateFlow(
+        AuthSessionState(
+            isRuntimeConfigured = true,
+            status = AuthSessionStatus.SignedOut,
+            email = null,
+            userId = null,
+            pendingEmail = null,
+        ),
+    )
+
+    override fun observeSession(): Flow<AuthSessionState> = session
+
+    override suspend fun requestEmailLink(email: String): EmailLinkRequestResult {
+        session.value = session.value.copy(
+            status = AuthSessionStatus.LinkSent,
+            pendingEmail = email,
+        )
+        return EmailLinkRequestResult.Success
+    }
+
+    override suspend fun completeEmailLinkSignIn(link: String): EmailLinkCompletionResult =
+        EmailLinkCompletionResult.Success
+
+    override suspend fun signOut() {
+        session.value = session.value.copy(
+            status = AuthSessionStatus.SignedOut,
+            email = null,
+            userId = null,
+            pendingEmail = null,
+        )
+    }
 }
 
 private object NoOpLocalReminderScheduler : LocalReminderScheduler {

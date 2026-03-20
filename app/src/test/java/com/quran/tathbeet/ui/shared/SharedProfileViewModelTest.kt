@@ -169,6 +169,36 @@ class SharedProfileViewModelTest {
     }
 
     @Test
+    fun shared_owner_profile_member_load_failures_do_not_crash_screen() = runTest {
+        val owner = profile(
+            id = "child-1",
+            name = "أحمد",
+            isShared = true,
+            syncMode = ProfileSyncMode.SharedOwner,
+            cloudProfileId = "shared-child-1",
+        )
+        val profileRepository = FakeSharedProfileRepository(
+            accounts = listOf(owner),
+            active = owner,
+        )
+        val manager = FakeCloudSyncManager().apply {
+            membersError = RuntimeException("PERMISSION_DENIED")
+        }
+        val viewModel = SharedProfileViewModel(
+            selectedProfileId = owner.id,
+            profileRepository = profileRepository,
+            authSessionRepository = FakeSharedAuthRepository(),
+            cloudSyncManager = manager,
+        )
+
+        advanceUntilIdle()
+
+        assertEquals("أحمد", viewModel.uiState.value.profileName)
+        assertTrue(viewModel.uiState.value.members.isEmpty())
+        assertTrue(viewModel.uiState.value.canInviteEditors)
+    }
+
+    @Test
     fun enabling_sharing_calls_manager_and_updates_feedback() = runTest {
         val child = profile(
             id = "child-1",
@@ -330,6 +360,7 @@ private class FakeCloudSyncManager : CloudSyncManager(
 ) {
     var membersGate: CompletableDeferred<Unit>? = null
     var members: List<CloudProfileMember> = emptyList()
+    var membersError: Throwable? = null
     var enableSharingResult: SharedProfileActionResult = SharedProfileActionResult.Success
     var inviteEditorResult: SharedProfileActionResult = SharedProfileActionResult.Success
     val enabledSharingFor = mutableListOf<String>()
@@ -337,6 +368,7 @@ private class FakeCloudSyncManager : CloudSyncManager(
 
     override suspend fun listMembers(accountId: String): List<CloudProfileMember> {
         membersGate?.await()
+        membersError?.let { throw it }
         return members
     }
 

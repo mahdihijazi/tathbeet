@@ -70,56 +70,6 @@ internal fun ThemeSettingsCard(
 }
 
 @Composable
-internal fun ProfileReminderCard(
-    profile: SettingsProfileUiState,
-    onToggle: () -> Unit,
-) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = profile.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = when {
-                            profile.isActive -> stringResource(R.string.settings_profile_status_active)
-                            profile.isSelfProfile -> stringResource(R.string.settings_profile_status_self)
-                            else -> stringResource(R.string.settings_profile_status_additional)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(
-                    checked = profile.notificationsEnabled,
-                    onCheckedChange = { onToggle() },
-                    modifier = Modifier.testTag("settings-profile-toggle-${profile.id}"),
-                )
-            }
-            Text(
-                text = if (profile.hasSchedule) {
-                    stringResource(R.string.settings_profile_schedule_ready)
-                } else {
-                    stringResource(R.string.settings_profile_schedule_missing)
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
 internal fun ReminderSettingsCard(
     uiState: SettingsUiState,
     onGlobalNotificationsChanged: () -> Unit,

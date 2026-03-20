@@ -80,6 +80,7 @@ internal fun profilesViewModelFactory(
     scheduleRepository = appContainer.scheduleRepository,
     reviewRepository = appContainer.reviewRepository,
     settingsRepository = appContainer.settingsRepository,
+    authSessionRepository = appContainer.authSessionRepository,
     timeProvider = appContainer.timeProvider,
     localReminderScheduler = appContainer.localReminderScheduler,
 )
@@ -98,10 +99,7 @@ internal fun settingsViewModelFactory(
     appContainer: AppContainer,
 ) = SettingsViewModelFactory(
     settingsRepository = appContainer.settingsRepository,
-    profileRepository = appContainer.profileRepository,
-    scheduleRepository = appContainer.scheduleRepository,
     localReminderScheduler = appContainer.localReminderScheduler,
-    authSessionRepository = appContainer.authSessionRepository,
 )
 
 internal fun progressViewModelFactory(

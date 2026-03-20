@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LocalProfilesFlowTest : BaseUiFlowTest() {
@@ -58,6 +59,32 @@ class LocalProfilesFlowTest : BaseUiFlowTest() {
     }
 
     @Test
+    fun toggling_child_profile_notifications_from_accounts_updates_persistence() {
+        completeOnboardingWithJuzOne()
+        openProfilesTab()
+
+        openAddProfileDialog()
+        enterProfileEditorName("سارة")
+        saveProfileDialog()
+        assertPoolSelectorVisible()
+        navigateBack()
+
+        val createdProfileId = activeAccountId()
+
+        toggleProfileNotifications(createdProfileId)
+
+        runBlocking {
+            val accounts = appContainer.profileRepository.observeAccounts().first()
+            val createdProfile = accounts.first { account -> account.id == createdProfileId }
+
+            assertTrue(createdProfile.notificationsEnabled)
+        }
+
+        val latestSchedule = appContainer.recordingReminderScheduler.scheduledProfiles.last()
+        assertEquals(listOf("self"), latestSchedule)
+    }
+
+    @Test
     fun deleting_local_profile_removes_it_and_restores_self_profile() {
         completeOnboardingWithJuzOne()
         openProfilesTab()
@@ -74,6 +101,10 @@ class LocalProfilesFlowTest : BaseUiFlowTest() {
         openEditActiveProfileDialog()
         deleteProfileFromDialog()
         confirmProfileDeletion()
+
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            activeAccountId() == "self"
+        }
 
         runBlocking {
             val activeAccount = appContainer.profileRepository.observeActiveAccount()

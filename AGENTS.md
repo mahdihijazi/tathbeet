@@ -113,6 +113,7 @@ Use Compose Preview Screenshot Testing for visual regression coverage of importa
 - break each screen into smaller UI elements that form one meaningful component with one clear purpose, then create screenshot tests for those components
 - if a component has multiple variants or changes its UI based on state, capture one screenshot per state or variant
 - avoid duplicating screenshot coverage when a reusable component is already covered elsewhere; add new coverage only for missing components or missing states
+- when adding a new visual component, card, sheet, dialog, or other reusable UI surface to an existing screen, update `app/src/screenshotTest/coverage/targets.txt` and add matching screenshot tests in `app/src/screenshotTest/kotlin/...` before merging so the report does not claim false 100% coverage
 
 - `./gradlew updateDebugScreenshotTest` to generate or refresh reference images
 - `./gradlew validateDebugScreenshotTest` to compare current renders against the saved references

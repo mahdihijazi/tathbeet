@@ -9,6 +9,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -110,7 +111,15 @@ abstract class BaseUiFlowTest {
     }
 
     protected fun openEditActiveProfileDialog() {
-        composeRule.onNodeWithTag("profiles-edit-active").performClick()
+        openProfileDetails(activeAccountId())
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithTag("profiles-detail-edit").fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag("profiles-detail-edit").performClick()
+    }
+
+    protected fun openProfileDetails(profileId: String) {
+        composeRule.onNodeWithTag("profiles-card-$profileId").performClick()
     }
 
     protected fun enterProfileEditorName(name: String) {
@@ -169,13 +178,6 @@ abstract class BaseUiFlowTest {
         inputs[1].performTextClearance()
         inputs[1].performTextInput("%02d".format(minute))
         composeRule.onNodeWithTag("settings-time-save").performClick()
-    }
-
-    protected fun toggleProfileReminder(profileId: String) {
-        composeRule.onNodeWithTag("screen-layout-list").performScrollToNode(
-            hasTestTag("settings-profile-toggle-$profileId"),
-        )
-        composeRule.onNodeWithTag("settings-profile-toggle-$profileId").performClick()
     }
 
     protected fun navigateBack() {
@@ -258,7 +260,7 @@ abstract class BaseUiFlowTest {
     protected fun assertProfilesVisible() {
         composeRule.waitUntil(timeoutMillis = 5_000) {
             composeRule.onAllNodesWithText(
-                composeRule.activity.getString(R.string.profile_screen_subtitle),
+                composeRule.activity.getString(R.string.profile_screen_title),
             ).fetchSemanticsNodes().isNotEmpty()
         }
     }

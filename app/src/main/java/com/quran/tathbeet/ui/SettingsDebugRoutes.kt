@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quran.tathbeet.R
 import com.quran.tathbeet.app.AppContainer
@@ -53,10 +54,7 @@ internal fun SettingsRoute(
         onThemeModeSelected = settingsViewModel::selectThemeMode,
         onGlobalNotificationsChanged = settingsViewModel::toggleGlobalNotifications,
         onMotivationalMessagesChanged = settingsViewModel::toggleMotivationalMessages,
-        onProfileNotificationsChanged = settingsViewModel::toggleProfileNotifications,
         onReminderTimeSelected = settingsViewModel::selectReminderTime,
-        onRequestEmailLink = settingsViewModel::requestEmailLink,
-        onSignOut = settingsViewModel::signOut,
         onRequestNotificationPermission = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -81,7 +79,7 @@ internal fun DebugToolsRoute(
         onAuthLinkChanged = { authLinkDraft = it },
         onCopyAuthLink = {
             if (authLinkDraft.isNotBlank()) {
-                clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(authLinkDraft))
+                clipboardManager.setText(AnnotatedString(authLinkDraft))
             }
         },
         onOpenAuthLink = {

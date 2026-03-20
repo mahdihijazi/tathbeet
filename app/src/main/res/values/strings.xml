@@ -31,7 +31,7 @@
     <string name="snackbar_schedule_updated">تم تحديث الخطة.</string>
     <string name="snackbar_create_account_for_sharing">أنشئ حساباً من أعلى الشاشة لتجربة المشاركة.</string>
     <string name="snackbar_sync_simulated">تمت محاكاة المزامنة.</string>
-    <string name="snackbar_child_profile_created">تم إنشاء حساب جديد.</string>
+    <string name="snackbar_child_profile_created">تم إنشاء حساب فرعي جديد.</string>
 
     <string name="pace_one_rub">ربع حزب يومياً</string>
     <string name="pace_one_hizb">حزب يومياً</string>
@@ -117,7 +117,7 @@
     <string name="profile_name_ibrahim">إبراهيم</string>
     <string name="profile_name_zaynab">زينب</string>
     <string name="profile_name_abdullah">عبدالله</string>
-    <string name="profile_name_child_generic">طفل %1$d</string>
+    <string name="profile_name_child_generic">حساب فرعي %1$d</string>
 
     <string name="feed_father_today">اليوم · فتح الورد بدون إنترنت</string>
     <string name="feed_father_yesterday">أمس · تم إنجاز 3 من 4 مقاطع</string>
@@ -126,7 +126,7 @@
     <string name="feed_shared_synced">أمس · تمت مزامنة الحساب على جهازين</string>
     <string name="feed_yusuf_today">اليوم · الإشعارات متوقفة</string>
     <string name="feed_yusuf_yesterday">أمس · تم ترحيل المتبقي إلى ورد اليوم</string>
-    <string name="feed_new_child_created">الآن · تم إنشاء حساب %1$s محلياً</string>
+    <string name="feed_new_child_created">الآن · تم إنشاء حساب فرعي %1$s محلياً</string>
     <string name="feed_new_child_next_step">الخطوة التالية · اختيار المحفوظ والوتيرة</string>
     <string name="feed_sync_now">الآن · بدأت دورة مزامنة لحساب %1$s</string>
 
@@ -134,22 +134,34 @@
     <string name="sync_pending">بانتظار المزامنة</string>
     <string name="sync_synced">تمت المزامنة</string>
 
-    <string name="profile_screen_title">الحسابات</string>
-    <string name="profile_screen_subtitle">بدّل بين الحسابات بسرعة</string>
+    <string name="profile_screen_title">الملفات الشخصية</string>
     <string name="profile_active_eyebrow">الحساب الحالي</string>
     <string name="profile_active_body">لكل حساب خطته وورده وإشعاراته الخاصة.</string>
+    <string name="profile_self_label">الحساب الرئيسي</string>
+    <string name="profile_account_state_signed_out">الحساب غير متصل</string>
+    <string name="profile_account_state_link_sent">تم إرسال رابط الدخول</string>
+    <string name="profile_account_state_signed_in">الحساب متصل</string>
+    <string name="profile_account_setup_required">لا تزال بيانات Firebase التجريبية غير مكتملة. أكمل إعداد الخطوات اليدوية قبل استخدام المزامنة الحقيقية.</string>
+    <string name="profile_account_body_signed_out">أدخل بريدك الإلكتروني وسنرسل رابط دخول.</string>
+    <string name="profile_account_sync_paused">المزامنة متوقفة حتى تسجيل الدخول.</string>
+    <string name="profile_account_sync_active">المزامنة مفعلة على هذا الجهاز.</string>
     <string name="profile_button_open_schedule">فتح الخطة</string>
     <string name="profile_button_edit_profile">تعديل الحساب</string>
-    <string name="profile_button_manage_sharing">إدارة المشاركة</string>
-    <string name="profile_section_title">الحسابات</string>
-    <string name="profile_add_child">إضافة حساب</string>
+    <string name="profile_button_manage_account">إدارة الحساب</string>
+    <string name="profile_button_manage_sharing">مشاركة الحساب</string>
+    <string name="profile_section_title">الحسابات الفرعية</string>
+    <string name="profile_add_child">إضافة حساب فرعي</string>
     <string name="profile_type_self">حساب شخصي</string>
-    <string name="profile_type_child">حساب إضافي</string>
+    <string name="profile_type_child">حساب فرعي</string>
+    <string name="profile_sync_local">محلي</string>
+    <string name="profile_sync_synced">سحابي</string>
+    <string name="profile_sync_shared">مشترك</string>
     <string name="profile_chip_active">الحالي</string>
     <string name="profile_chip_activate">تفعيل</string>
     <string name="profile_goal">الهدف</string>
     <string name="profile_schedule_missing">لم تُنشأ الخطة بعد</string>
     <string name="profile_completion_rate">نسبة الإنجاز</string>
+    <string name="profile_today_tasks_label">مهام اليوم</string>
     <string name="percentage_value">%1$d%%</string>
     <string name="profile_today_tasks_done">تم %1$d من %2$d لمهام اليوم</string>
     <string name="profile_today_tasks_empty">افتح الخطة لإعداد أول ورد</string>
@@ -337,16 +349,16 @@
     <string name="settings_reminder_selected">الحالي</string>
     <string name="settings_profiles_title">الحسابات</string>
     <string name="settings_profiles_subtitle">فعّل التذكير للحسابات التي تريد تنبيهها.</string>
-    <string name="settings_profiles_show_more">عرض %1$d حسابات أخرى</string>
-    <string name="settings_profiles_show_less">إخفاء الحسابات الإضافية (%1$d)</string>
+    <string name="settings_profiles_show_more">عرض %1$d حسابات فرعية أخرى</string>
+    <string name="settings_profiles_show_less">إخفاء الحسابات الفرعية (%1$d)</string>
     <string name="settings_profile_status_active">الحساب الحالي</string>
     <string name="settings_profile_status_self">الحساب الرئيسي</string>
-    <string name="settings_profile_status_additional">حساب إضافي</string>
+    <string name="settings_profile_status_additional">حساب فرعي</string>
     <string name="settings_profile_schedule_ready">ستصل التذكيرات لهذا الحساب في الوقت المحدد إذا بقي مفعّلاً.</string>
     <string name="settings_profile_schedule_missing">لن يظهر تذكير لهذا الحساب حتى تُحفظ له خطة مراجعة، لكن تفضيله سيبقى محفوظاً.</string>
     <string name="settings_account_title">الحساب</string>
     <string name="settings_account_subtitle">سجّل الدخول لتفعيل المزامنة واستعادة الحساب على جهاز آخر.</string>
-    <string name="settings_account_state_signed_out">الحساب غير مسجل</string>
+    <string name="settings_account_state_signed_out">الحساب غير متصل</string>
     <string name="settings_account_state_link_sent">تم إرسال رابط الدخول</string>
     <string name="settings_account_state_signed_in">الحساب متصل</string>
     <string name="settings_account_body">أدخل بريدك الإلكتروني وسنرسل رابط دخول يفعّل مزامنة الحساب الرئيسي فوراً.</string>

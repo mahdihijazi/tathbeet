@@ -30,10 +30,6 @@ class FirebaseEmailLinkAuthClient(
         return callbackFlow {
             val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
                 val user = firebaseAuth.currentUser
-                Log.d(
-                    tag,
-                    "Auth state changed currentUserEmail=${user?.email} uid=${user?.uid}",
-                )
                 trySend(
                     user?.let { resolvedUser ->
                         AuthUser(
@@ -50,10 +46,6 @@ class FirebaseEmailLinkAuthClient(
 
     override suspend fun sendSignInLink(email: String) {
         val auth = requireAuth()
-        Log.i(
-            tag,
-            "sendSignInLink calling Firebase for email=$email url=${runtimeConfig.emailLinkUrl} package=${runtimeConfig.androidPackageName}",
-        )
         runCatching {
             auth.sendSignInLinkToEmail(
                 email,
@@ -75,24 +67,17 @@ class FirebaseEmailLinkAuthClient(
             )
             throw throwable
         }
-        Log.i(tag, "sendSignInLink Firebase call completed for email=$email")
     }
 
     override fun isSignInLink(link: String): Boolean {
         val isBootstrapReady = FirebaseBootstrapper.ensureInitialized(appContext, runtimeConfig)
-        val isSignInLink = isBootstrapReady && FirebaseAuth.getInstance().isSignInWithEmailLink(link)
-        Log.i(
-            tag,
-            "isSignInLink evaluated bootstrapReady=$isBootstrapReady result=$isSignInLink link=$link",
-        )
-        return isSignInLink
+        return isBootstrapReady && FirebaseAuth.getInstance().isSignInWithEmailLink(link)
     }
 
     override suspend fun signInWithEmailLink(
         email: String,
         link: String,
     ): AuthUser {
-        Log.i(tag, "signInWithEmailLink calling Firebase for email=$email")
         val authResult = runCatching {
             requireAuth().signInWithEmailLink(email, link).await()
         }.getOrElse { throwable ->
@@ -104,7 +89,6 @@ class FirebaseEmailLinkAuthClient(
             throw throwable
         }
         val user = authResult.user ?: error("Firebase sign-in completed without a user.")
-        Log.i(tag, "signInWithEmailLink Firebase call completed for email=$email uid=${user.uid}")
         return AuthUser(
             uid = user.uid,
             email = user.email,
@@ -116,16 +100,10 @@ class FirebaseEmailLinkAuthClient(
             Log.w(tag, "signOut skipped because Firebase bootstrap failed.")
             return
         }
-        Log.i(tag, "signOut calling FirebaseAuth.signOut()")
         FirebaseAuth.getInstance().signOut()
-        Log.i(tag, "signOut completed")
     }
 
     private fun requireAuth(): FirebaseAuth {
-        Log.i(
-            tag,
-            "requireAuth configCheck isConfigured=${runtimeConfig.isConfigured} authDomain=${runtimeConfig.authDomain} authHost=${runtimeConfig.authHost} continueUrl=${runtimeConfig.emailLinkUrl}",
-        )
         check(FirebaseBootstrapper.ensureInitialized(appContext, runtimeConfig)) {
             "Firebase is not configured. Fill the placeholder values first."
         }

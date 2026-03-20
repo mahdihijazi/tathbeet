@@ -1,5 +1,6 @@
 package com.quran.tathbeet.ui.features.shared
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -20,6 +21,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+
+private const val TAG = "SharedProfileVM"
 
 class SharedProfileViewModel(
     private val selectedProfileId: String,
@@ -118,7 +121,19 @@ class SharedProfileViewModel(
     ) {
         val profileId = _uiState.value.profileId ?: return
         launchUndispatched {
-            val result = action(profileId)
+            val result = runCatching {
+                action(profileId)
+            }.getOrElse { throwable ->
+                Log.w(
+                    TAG,
+                    "profile action failed for profileId=$profileId message=${throwable.message}",
+                    throwable,
+                )
+                _uiState.value = _uiState.value.copy(
+                    banner = SharedProfileBanner.ShareUnavailable,
+                )
+                return@launchUndispatched
+            }
             val members = if (refreshMembers) {
                 loadMembers(profileId, _uiState.value.signedInEmail)
             } else {
@@ -134,16 +149,24 @@ class SharedProfileViewModel(
     private suspend fun loadMembers(
         profileId: String,
         signedInEmail: String?,
-    ): List<SharedProfileMemberUiState> = cloudSyncManager
-        .listMembers(profileId)
-        .map { member ->
-            SharedProfileMemberUiState(
-                email = member.email,
-                role = member.role,
-                isCurrentUser = member.email == signedInEmail,
-            )
-        }
-        .sortedBy { member -> member.email }
+    ): List<SharedProfileMemberUiState> = runCatching {
+        cloudSyncManager.listMembers(profileId)
+            .map { member ->
+                SharedProfileMemberUiState(
+                    email = member.email,
+                    role = member.role,
+                    isCurrentUser = member.email == signedInEmail,
+                )
+            }
+            .sortedBy { member -> member.email }
+    }.getOrElse { throwable ->
+        Log.w(
+            TAG,
+            "loadMembers skipped for profileId=$profileId message=${throwable.message}",
+            throwable,
+        )
+        emptyList()
+    }
 
     private fun launchUndispatched(block: suspend () -> Unit) {
         viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {

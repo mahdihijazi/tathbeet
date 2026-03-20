@@ -7,11 +7,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -20,75 +26,78 @@ import androidx.compose.ui.text.font.FontWeight
 import com.quran.tathbeet.R
 import com.quran.tathbeet.ui.components.AppCard
 import com.quran.tathbeet.ui.components.AppKeyValueRow
+import com.quran.tathbeet.ui.components.AppStatusBadge
+import com.quran.tathbeet.ui.components.AppStatusBadgeTone
 import com.quran.tathbeet.ui.components.AppPrimaryButton
 import com.quran.tathbeet.ui.components.AppSecondaryButton
 import com.quran.tathbeet.ui.components.AppSelectionChip
-import com.quran.tathbeet.ui.components.HeroCard
 import com.quran.tathbeet.ui.components.ScreenLayout
 import com.quran.tathbeet.ui.components.SectionHeader
+import com.quran.tathbeet.ui.features.settings.EmailLinkDialog
 import com.quran.tathbeet.ui.theme.TathbeetTokens
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilesScreen(
     uiState: ProfilesUiState,
     onProfileSelected: (String) -> Unit,
     onProfileNotificationsToggled: (String) -> Unit,
     onAddProfileRequested: () -> Unit,
-    onEditActiveProfileRequested: () -> Unit,
+    onEditProfileRequested: (String) -> Unit,
     onOpenSharedProfile: (String) -> Unit,
     onProfileNameChanged: (String) -> Unit,
     onSaveProfile: () -> Unit,
     onDismissProfileDialog: () -> Unit,
-    onRequestDeleteProfile: () -> Unit,
+    onRequestDeleteProfile: (String) -> Unit,
     onDismissDeleteProfile: () -> Unit,
     onConfirmDeleteProfile: () -> Unit,
-    onOpenSchedule: () -> Unit,
+    onOpenSchedule: (String) -> Unit,
+    onRequestEmailLink: (String) -> Unit,
+    onSignOut: () -> Unit,
 ) {
-    val activeProfile = uiState.activeProfile ?: return
+    if (uiState.isLoading) {
+        return
+    }
+
+    var showEmailDialog by remember { mutableStateOf(false) }
+    var selectedProfileForDetails by remember { mutableStateOf<ProfileCardUiState?>(null) }
+    val detailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val selfProfile = uiState.profiles.firstOrNull { it.isSelfProfile }
+    val otherProfiles = uiState.profiles.filterNot { it.isSelfProfile }
 
     ScreenLayout(
         title = stringResource(R.string.profile_screen_title),
-        subtitle = stringResource(R.string.profile_screen_subtitle),
+        subtitle = "",
     ) {
         item {
-            HeroCard(
-                eyebrow = stringResource(R.string.profile_active_eyebrow),
-                title = activeProfile.name,
-                body = stringResource(R.string.profile_active_body),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1Half),
-                ) {
-                    AppPrimaryButton(
-                        text = stringResource(R.string.profile_button_open_schedule),
-                        onClick = onOpenSchedule,
-                        modifier = Modifier.weight(1f),
-                    )
-                    AppSecondaryButton(
-                        text = stringResource(R.string.profile_button_edit_profile),
-                        onClick = onEditActiveProfileRequested,
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("profiles-edit-active"),
-                    )
-                }
+            selfProfile?.let { profile ->
+                ProfilesSelfProfileCard(
+                    profile = profile,
+                    account = uiState.account,
+                    onActivate = { onProfileSelected(profile.id) },
+                    onOpenDetails = { selectedProfileForDetails = profile },
+                    onToggleNotifications = { onProfileNotificationsToggled(profile.id) },
+                    onRequestEmailLink = { showEmailDialog = true },
+                    onSignOut = onSignOut,
+                )
             }
         }
 
-        item {
-            SectionHeader(
-                title = stringResource(R.string.profile_section_title),
-            )
-        }
+        if (otherProfiles.isNotEmpty()) {
+            item {
+                SectionHeader(
+                    title = stringResource(R.string.profile_section_title),
+                )
+            }
 
-        items(uiState.profiles, key = { it.id }) { profile ->
-            ProfileCard(
-                profile = profile,
-                onSelected = { onProfileSelected(profile.id) },
-                onToggleNotifications = { onProfileNotificationsToggled(profile.id) },
-                onOpenSharedProfile = onOpenSharedProfile,
-            )
+            items(otherProfiles, key = { it.id }) { profile ->
+                ProfileCard(
+                    profile = profile,
+                    onActivate = { onProfileSelected(profile.id) },
+                    onOpenDetails = { selectedProfileForDetails = profile },
+                    onToggleNotifications = { onProfileNotificationsToggled(profile.id) },
+                )
+            }
         }
 
         item {
@@ -100,13 +109,28 @@ fun ProfilesScreen(
         }
     }
 
+    selectedProfileForDetails?.let { profile ->
+        ProfileDetailsSheet(
+            profile = profile,
+            sheetState = detailSheetState,
+            onDismiss = { selectedProfileForDetails = null },
+            onActivate = onProfileSelected,
+            onOpenSchedule = onOpenSchedule,
+            onEditProfile = onEditProfileRequested,
+            onOpenSharedProfile = onOpenSharedProfile,
+            onRequestDeleteProfile = onRequestDeleteProfile,
+        )
+    }
+
     uiState.editor?.let { editor ->
         ProfileEditorDialog(
             editor = editor,
             onNameChanged = onProfileNameChanged,
             onSave = onSaveProfile,
             onDismiss = onDismissProfileDialog,
-            onRequestDelete = onRequestDeleteProfile,
+            onRequestDelete = {
+                editor.profileId?.let(onRequestDeleteProfile)
+            },
         )
     }
 
@@ -117,14 +141,24 @@ fun ProfilesScreen(
             onConfirm = onConfirmDeleteProfile,
         )
     }
+
+    if (showEmailDialog) {
+        EmailLinkDialog(
+            onDismiss = { showEmailDialog = false },
+            onConfirm = { email ->
+                onRequestEmailLink(email)
+                showEmailDialog = false
+            },
+        )
+    }
 }
 
 @Composable
-private fun ProfileCard(
+internal fun ProfileCard(
     profile: ProfileCardUiState,
-    onSelected: () -> Unit,
+    onActivate: () -> Unit,
+    onOpenDetails: () -> Unit,
     onToggleNotifications: () -> Unit,
-    onOpenSharedProfile: (String) -> Unit,
 ) {
     val scheduleValue = profile.paceLabelRes?.let { labelRes ->
         stringResource(labelRes)
@@ -132,7 +166,7 @@ private fun ProfileCard(
 
     AppCard(
         modifier = Modifier.testTag("profiles-card-${profile.id}"),
-        onClick = onSelected,
+        onClick = onOpenDetails,
     ) {
         Column(
             modifier = Modifier.padding(TathbeetTokens.spacing.x2Half),
@@ -149,24 +183,36 @@ private fun ProfileCard(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
-                    Text(
-                        text = if (profile.isSelfProfile) {
-                            stringResource(R.string.profile_type_self)
-                        } else {
-                            stringResource(R.string.profile_type_child)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(TathbeetTokens.spacing.x1),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = if (profile.isSelfProfile) {
+                                stringResource(R.string.profile_type_self)
+                            } else {
+                                stringResource(R.string.profile_type_child)
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (profile.isShared) {
+                            AppStatusBadge(
+                                text = stringResource(R.string.profile_sync_shared),
+                                tone = AppStatusBadgeTone.Accent,
+                            )
+                        }
+                    }
                 }
                 AppSelectionChip(
                     selected = profile.isActive,
-                    onClick = onSelected,
+                    onClick = onActivate,
                     text = if (profile.isActive) {
                         stringResource(R.string.profile_chip_active)
                     } else {
                         stringResource(R.string.profile_chip_activate)
                     },
+                    modifier = Modifier.testTag("profiles-activate-${profile.id}"),
                 )
             }
             AppKeyValueRow(
@@ -176,6 +222,13 @@ private fun ProfileCard(
             AppKeyValueRow(
                 label = stringResource(R.string.profile_completion_rate),
                 value = stringResource(R.string.percentage_value, profile.completionRate),
+            )
+            AppSecondaryButton(
+                text = stringResource(R.string.profile_button_manage_account),
+                onClick = onOpenDetails,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("profiles-manage-account-${profile.id}"),
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -210,24 +263,12 @@ private fun ProfileCard(
                     )
                 }
             }
-            if (!profile.isSelfProfile) {
-                AppSecondaryButton(
-                    text = stringResource(R.string.profile_button_manage_sharing),
-                    onClick = {
-                        onSelected()
-                        onOpenSharedProfile(profile.id)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("profiles-open-shared-${profile.id}"),
-                )
-            }
         }
     }
 }
 
 @Composable
-private fun ProfileEditorDialog(
+internal fun ProfileEditorDialog(
     editor: ProfileEditorUiState,
     onNameChanged: (String) -> Unit,
     onSave: () -> Unit,
@@ -295,7 +336,7 @@ private fun ProfileEditorDialog(
 }
 
 @Composable
-private fun ProfileDeleteDialog(
+internal fun ProfileDeleteDialog(
     confirmation: ProfileDeleteConfirmationUiState,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
