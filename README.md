@@ -54,6 +54,7 @@ The MVP supports:
 - email-link sign-in for sync and sharing
 - cloud sync for signed-in profiles through the configured cloud sync provider
 - shared learner profiles so more than one manager can update schedule and completion state
+- the Accounts tab keeps adult sign-in state and profile management together, while Settings stays focused on local reminders
 
 The MVP does not include:
 
@@ -132,7 +133,7 @@ The MVP notification strategy is intentionally simple:
 - notifications may include the relevant profile name when multiple profiles exist on one device
 - notifications should start as local on-device reminders before any auth or cloud-sync work
 - the app should use one app-wide reminder time with per-profile on/off controls
-- the settings page should use one muted intro line, one reminders section, and one accounts section
+- the settings page should use one muted intro line and one reminders section; account sign-in lives in the Accounts tab
 - the self profile should default to reminders on once it has a schedule, while additional learner profiles default to off
 - missed work should be reflected in the next day's reminder instead of causing repeated same-day nudges
 
@@ -149,7 +150,7 @@ This repository will hold:
 - Mermaid MVP user flow: [docs/mvp-user-flow.md](/Users/mahdi/personal-repos/tathbeet/docs/mvp-user-flow.md)
 - Screen inventory: [docs/screen-list.md](/Users/mahdi/personal-repos/tathbeet/docs/screen-list.md)
 - Cloud sync plan: [docs/cloud-sync-system.md](/Users/mahdi/personal-repos/tathbeet/docs/cloud-sync-system.md)
-- Cloud sync follow-ups: [docs/firebase-sync-followups.md](/Users/mahdi/personal-repos/tathbeet/docs/firebase-sync-followups.md)
+- Cloud sync launch-critical fixes: [docs/firebase-sync-followups.md](/Users/mahdi/personal-repos/tathbeet/docs/firebase-sync-followups.md)
 - Android app entry point: [MainActivity.kt](/Users/mahdi/personal-repos/tathbeet/app/src/main/java/com/quran/tathbeet/MainActivity.kt)
 
 The current app build is:
@@ -158,6 +159,7 @@ The current app build is:
 - interactive
 - UI-only
 - intentionally fake for sync/provider, database, and backend behavior
+- the current cloud-sync design is not safe to postpone to post-launch because repeated full-tree reads and writes can exceed Firestore free tier usage even with a single tester
 - uses a 3-step schedule wizard
 - shows a one-time intro on first app open
 - asks for the active profile name on the intro step with a lightweight single input before memorized-pool selection

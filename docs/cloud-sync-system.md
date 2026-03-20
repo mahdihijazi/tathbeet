@@ -415,11 +415,13 @@ For the current Tathbeet design:
 - Firebase is financially reasonable for MVP
 - Blaze is required because of email-link sign-in limits, not because the app is expected to be expensive
 - with efficient queries, the likely monthly bill should stay near `$0` in pilot and low-single-digits in a small launch
-- the biggest cost risk is unnecessary Firestore reads, especially loading too many task documents or using broad listeners too often
+- the biggest cost risk is unnecessary Firestore reads and writes, especially loading too many task documents, re-reading full profile trees, or using broad listeners too often
+- current sync behavior can exceed the Firestore free tier even with a single active tester if repeated sync passes keep rewriting the same profile tree
+- this is a launch blocker, not a polish item, because a small test loop can create billable usage quickly enough to matter before public release
 
 ### Cost-Control Implementation Rules
 
-These implementation rules should be treated as part of the sync design, not optional optimizations.
+These implementation rules are launch-critical. They should be treated as part of the sync design, not optional optimizations that can wait until after launch.
 
 - only listen to the active profile, never all profiles at once
 - only query the active cycle and the visible task window for the current screen

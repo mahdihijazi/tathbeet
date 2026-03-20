@@ -1,23 +1,24 @@
-# Firebase Sync Follow-Ups
+# Firebase Sync Launch-Critical Fixes
 
-This document captures Firebase sync improvements that should stay out of the MVP path.
+This document captures Firebase sync changes that are required before launch.
 
-The current MVP sync approach is intentionally simple:
+The current sync approach is intentionally simple, but the current read/write pattern is too expensive to leave in place for launch:
 
 - the app builds a full cloud snapshot for a profile when it needs to sync
 - Firestore writes the full profile tree when that snapshot changes
 - Room stays the source of truth on device
 
-That is acceptable for MVP because it keeps the implementation predictable while the core product is still being finished.
+That is acceptable only for internal prototyping. In real testing, even a single active user can burn through the Firestore free tier if the app keeps re-reading and rewriting the same tree.
 
 ## Why These Items Are Deferred
 
-These changes are useful, but they add sync complexity that is not needed to finish the main app flow:
+These changes are still useful, but they are no longer optional cleanup:
 
 - they require diffing local and remote state
 - they need more targeted Firestore write logic
 - they increase the number of edge cases around partial failures and retries
 - they make the sync path harder to reason about while the app is still changing quickly
+- they are the difference between a cheap pilot and a billable launch
 
 ## Post-MVP Work Items
 
@@ -78,5 +79,4 @@ These improvements are done when:
 
 ## MVP Boundary
 
-Do not implement any of the above until the main MVP feature set is complete and stable.
-
+Do not treat any of the above as optional after the MVP ships. These changes must be completed before launch or the app can generate avoidable Firestore cost from a single tester.

@@ -213,7 +213,7 @@ Hard testing rules:
 - test doubles should be handwritten fakes, stubs, or no-op implementations
 - prefer in-memory Room and real repositories for integration-style tests where practical
 
-Post-MVP cloud sync optimization work should be tracked separately in [docs/firebase-sync-followups.md](/Users/mahdi/personal-repos/tathbeet/docs/firebase-sync-followups.md) so the MVP can stay simple while the main product flow is still being finished.
+Cloud sync cost-control work should be tracked separately in [docs/firebase-sync-followups.md](/Users/mahdi/personal-repos/tathbeet/docs/firebase-sync-followups.md), but it is launch-critical rather than a later optimization. The current sync path can generate billable Firestore usage from a single active tester if repeated reads, writes, or listeners are left unchecked.
 
 ## 8. Quran Content Model
 
@@ -634,7 +634,15 @@ That plan is the source of truth for:
 - reminder scheduling uses one app-wide preferred time with per-profile enable/disable controls
 - the app should persist notification settings locally and restore scheduled reminders on device restart
 
-### 13.7 Settings Screen
+### 13.7 Accounts Screen
+
+- the Accounts tab should be the single place for adult sign-in state, cloud-sync readiness, and learner profile management
+- the top account card should stay visible at the top of the screen and combine auth state with sync availability
+- when signed out, the card should offer email-link sign-in; when signed in, it should show the adult email and sign-out action
+- learner profile cards should keep a small shared badge when a profile is shared, but should not show a separate cloud/sync badge that conflicts with the top account card
+- profile detail actions such as activate, edit, schedule, sharing, and delete should stay on the selected profile sheet
+
+### 13.8 Settings Screen
 
 - the MVP settings screen should focus primarily on local reminder behavior
 - the screen should expose:
@@ -642,17 +650,16 @@ That plan is the source of truth for:
   - motivational reminder enable/disable
   - one preferred reminder time for the whole app
   - per-profile reminder toggles
-  - current account state and email-link sign-in entry point for sync and sharing when applicable
 - the screen hierarchy should stay simple:
   - one muted intro line under the page title
   - one reminders section for app-level toggles and reminder time
-  - one accounts section for sign-in state and sync or sharing entry points
+- the settings screen should not include account state, sign-in state, or sync/sharing entry points
 - the settings screen should not use a second hero title that competes with the main section headings
 - the per-profile list should show profiles directly when the list is short
 - if the profile list grows beyond five entries, the extra entries may be collapsed behind an expandable section
 - the active profile, self profile, and profiles with reminders already enabled should remain visible before collapsed overflow when practical
 
-### 13.8 Localization and UI Composition
+### 13.9 Localization and UI Composition
 
 - the product UI should be designed as RTL-first
 - screen layouts, navigation placement, chip flow, and action alignment should be reviewed from an Arabic reading direction first
