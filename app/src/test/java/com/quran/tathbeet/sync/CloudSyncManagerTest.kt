@@ -315,6 +315,54 @@ class CloudSyncManagerTest {
         assertEquals(SharedProfileActionResult.ProfileNotFound, result)
     }
 
+    @Test
+    fun shared_profile_lifecycle_can_be_enabled_invited_cleared_and_deleted() = runTest {
+        val authRepository = FakeAuthRepository()
+        val profileRepository = FakeSyncProfileRepository(
+            accounts = linkedMapOf(
+                "child-1" to childAccount(
+                    id = "child-1",
+                    syncMode = ProfileSyncMode.LocalOnly,
+                ),
+            ),
+        )
+        val cloudStore = FakeCloudStore()
+        val manager = CloudSyncManager(
+            authSessionRepository = authRepository,
+            profileSyncCoordinator = FakeProfileSyncCoordinator(profileRepository, cloudStore),
+            profileRepository = profileRepository,
+            cloudSyncStore = cloudStore,
+            localMirror = FakeLocalCloudProfileMirror(hasLocalContent = true),
+        )
+
+        assertEquals(SharedProfileActionResult.Success, manager.enableSharing("child-1"))
+        val cloudProfileId = profileRepository.accounts["child-1"]?.cloudProfileId
+            ?: error("Expected cloud profile id after enabling sharing.")
+
+        cloudStore.members[cloudProfileId] = mutableListOf(
+            CloudProfileMember(
+                email = "owner@example.com",
+                role = CloudProfileMemberRole.Owner,
+                userId = "uid-owner",
+            ),
+        )
+
+        assertEquals(SharedProfileActionResult.Success, manager.inviteEditor("child-1", "teacher@example.com"))
+        assertEquals(
+            listOf("owner@example.com", "teacher@example.com"),
+            manager.listMembers("child-1").map { member -> member.email },
+        )
+
+        assertEquals(SharedProfileActionResult.Success, manager.removeEditor("child-1", "teacher@example.com"))
+        assertEquals(
+            listOf("owner@example.com"),
+            manager.listMembers("child-1").map { member -> member.email },
+        )
+
+        assertEquals(SharedProfileActionResult.Success, manager.deleteOwnedProfile("child-1"))
+        assertTrue(cloudProfileId in cloudStore.deletedProfiles)
+    }
+
     private fun remoteSnapshot() =
         CloudProfileSnapshot(
             cloudProfileId = "personal-uid-owner",
